@@ -1,0 +1,69 @@
+﻿@model Abixe_Models.DTOs.Login
+@{
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+<!-- Incluir Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link href="~/themplates/css/custom-login.css" rel="stylesheet" />
+
+<main class="d-flex w-100">
+    <div class="container-fluid">
+        <div class="row vh-100">
+            <!-- Columna de la imagen -->
+            <div class="col-md-7 image-container d-none d-md-flex">
+                <div class="image-text">
+                </div>
+            </div>
+
+            <!-- Columna del formulario -->
+            <div class="col-md-5 d-flex align-items-center justify-content-center">
+                <div class="login-container">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-lock fa-3x mb-3"></i> <!-- Icono de candado -->
+                        <h1 class="h2">Bienvenido de nuevo</h1>
+                        <p class="lead">
+                            Inicia sesión para continuar
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="m-sm-4">
+                                @using (Html.BeginForm("Login", "Accounts", FormMethod.Post, new { @id = "loginForm" }))
+                                {
+                                    @Html.ValidationSummary(true)
+                                    @Html.AntiForgeryToken()
+
+                                    <div class="mb-3">
+                                        <label class="form-label"><i class="fas fa-user"></i> Usuario</label> <!-- Icono de usuario -->
+                                        @Html.EditorFor(model => model.Usuario, new { htmlAttributes = new { @class = "form-control form-control-lg", @name = "Usuario", @placeholder = "Ingresa tu Usuario" } })
+                                        @Html.ValidationMessageFor(model => model.Usuario, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label"><i class="fas fa-lock"></i> Contraseña</label> <!-- Icono de candado -->
+                                        @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control form-control-lg", @name = "Password", @type = "password", @placeholder = "Ingresa tu Contraseña" } })
+                                        @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                                    </div>
+                                   @*  <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                                        <label class="form-check-label" for="rememberMe"><i class="fas fa-check"></i> Recordarme</label> <!-- Icono de check -->
+                                    </div> *@
+                                    <div class="text-center mt-3">
+                                        <button type="submit" id="btnIngresar" class="btn btn-lg btn-primary"><i class="fas fa-sign-in-alt"></i> Ingresar</button> <!-- Icono de ingresar -->
+                                    </div>
+                                  @*   <div class="text-center mt-3">
+                                        <a href="#" class="text-muted"><i class="fas fa-key"></i> ¿Olvidaste tu contraseña?</a> <!-- Icono de contraseña -->
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <p class="text-muted">¿No tienes una cuenta? <a href="#"><i class="fas fa-user-plus"></i> Regístrate</a></p> <!-- Icono de registro -->
+                                    </div> *@
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

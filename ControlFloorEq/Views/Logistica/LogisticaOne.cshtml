@@ -1,0 +1,276 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logística</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/themplates/css/LogisticaOne.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container-fluid logistica-container">
+        <!-- Botón para abrir Logística.cshtml -->
+        <button type="button" class="btn btn-primary mb-3"
+                onclick="window.open('@Url.Action("Logistica", "Logistica")', '_blank')">
+            Ir a Logística
+        </button>
+
+        <!-- Cabecera -->
+        <div class="logistica-header">
+            <div class="logistica-filters">
+                <div class="filter-group">
+                    <label for="status">Status:</label>
+                    <input type="text" id="status" name="status" placeholder="Buscar" class="form-control">
+                </div>
+                <div class="filter-group">
+                    <label for="tipo-transporte">Tipo transporte:</label>
+                    <input type="text" id="tipo-transporte" name="tipo-transporte" placeholder="Buscar" class="form-control">
+                </div>
+                <div class="filter-group">
+                    <label for="desde">Desde:</label>
+                    <input type="date" id="desde" name="desde" class="form-control">
+                </div>
+                <div class="filter-group">
+                    <label for="hasta">Hasta:</label>
+                    <input type="date" id="hasta" name="hasta" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <!-- Campos Compactados Debajo de la Cabecera 11111 -->
+        <div class="logistica-details-container">
+            <div class="logistica-details">
+                <div class="detail-group">
+                    <label for="nro-ruta">No. de ruta:</label>
+                    <input type="text" id="nro-ruta" name="nro-ruta" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="fecha-ruta">Fecha de ruta:</label>
+                    <input type="date" id="fecha-ruta" name="fecha-ruta" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="empleado">Empleado:</label>
+                    <input type="text" id="empleado" name="empleado" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="tipo-transporte-detail">Tipo de transporte:</label>
+                    <input type="text" id="tipo-transporte-detail" name="tipo-transporte-detail" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="unidad">Unidad:</label>
+                    <input type="text" id="unidad" name="unidad" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="transportista">Transportista:</label>
+                    <input type="text" id="transportista" name="transportista" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="status-detail">Status:</label>
+                    <input type="text" id="status-detail" name="status-detail" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="fecha-embarque">Fecha de embarque:</label>
+                    <input type="date" id="fecha-embarque" name="fecha-embarque" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="hora-embarque">Hora de embarque:</label>
+                    <input type="time" id="hora-embarque" name="hora-embarque" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="fecha-entrega">Fecha de entrega:</label>
+                    <input type="date" id="fecha-entrega" name="fecha-entrega" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="hora-entrega">Hora de entrega:</label>
+                    <input type="time" id="hora-entrega" name="hora-entrega" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="nro-pedidos">No. pedidos:</label>
+                    <input type="number" id="nro-pedidos" name="nro-pedidos" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="kilos-netos">Kilos netos:</label>
+                    <input type="number" id="kilos-netos" name="kilos-netos" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="kilos-brutos">Kilos brutos:</label>
+                    <input type="number" id="kilos-brutos" name="kilos-brutos" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="nro-pallets">No. pallets:</label>
+                    <input type="number" id="nro-pallets" name="nro-pallets" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <!-- Campos Compactados Debajo de la Cabecera 2222 -->
+        <div class="logistica-details-container">
+            <div class="logistica-details">
+                <div class="detail-group">
+                    <label for="nro-ruta">No. de ruta:</label>
+                    <input type="text" id="nro-ruta" name="nro-ruta" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="fecha-ruta">Fecha de ruta:</label>
+                    <input type="date" id="fecha-ruta" name="fecha-ruta" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="empleado">Empleado:</label>
+                    <input type="text" id="empleado" name="empleado" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="tipo-transporte-detail">Tipo de transporte:</label>
+                    <input type="text" id="tipo-transporte-detail" name="tipo-transporte-detail" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="unidad">Unidad:</label>
+                    <input type="text" id="unidad" name="unidad" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="transportista">Transportista:</label>
+                    <input type="text" id="transportista" name="transportista" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="status-detail">Status:</label>
+                    <input type="text" id="status-detail" name="status-detail" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="fecha-embarque">Fecha de embarque:</label>
+                    <input type="date" id="fecha-embarque" name="fecha-embarque" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="hora-embarque">Hora de embarque:</label>
+                    <input type="time" id="hora-embarque" name="hora-embarque" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="fecha-entrega">Fecha de entrega:</label>
+                    <input type="date" id="fecha-entrega" name="fecha-entrega" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="hora-entrega">Hora de entrega:</label>
+                    <input type="time" id="hora-entrega" name="hora-entrega" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="nro-pedidos">No. pedidos:</label>
+                    <input type="number" id="nro-pedidos" name="nro-pedidos" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="kilos-netos">Kilos netos:</label>
+                    <input type="number" id="kilos-netos" name="kilos-netos" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="kilos-brutos">Kilos brutos:</label>
+                    <input type="number" id="kilos-brutos" name="kilos-brutos" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="nro-pallets">No. pallets:</label>
+                    <input type="number" id="nro-pallets" name="nro-pallets" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <!-- Campos Compactados Debajo de la Cabecera 33333 -->
+        <div class="logistica-details-container">
+            <div class="logistica-details">
+                <div class="detail-group">
+                    <label for="nro-ruta">No. de ruta:</label>
+                    <input type="text" id="nro-ruta" name="nro-ruta" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="fecha-ruta">Fecha de ruta:</label>
+                    <input type="date" id="fecha-ruta" name="fecha-ruta" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="empleado">Empleado:</label>
+                    <input type="text" id="empleado" name="empleado" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="tipo-transporte-detail">Tipo de transporte:</label>
+                    <input type="text" id="tipo-transporte-detail" name="tipo-transporte-detail" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="unidad">Unidad:</label>
+                    <input type="text" id="unidad" name="unidad" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="transportista">Transportista:</label>
+                    <input type="text" id="transportista" name="transportista" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="status-detail">Status:</label>
+                    <input type="text" id="status-detail" name="status-detail" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="fecha-embarque">Fecha de embarque:</label>
+                    <input type="date" id="fecha-embarque" name="fecha-embarque" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="hora-embarque">Hora de embarque:</label>
+                    <input type="time" id="hora-embarque" name="hora-embarque" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="fecha-entrega">Fecha de entrega:</label>
+                    <input type="date" id="fecha-entrega" name="fecha-entrega" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="hora-entrega">Hora de entrega:</label>
+                    <input type="time" id="hora-entrega" name="hora-entrega" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="nro-pedidos">No. pedidos:</label>
+                    <input type="number" id="nro-pedidos" name="nro-pedidos" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="kilos-netos">Kilos netos:</label>
+                    <input type="number" id="kilos-netos" name="kilos-netos" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="kilos-brutos">Kilos brutos:</label>
+                    <input type="number" id="kilos-brutos" name="kilos-brutos" class="form-control">
+                </div>
+                <div class="detail-group">
+                    <label for="nro-pallets">No. pallets:</label>
+                    <input type="number" id="nro-pallets" name="nro-pallets" class="form-control">
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- Paginación -->
+        <div class="pagination-container">
+            <button class="pagination-button">1</button>
+            <button class="pagination-button">2</button>
+            <button class="pagination-button">3</button>
+            <button class="pagination-button">4</button>
+            <button class="pagination-button">5</button>
+            <button class="pagination-button">6</button>
+        </div>
+    </div>
+</body>
+</html>

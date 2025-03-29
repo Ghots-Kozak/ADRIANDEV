@@ -1,0 +1,644 @@
+﻿@model dynamic
+@{
+    // int CallId = Model.CallId;
+    // string IdSOT = Model.IdSolWor;
+    // string CardCode = Model.CardCode;
+}
+
+<!-- Estilos y Librerías FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/locales/es.global.min.js"></script> <!-- Locale Español -->
+<<<<<<< HEAD
+
+=======
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Bootstrap CSS y JS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Font Awesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+<!-- DataTables CSS -->
+<link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 10px; /* Reducido para un diseño más compacto */
+        background-color: #f8f9fa; /* Fondo más claro y uniforme */
+    }
+
+    .container-main {
+        max-width: 98%; /* Más cerca de los bordes */
+        margin: 0 auto;
+        display: flex;
+        flex-direction: row;
+        gap: 15px; /* Espacio más pequeño entre elementos */
+        align-items: stretch;
+    }
+
+    #calendar-container {
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+        width: 100%;
+    }
+
+    #calendar, #table-container {
+        border-radius: 8px; /* Bordes más suaves */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra más sutil */
+        background: #fff;
+        padding: 10px; /* Reducido para un diseño más compacto */
+        flex: 1;
+    }
+
+    #calendar {
+        width: 40%; /* Calendario más pequeño */
+        height: 500px; /* Altura ajustada para ser más compacta */
+        overflow-y: auto;
+    }
+
+    #table-container {
+        width: 60%; /* Tabla ocupa más espacio */
+        overflow-x: auto;
+    }
+
+    #simpletablePedAnt {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px; /* Texto más pequeño para coincidir con la captura */
+    }
+
+        #simpletablePedAnt th,
+        #simpletablePedAnt td {
+            padding: 8px 10px; /* Padding más pequeño */
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        #simpletablePedAnt th {
+            background-color: #007bff;
+            color: white;
+            font-weight: 600;
+            font-size: 11px; /* Encabezados más pequeños */
+        }
+
+        #simpletablePedAnt td {
+            font-size: 11px;
+            color: #333;
+        }
+
+        #simpletablePedAnt tr:hover {
+            background-color: #f5f5f5;
+            transition: background-color 0.3s ease;
+        }
+
+    .dataTables_filter input {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 12px;
+        width: 200px; /* Más pequeño */
+    }
+
+    .dataTables_length select {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px;
+        font-size: 12px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 4px 8px;
+        margin: 0 2px;
+        border: 1px solid #007bff;
+        border-radius: 4px;
+        color: #007bff;
+        font-size: 12px;
+    }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+    .card {
+        border: none;
+        border-radius: 8px;
+    }
+
+    .card-body {
+        padding: 10px;
+    }
+
+    .mb-3 h1 {
+        font-size: 1.4rem; /* Título más pequeño */
+        margin-bottom: 10px;
+        color: #007bff;
+        font-weight: 600;
+    }
+
+    /* Estilos del Modal */
+    .modal-dialog {
+        max-width: 600px; /* Más pequeño para coincidir con el diseño */
+    }
+
+    .modal-content {
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background: #fff;
+    }
+
+    .modal-header {
+        background-color: #007bff;
+        color: white;
+        border-radius: 8px 8px 0 0;
+        padding: 15px;
+    }
+
+    .modal-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+        .modal-body label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .modal-body .form-control {
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 12px;
+            border: 1px solid #ccc;
+        }
+
+    .modal-footer {
+        padding: 15px;
+        border-top: none;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+
+    /* Responsividad */
+    (max-width: 768px) {
+        .container-main
+
+    {
+        padding: 5px;
+        flex-direction: column;
+    }
+
+    #calendar-container {
+        flex-direction: column;
+    }
+
+    #calendar, #table-container {
+        width: 100%;
+        padding: 10px;
+    }
+
+    #calendar {
+        height: 400px;
+    }
+
+    #simpletablePedAnt th,
+    #simpletablePedAnt td {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+
+    .modal-dialog {
+        max-width: 90%;
+    }
+
+    .mb-3 h1 {
+        font-size: 1.2rem;
+    }
+
+    }
+
+    (max-width: 576px) {
+        #calendar
+
+    {
+        height: 350px;
+    }
+
+    .modal-body {
+        padding: 10px;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    }
+</style>
+>>>>>>> 8c492d8 (CALENDARIO Y TABLA ACTUALIZADOS HRS)
+
+<div class="container-main">
+    <div id="calendar-container">
+        <div id="calendar"></div>
+        <div id="table-container">
+            <div class="mb-3">
+                <h1>Actividades Preventivas</h1>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="dt-responsive table-responsive">
+                        <table id="simpletablePedAnt" class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>CallId</th>
+                                    <th>LineNum</th>
+                                    <th>ClgId</th>
+                                    <th>Técnico</th>
+                                    <th>Actividad</th>
+                                    <th>Fecha Inicio</th>
+                                    <th>Hora Inicio</th>
+                                    <th>Fecha Fin</th>
+                                    <th>Hora Fin</th>
+                                    <th>Duración</th>
+                                    <th>Tiempo Real</th>
+                                    <th>Comentarios</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los datos se cargarán dinámicamente aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Actividades -->
+<div class="modal fade" id="agregarActividadModal" tabindex="-1" aria-labelledby="agregarActividadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agregarActividadModalLabel">Agregar Actividad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="tecnicoInput" class="form-label">Selecciona un Técnico:</label>
+                    <input list="tecnico" id="tecnicoInput" class="form-control" placeholder="Selecciona o escribe un Técnico" required>
+                    <datalist id="tecnico"></datalist>
+                    <div class="invalid-feedback">Seleccione un técnico.</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="fechaInicial" class="form-label">Fecha Inicial</label>
+                        <input type="date" class="form-control" id="fechaInicial" required>
+                        <div class="invalid-feedback">Ingrese la fecha inicial.</div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="horaInicial" class="form-label">Hora Inicial</label>
+                        <input type="time" class="form-control" id="horaInicial" required>
+                        <div class="invalid-feedback">Ingrese la hora inicial.</div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="horaFinal" class="form-label">Hora Final</label>
+                        <input type="time" class="form-control" id="horaFinal" required>
+                        <div class="invalid-feedback">Ingrese la hora final.</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="tiempoPlaneado" class="form-label">Tiempo Planeado (minutos)</label>
+                        <input type="number" class="form-control" id="tiempoPlaneado" placeholder="Calculado automáticamente" required readonly>
+                        <div class="invalid-feedback">Ingrese el tiempo planeado.</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="tiempoReal" class="form-label">Tiempo Real (minutos)</label>
+                        <input type="number" class="form-control" id="tiempoReal" placeholder="Tiempo en minutos" required>
+                        <div class="invalid-feedback">Ingrese el tiempo real.</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="comentarios" class="form-label">Comentarios</label>
+                    <textarea class="form-control" id="comentarios" rows="4" placeholder="Escribe tus comentarios aquí" required></textarea>
+                    <div class="invalid-feedback">Ingrese los comentarios.</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="guardarBtn">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para Inicializar FullCalendar, DataTable y Funcionalidades del Modal -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+        const modalEl = document.getElementById('agregarActividadModal');
+        const closeModalBtn = document.querySelector('.btn-close');
+        const saveActivityBtn = document.getElementById('guardarBtn');
+
+        // Inicializar FullCalendar en Español
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es', // Configuración del idioma español
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            buttonText: {
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día'
+            },
+            selectable: true,
+            editable: true,
+            height: '100%', // Usar el 100% de la altura del contenedor
+            contentHeight: 'auto', // Ajustar contenido dinámicamente
+            events: function (fetchInfo, successCallback, failureCallback) {
+                $.ajax({
+                    url: "/Mtto/ListActivitiesPrevent",
+                    type: "GET",
+                    success: function (data) {
+                        console.log("Datos recibidos para el calendario:", data);
+                        if (data && Array.isArray(data) && data.length > 0) {
+                            const eventos = data.map((actividad, index) => {
+                                const startDate = actividad.DateStart ? new Date(actividad.DateStart) : null;
+                                const endDate = actividad.DateEnd ? new Date(actividad.DateEnd) : startDate;
+                                const startTime = actividad.TimeStart || "00:00";
+                                const endTime = actividad.TimeEnd || "23:59";
+                                const start = startDate ? `${startDate.toISOString().split('T')[0]}T${startTime}` : null;
+                                const end = endDate ? `${endDate.toISOString().split('T')[0]}T${endTime}` : null;
+
+                                return {
+                                    title: actividad.Activiti || `Actividad ${index + 1}`,
+                                    start: start,
+                                    end: end,
+                                    backgroundColor: "#007bff",
+                                    extendedProps: {
+                                        tecnico: `${actividad.NameTechnical || 'N/A'} (${actividad.IdTechnical || 'N/A'})`,
+                                        comentarios: actividad.Remarks || "Sin comentarios",
+                                        callId: actividad.CallId || "N/A",
+                                        lineNum: actividad.LineNum || "N/A",
+                                        clgId: actividad.ClgId || "N/A",
+                                        duracion: actividad.Duration || "N/A",
+                                        tiempoReal: actividad.RealTime || "N/A"
+                                    }
+                                };
+                            }).filter(event => event.start && event.end);
+                            successCallback(eventos);
+                        } else {
+                            successCallback([]);
+                        }
+                    },
+                    error: function (error) {
+                        console.error("Error al cargar actividades para el calendario:", error);
+                        failureCallback(error);
+                    }
+                });
+            },
+            dateClick: function (info) {
+                const modal = new bootstrap.Modal(document.getElementById('agregarActividadModal'));
+                modal.show();
+            },
+            eventClick: function (info) {
+                const confirmDelete = confirm(`¿Deseas eliminar el evento "${info.event.title}"?`);
+                if (confirmDelete) {
+                    info.event.remove();
+                    alert(`Evento "${info.event.title}" eliminado.`);
+                }
+            }
+        });
+
+        // Inicializar DataTable
+        var table = $('#simpletablePedAnt').DataTable({
+            "language": {
+                "decimal": ",",
+                "thousands": ".",
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                "search": "Buscar:",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            },
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true
+        });
+
+        // Cargar datos en la tabla
+        cargarActividadesPreventivas(table);
+
+        function cargarActividadesPreventivas(table) {
+            $.ajax({
+                url: "/Mtto/ListActivitiesPrevent",
+                type: "GET",
+                success: function (data) {
+                    console.log("Datos recibidos para la tabla:", data);
+                    if (data && data.length > 0) {
+                        table.clear();
+                        data.forEach(function (actividad, index) {
+                            table.row.add([
+                                index + 1,
+                                actividad.CallId || "N/A",
+                                actividad.LineNum || "N/A",
+                                actividad.ClgId || "N/A",
+                                `${actividad.NameTechnical || 'N/A'} (${actividad.IdTechnical || 'N/A'})`,
+                                actividad.Activiti || "Sin título",
+                                actividad.DateStart ? new Date(actividad.DateStart).toLocaleDateString("es-ES") : "N/A",
+                                actividad.TimeStart || "N/A",
+                                actividad.DateEnd ? new Date(actividad.DateEnd).toLocaleDateString("es-ES") : "N/A",
+                                actividad.TimeEnd || "N/A",
+                                actividad.Duration || "N/A",
+                                actividad.RealTime || "N/A",
+                                actividad.Remarks || "Sin comentarios"
+                            ]);
+                        });
+                        table.draw();
+                    } else {
+                        console.log("No se encontraron datos para la tabla.");
+                        table.clear().draw();
+                    }
+                },
+                error: function (error) {
+                    console.error("Error al cargar actividades preventivas:", error);
+                    table.clear().draw();
+                }
+            });
+        }
+
+        // Cerrar el modal
+        closeModalBtn.addEventListener('click', function () {
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+        });
+
+        // Guardar actividad
+        saveActivityBtn.addEventListener('click', function () {
+            const tecnico = document.getElementById('tecnicoInput').value;
+            const fechaInicial = document.getElementById('fechaInicial').value;
+            const horaInicial = document.getElementById('horaInicial').value;
+            const horaFinal = document.getElementById('horaFinal').value;
+            const tiempoReal = document.getElementById('tiempoReal').value;
+            const comentarios = document.getElementById('comentarios').value;
+
+            const cardCode = "";
+            const idSOT = "";
+            const callId = 0;
+            const tiempoPlaneado = document.getElementById('tiempoPlaneado').value;
+
+            if (!tecnico || !fechaInicial || !horaInicial || !horaFinal || !tiempoReal || !comentarios) {
+                Swal.fire('Error!', 'Todos los campos son obligatorios.', 'error');
+                return;
+            }
+
+            const startTimeFormatted = convertirHora24(horaInicial);
+            const endTimeFormatted = convertirHora24(horaFinal);
+
+            const activityData = {
+                ActivityCode: 0,
+                ActivityDate: fechaInicial,
+                StartDate: fechaInicial,
+                StartTime: startTimeFormatted,
+                EndDueDate: fechaInicial,
+                EndTime: endTimeFormatted,
+                Details: comentarios,
+                ParentObjectType: "191",
+                IdCall: callId,
+                IdSOT: idSOT,
+                ParentObjectId: callId,
+                CardCode: cardCode,
+                RealTime: tiempoReal,
+                Technical: tecnico
+            };
+            console.log("Datos a enviar:", activityData);
+
+            Swal.fire({
+                title: '¿Está seguro de guardar esta actividad?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, guardar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Guardando...',
+                        text: 'Por favor, espera.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    fetch("/Mtto/Activities", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(activityData)
+                    })
+                        .then(response => response.json().then(data => ({ status: response.status, data })))
+                        .then(({ status, data }) => {
+                            Swal.close();
+                            if (status >= 200 && status < 300 && !data.isError) {
+                                Swal.fire('Guardado!', data.message, 'success').then(() => {
+                                    $('#agregarActividadModal').modal('hide');
+                                    calendar.refetchEvents();
+                                    cargarActividadesPreventivas(table);
+                                });
+                            } else {
+                                throw new Error(data.message || 'Error desconocido');
+                            }
+                        })
+                        .catch(error => {
+                            Swal.close();
+                            Swal.fire('Error!', error.message || 'Error al guardar la actividad.', 'error');
+                        });
+                }
+            });
+        });
+
+        function calcularTiempo() {
+            let horaInicial = document.getElementById('horaInicial').value;
+            let horaFinal = document.getElementById('horaFinal').value;
+            let tiempoPlaneado = document.getElementById('tiempoPlaneado');
+
+            if (horaInicial && horaFinal) {
+                let inicio = new Date(`1970-01-01T${horaInicial}:00`);
+                let fin = new Date(`1970-01-01T${horaFinal}:00`);
+                let diferencia = (fin - inicio) / (1000 * 60);
+                if (diferencia < 0) {
+                    diferencia += 1440;
+                }
+                tiempoPlaneado.value = diferencia;
+            } else {
+                tiempoPlaneado.value = "";
+            }
+        }
+
+        document.getElementById('horaInicial').addEventListener('change', calcularTiempo);
+        document.getElementById('horaFinal').addEventListener('change', calcularTiempo);
+
+        function convertirHora24(hora) {
+            return hora || "00:00";
+        }
+
+        calendar.render();
+    });
+</script>

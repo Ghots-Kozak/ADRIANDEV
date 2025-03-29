@@ -1,0 +1,124 @@
+﻿/* custom-login.css */
+
+/* Fondo degradado dinámico */
+body {
+    background-color: aliceblue;
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Estilos para el contenedor de la imagen */
+.image-container {
+    background: url('FONO DE CONTROL DE PISO.jpg') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 100vh;
+    width: 54%;
+}
+
+/* Texto dentro de la imagen */
+.image-text {
+    text-align: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    margin-bottom: 50px;
+    font-size: 1.25rem;
+}
+
+/* Contenedor de login */
+.login-container {
+    width: 120%;
+    max-width: 500px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1.5s ease-in-out;
+    color: black;
+}
+
+    /* Encabezado del login */
+
+
+    /* Iconos */
+    .login-container i {
+        color: #007bff;
+        transition: color 0.5s ease, transform 0.5s ease;
+    }
+
+        .login-container i:hover {
+            color: #0056b3;
+            transform: scale(1.2);
+        }
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.text-danger {
+    font-size: 0.875rem;
+    margin-top: 5px;
+}
+
+/* Botones */
+.btn-primary {
+    width: 100%;
+    font-weight: 600;
+    padding: 12px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+.form-check-input {
+    margin-top: 0.3rem;
+}
+
+.form-check-label {
+    font-weight: 400;
+    margin-left: 10px;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .image-container {
+        display: none;
+    }
+
+    .col-md-4 {
+        width: 100%;
+    }
+
+    .login-container {
+        max-width: 100%;
+        padding: 15px;
+    }
+}
+
+/* Animación de aparición */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

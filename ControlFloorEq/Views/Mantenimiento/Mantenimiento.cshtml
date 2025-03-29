@@ -1,0 +1,786 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Mantenimiento</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link href="~/themplates/css/Mantenimiento.css" rel="stylesheet" />
+
+</head>
+<body>
+    <div class="container-fluid maintenance-request-container">
+        <!-- Cabecera (se mantiene igual) -->
+        <form class="mb-4">
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Estatus</label>
+                    <input type="text" class="form-control" placeholder="Estatus">
+                </div>
+                <div class="col">
+                    <label class="form-label">Número de Solicitud</label>
+                    <input type="text" class="form-control" placeholder="Número de Solicitud">
+                </div>
+                <div class="col">
+                    <label class="form-label">Fecha de solicitud</label>
+                    <input type="date" class="form-control">
+                </div>
+                <div class="col">
+                    <label class="form-label">Hora de Solicitud</label>
+                    <input type="time" class="form-control">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Solicitante</label>
+                    <input type="text" class="form-control" placeholder="Solicitante">
+                </div>
+                <div class="col">
+                    <label class="form-label">Locación</label>
+                    <input type="text" class="form-control" placeholder="Locación">
+                </div>
+                <div class="col">
+                    <label class="form-label">Prioridad</label>
+                    <input type="text" class="form-control" placeholder="Prioridad">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Tipo de mantenimiento</label>
+                    <input type="text" class="form-control" placeholder="Tipo de mantenimiento">
+                </div>
+                <div class="col">
+                    <label class="form-label">Máquina</label>
+                    <input type="text" class="form-control" placeholder="Máquina">
+                </div>
+                <div class="col">
+                    <label class="form-label">Equipo periférico</label>
+                    <input type="text" class="form-control" placeholder="Equipo periférico">
+                </div>
+                <div class="col">
+                    <label class="form-label">Instalaciones</label>
+                    <input type="text" class="form-control" placeholder="Instalaciones">
+                </div>
+                <div class="col">
+                    <label class="form-label">Otros (Especifique)</label>
+                    <input type="text" class="form-control" placeholder="Otros">
+                </div>
+            </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="mntoExterno">
+                <label class="form-check-label" for="mntoExterno">Mnto. Externo</label>
+            </div>
+        </form>
+
+        <!-- Botones de pestañas -->
+        <div class="tab-buttons mb-4">
+            <button class="btn btn-secondary large-button" onclick="setActiveTab('actividades')">Actividades</button>
+            <button class="btn btn-secondary large-button" onclick="setActiveTab('traslado')">Solicitud de traslado</button>
+            <button class="btn btn-secondary large-button" onclick="setActiveTab('compra')">Solicitud de compra</button>
+            <button class="btn btn-secondary large-button" onclick="setActiveTab('consumo')">Consumo de Materiales</button>
+            <button class="btn btn-secondary large-button" onclick="setActiveTab('externo')">Mantenimiento Externo</button>
+            <button class="btn btn-secondary large-button" onclick="setActiveTab('evidencias')">Evidencias</button>
+        </div>
+
+
+        <!-- Contenido de las pestañas -->
+        <div id="actividades" class="tab-content">
+
+            <!-- Inicio del código de Agregar Actividad -->
+            <button class="btn btn-primary mb-3" id="agregarActividadBtn">Agregar Actividad</button>
+
+            <!-- Tabla de Actividades -->
+            <div class="activity-table">
+                <div class="row table-header">
+                    <div class="col">Técnico / Mecánico</div>
+                    <div class="col">Actividad</div>
+                    <div class="col">Fecha inicial</div>
+                    <div class="col">Hora inicial</div>
+                    <div class="col">Hora final</div>
+                    <div class="col">Tiempo planeado</div>
+                    <div class="col">Tiempo real</div>
+                    <div class="col">Comentarios</div>
+                    <div class="col">Cotizar</div>
+                    <div class="col">Generar</div>
+                </div>
+              
+            </div>
+
+            <!-- Modal personalizado para Agregar Actividad -->
+            <div id="agregarActividadModal" class="custom-modal" style="display: none;">
+                <div class="custom-modal-content">
+                    <span class="close-button" id="closeModalBtn">&times;</span>
+                    <h2>Agregar Actividad</h2>
+                    <form id="agregarActividadForm">
+                        <div class="mb-3">
+                            <label for="tecnico" class="form-label">Técnico / Mecánico</label>
+                            <select class="form-select" id="tecnico">
+                                <option value="">Seleccione un técnico</option>
+                                <!-- Aquí agregarías las opciones dinámicamente -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fechaInicial" class="form-label">Fecha inicial</label>
+                            <input type="date" class="form-control" id="fechaInicial">
+                        </div>
+                        <div class="mb-3">
+                            <label for="horaInicial" class="form-label">Hora inicial</label>
+                            <input type="time" class="form-control" id="horaInicial">
+                        </div>
+                        <div class="mb-3">
+                            <label for="horaFinal" class="form-label">Hora final</label>
+                            <input type="time" class="form-control" id="horaFinal">
+                        </div>
+                        <div class="mb-3">
+                            <label for="tiempoPlaneado" class="form-label">Tiempo planeado</label>
+                            <input type="number" class="form-control" id="tiempoPlaneado" placeholder="Tiempo planeado">
+                        </div>
+                        <div class="mb-3">
+                            <label for="tiempoReal" class="form-label">Tiempo real</label>
+                            <input type="number" class="form-control" id="tiempoReal" placeholder="Tiempo real">
+                        </div>
+                        <div class="mb-3">
+                            <label for="comentarios" class="form-label">Comentarios</label>
+                            <textarea class="form-control" id="comentarios" rows="3" placeholder="Comentarios"></textarea>
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="cancelarBtn">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+            <!-- Fin del código de Agregar Actividad -->
+            <!-- JavaScript para manejar el modal -->
+            <script>
+                document.getElementById('agregarActividadBtn').addEventListener('click', function () {
+                    document.getElementById('agregarActividadModal').style.display = 'block';
+                });
+
+                document.getElementById('closeModalBtn').addEventListener('click', function () {
+                    document.getElementById('agregarActividadModal').style.display = 'none';
+                });
+
+                document.getElementById('cancelarBtn').addEventListener('click', function () {
+                    document.getElementById('agregarActividadModal').style.display = 'none';
+                });
+
+                document.getElementById('agregarActividadForm').addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    // Lógica para guardar la actividad
+                    document.getElementById('agregarActividadModal').style.display = 'none';
+                });
+            </script>
+        </div>
+
+
+
+        <div id="traslado" class="tab-content" style="display: none;">
+            <h2>Solicitud de Traslado</h2>
+            <!-- Inicio del código de Agregar Traslado -->
+            <button class="btn btn-primary mb-3" id="agregarTrasladoBtn">Agregar Traslado</button>
+
+            <!-- Tabla de Traslado -->
+            <div class="traslado-table">
+                <div class="row table-header">
+                    <div class="col">#</div>
+                    <div class="col">N° de documento</div>
+                    <div class="col">Fecha de documento</div>
+                    <div class="col">Estatus</div>
+                    <div class="col">Tipo de documento</div>
+                    <div class="col">N° de producto</div>
+                    <div class="col">Producto</div>
+                    <div class="col">Cantidad</div>
+                    <div class="col">UM</div>
+                </div>
+                <!-- Aquí agregarías las filas dinámicas -->
+            </div>
+
+            <!-- Modal personalizado para Agregar Traslado -->
+            <div id="agregarTrasladoModal" class="custom-modal" style="display: none;">
+                <div class="custom-modal-content">
+                    <span class="close-button" id="closeTrasladoModalBtn">&times;</span>
+                    <h2>Agregar Traslado</h2>
+                    <form id="agregarTrasladoForm">
+                        <div class="mb-3">
+                            <label for="fechaDocumento" class="form-label">Fecha de documento</label>
+                            <input type="date" class="form-control" id="fechaDocumento">
+                        </div>
+                        <div class="mb-3">
+                            <label for="tipoDocumento" class="form-label">Tipo de documento</label>
+                            <input type="text" class="form-control" id="tipoDocumento" placeholder="Tipo de documento">
+                        </div>
+                        <div class="mb-3">
+                            <label for="numeroProducto" class="form-label">N° de producto</label>
+                            <input type="text" class="form-control" id="numeroProducto" placeholder="N° de producto">
+                        </div>
+                        <div class="mb-3">
+                            <label for="producto" class="form-label">Producto</label>
+                            <input type="text" class="form-control" id="producto" placeholder="Producto">
+                        </div>
+                        <div class="mb-3">
+                            <label for="cantidad" class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="cantidad" placeholder="Cantidad">
+                        </div>
+                        <div class="mb-3">
+                            <label for="um" class="form-label">UM</label>
+                            <input type="text" class="form-control" id="um" placeholder="UM">
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="cancelarTrasladoBtn">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+            <!-- Fin del código de Agregar Traslado -->
+            <!-- JavaScript para manejar el modal de traslado -->
+            <script>
+                document.getElementById('agregarTrasladoBtn').addEventListener('click', function () {
+                    document.getElementById('agregarTrasladoModal').style.display = 'block';
+                });
+
+                document.getElementById('closeTrasladoModalBtn').addEventListener('click', function () {
+                    document.getElementById('agregarTrasladoModal').style.display = 'none';
+                });
+
+                document.getElementById('cancelarTrasladoBtn').addEventListener('click', function () {
+                    document.getElementById('agregarTrasladoModal').style.display = 'none';
+                });
+
+                document.getElementById('agregarTrasladoForm').addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    // Lógica para guardar el traslado
+                    document.getElementById('agregarTrasladoModal').style.display = 'none';
+                });
+            </script>
+        </div>
+
+
+
+
+
+
+
+
+        <div id="compra" class="tab-content" style="display: none;">
+            <h2>Solicitud de Compra</h2>
+            <!-- Botón para agregar solicitud de compra -->
+            <button class="btn btn-primary mb-3" id="agregarCompraBtn">Agregar Solicitud de Compra</button>
+
+            <!-- Tabla de Solicitudes de Compra -->
+            <div class="compra-table">
+                <div class="row table-header">
+                    <div class="col">Número de Solicitud</div>
+                    <div class="col">Fecha requerida</div>
+                    <div class="col">Fecha de Solicitud</div>
+                    <div class="col">Hora de la solicitud</div>
+                    <div class="col">Solicitante</div>
+                    <div class="col">N° de producto</div>
+                    <div class="col">Producto</div>
+                    <div class="col">Cantidad</div>
+                    <div class="col">Comentarios</div>
+                    <div class="col">Pedido del cliente</div>
+                    <div class="col">Documento Adjunto</div>
+                    <div class="col">Estatus</div>
+                </div>
+                <!-- Aquí agregarías las filas dinámicas -->
+            </div>
+
+            <!-- Modal para Agregar Solicitud de Compra -->
+            <div id="agregarCompraModal" class="custom-modal" style="display: none;">
+                <div class="custom-modal-content">
+                    <span class="close-button" id="closeCompraModalBtn">&times;</span>
+                    <h2>SOLICITUD DE COMPRA DE SERVICIO</h2>
+                    <form id="agregarCompraForm">
+                        <div class="mb-3">
+                            <label for="clasificacion" class="form-label">Clasificación</label>
+                            <select class="form-select" id="clasificacion">
+                                <option>Seleccione</option>
+                                <option>Opción 1</option>
+                                <option>Opción 2</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="articulo" class="form-label">Artículo</label>
+                            <input type="text" class="form-control" id="articulo" placeholder="Artículo">
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="descripcion" placeholder="Descripción">
+                        </div>
+                        <div class="mb-3">
+                            <label for="cantidad" class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="cantidad" placeholder="Cantidad">
+                        </div>
+                        <div class="mb-3">
+                            <label for="precio" class="form-label">Precio</label>
+                            <input type="number" class="form-control" id="precio" placeholder="Precio">
+                        </div>
+                        <div class="mb-3">
+                            <label for="proveedor" class="form-label">Proveedor</label>
+                            <input type="text" class="form-control" id="proveedor" placeholder="Proveedor">
+                        </div>
+                        <div class="mb-3">
+                            <label for="impuesto" class="form-label">Impuesto</label>
+                            <select class="form-select" id="impuesto">
+                                <option>Seleccione</option>
+                                <option>Opción 1</option>
+                                <option>Opción 2</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fechaRequerida" class="form-label">Fecha requerida</label>
+                            <input type="date" class="form-control" id="fechaRequerida">
+                        </div>
+                        <div class="mb-3">
+                            <label for="moneda" class="form-label">Moneda</label>
+                            <select class="form-select" id="moneda">
+                                <option>Seleccione</option>
+                                <option>Opción 1</option>
+                                <option>Opción 2</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="textoLibre" class="form-label">Texto libre</label>
+                            <input type="text" class="form-control" id="textoLibre" placeholder="Texto libre">
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="cancelarCompraBtn">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- JavaScript para manejar el modal de compra -->
+            <script>
+                document.getElementById('agregarCompraBtn').addEventListener('click', function () {
+                    document.getElementById('agregarCompraModal').style.display = 'block';
+                });
+
+                document.getElementById('closeCompraModalBtn').addEventListener('click', function () {
+                    document.getElementById('agregarCompraModal').style.display = 'none';
+                });
+
+                document.getElementById('cancelarCompraBtn').addEventListener('click', function () {
+                    document.getElementById('agregarCompraModal').style.display = 'none';
+                });
+
+                document.getElementById('agregarCompraForm').addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    // Lógica para guardar la solicitud de compra
+                    document.getElementById('agregarCompraModal').style.display = 'none';
+                });
+            </script>
+        </div>
+
+
+
+
+
+        <div id="consumo" class="tab-content" style="display: none;">
+            <h2>Consumo de Materiales</h2>
+            <!-- Inicio del código de Consumo de Materiales y/o Refacciones -->
+            <button class="btn btn-primary mb-3" id="agregarRefaccionBtn">Agregar Refacción</button>
+
+            <div class="consumo-table">
+                <div class="row table-header">
+                    <div class="col">#</div>
+                    <div class="col">Clasificación</div>
+                    <div class="col">Código</div>
+                    <div class="col">Descripción</div>
+                    <div class="col">Cantidad</div>
+                </div>
+                <!-- Aquí agregarías las filas dinámicas -->
+            </div>
+
+            <!-- Modal personalizado para Agregar Consumo de Materiales y/o Refacciones -->
+            <div id="agregarRefaccionModal" class="custom-modal" style="display: none;">
+                <div class="custom-modal-content">
+                    <span class="close-button" id="closeRefaccionModalBtn">&times;</span>
+                    <h2>Agregar Refacción</h2>
+                    <form id="agregarRefaccionForm">
+                        <div class="mb-3">
+                            <label for="clasificacion" class="form-label">Clasificación</label>
+                            <input type="text" class="form-control" id="clasificacion" placeholder="Clasificación">
+                        </div>
+                        <div class="mb-3">
+                            <label for="codigo" class="form-label">Código</label>
+                            <input type="text" class="form-control" id="codigo" placeholder="Código">
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="descripcion" placeholder="Descripción">
+                        </div>
+                        <div class="mb-3">
+                            <label for="cantidad" class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="cantidad" placeholder="Cantidad">
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="cancelarRefaccionBtn">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+            <!-- Fin del código de Consumo de Materiales y/o Refacciones -->
+            <!-- JavaScript para manejar el modal de consumo -->
+            <script>
+                document.getElementById('agregarRefaccionBtn').addEventListener('click', function () {
+                    document.getElementById('agregarRefaccionModal').style.display = 'block';
+                });
+
+                document.getElementById('closeRefaccionModalBtn').addEventListener('click', function () {
+                    document.getElementById('agregarRefaccionModal').style.display = 'none';
+                });
+
+                document.getElementById('cancelarRefaccionBtn').addEventListener('click', function () {
+                    document.getElementById('agregarRefaccionModal').style.display = 'none';
+                });
+
+                document.getElementById('agregarRefaccionForm').addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    // Lógica para guardar el consumo de materiales y/o refacciones
+                    document.getElementById('agregarRefaccionModal').style.display = 'none';
+                });
+
+                function setActiveTab(tabId) {
+                    const tabs = document.querySelectorAll('.tab-content');
+                    tabs.forEach(tab => {
+                        tab.style.display = 'none';
+                    });
+
+                    document.getElementById(tabId).style.display = 'block';
+                }
+            </script>
+        </div>
+
+        <div id="externo" class="tab-content" style="display: none;">
+            <h2>Mantenimiento Externo</h2>
+            <!-- Inicio del código de Mantenimiento Externo -->
+            <button class="btn btn-primary mb-3" id="agregarMantenimientoExternoBtn">Agregar Mantenimiento Externo</button>
+
+            <div class="externo-table">
+                <div class="row table-header">
+                    <div class="col">#</div>
+                    <div class="col">Clasificación</div>
+                    <div class="col">Artículo</div>
+                    <div class="col">Descripción</div>
+                    <div class="col">Cantidad</div>
+                    <div class="col">Precio</div>
+                    <div class="col">Proveedor</div>
+                    <div class="col">Impuesto</div>
+                    <div class="col">Fecha requerida</div>
+                    <div class="col">Moneda</div>
+                    <div class="col">Texto libre</div>
+                    <div class="col">Documento Adjunto</div>
+                    <div class="col">Estatus</div>
+                    <div class="col">Solución de la falla</div>
+                </div>
+                <!-- Aquí agregarías las filas dinámicas -->
+                <!-- Ejemplo de fila dinámica -->
+                <div class="row table-row">
+                    <div class="col">1</div>
+                    <div class="col">Clase A</div>
+                    <div class="col">Artículo 001</div>
+                    <div class="col">Descripción del artículo</div>
+                    <div class="col">10</div>
+                    <div class="col">$100</div>
+                    <div class="col">Proveedor X</div>
+                    <div class="col">16%</div>
+                    <div class="col">2023-12-01</div>
+                    <div class="col">USD</div>
+                    <div class="col">Información adicional</div>
+                    <div class="col"><a href="#" target="_blank" rel="noopener noreferrer">Ver Documento</a></div>
+                    <div class="col"><button class="btn btn-success">OK</button></div>
+                    <div class="col"><textarea class="form-control" rows="2" placeholder="Ingrese la solución de la falla"></textarea></div>
+                </div>
+                <!-- Fin de ejemplo de fila dinámica -->
+            </div>
+
+            <!-- Modal personalizado para Agregar Mantenimiento Externo -->
+            <div id="agregarMantenimientoExternoModal" class="custom-modal" style="display: none;">
+                <div class="custom-modal-content">
+                    <span class="close-button" id="closeMantenimientoExternoModalBtn">&times;</span>
+                    <h2>Solicitud de Compra de Servicio</h2>
+                    <form id="agregarMantenimientoExternoForm">
+                        <div class="mb-3">
+                            <label for="clasificacion" class="form-label">Clasificación</label>
+                            <input type="text" class="form-control" id="clasificacion" placeholder="Clasificación">
+                        </div>
+                        <div class="mb-3">
+                            <label for="articulo" class="form-label">Artículo</label>
+                            <input type="text" class="form-control" id="articulo" placeholder="Artículo">
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="descripcion" placeholder="Descripción">
+                        </div>
+                        <div class="mb-3">
+                            <label for="cantidad" class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="cantidad" placeholder="Cantidad">
+                        </div>
+                        <div class="mb-3">
+                            <label for="precio" class="form-label">Precio</label>
+                            <input type="number" class="form-control" id="precio" placeholder="Precio">
+                        </div>
+                        <div class="mb-3">
+                            <label for="proveedor" class="form-label">Proveedor</label>
+                            <input type="text" class="form-control" id="proveedor" placeholder="Proveedor">
+                        </div>
+                        <div class="mb-3">
+                            <label for="impuesto" class="form-label">Impuesto</label>
+                            <input type="number" class="form-control" id="impuesto" placeholder="Impuesto">
+                        </div>
+                        <div class="mb-3">
+                            <label for="fechaRequerida" class="form-label">Fecha requerida</label>
+                            <input type="date" class="form-control" id="fechaRequerida">
+                        </div>
+                        <div class="mb-3">
+                            <label for="moneda" class="form-label">Moneda</label>
+                            <input type="text" class="form-control" id="moneda" placeholder="Moneda">
+                        </div>
+                        <div class="mb-3">
+                            <label for="textoLibre" class="form-label">Texto libre</label>
+                            <input type="text" class="form-control" id="textoLibre" placeholder="Texto libre">
+                        </div>
+                        <div class="mb-3">
+                            <label for="documentoAdjunto" class="form-label">Documento Adjunto</label>
+                            <input type="file" class="form-control" id="documentoAdjunto">
+                        </div>
+                        <div class="mb-3">
+                            <label for="estatus" class="form-label">Estatus</label>
+                            <select class="form-select" id="estatus">
+                                <option>OK</option>
+                                <option>CANCEL</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="solucionFalla" class="form-label">Solución de la falla</label>
+                            <textarea class="form-control" id="solucionFalla" rows="2" placeholder="Ingrese la solución de la falla"></textarea>
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="cancelarMantenimientoExternoBtn">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+            <!-- Fin del código de Mantenimiento Externo -->
+            <!-- JavaScript para manejar el modal de mantenimiento externo -->
+            <script>
+                document.getElementById('agregarMantenimientoExternoBtn').addEventListener('click', function () {
+                    document.getElementById('agregarMantenimientoExternoModal').style.display = 'block';
+                });
+
+                document.getElementById('closeMantenimientoExternoModalBtn').addEventListener('click', function () {
+                    document.getElementById('agregarMantenimientoExternoModal').style.display = 'none';
+                });
+
+                document.getElementById('cancelarMantenimientoExternoBtn').addEventListener('click', function () {
+                    document.getElementById('agregarMantenimientoExternoModal').style.display = 'none';
+                });
+
+                document.getElementById('agregarMantenimientoExternoForm').addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    // Lógica para guardar el mantenimiento externo
+                    document.getElementById('agregarMantenimientoExternoModal').style.display = 'none';
+                });
+
+                function setActiveTab(tabId) {
+                    const tabs = document.querySelectorAll('.tab-content');
+                    tabs.forEach(tab => {
+                        tab.style.display = 'none';
+                    });
+
+                    document.getElementById(tabId).style.display = 'block';
+                }
+            </script>
+        </div>
+
+
+        <div id="evidencias" class="tab-content" style="display: none;">
+            <h2>Subir Evidencias</h2>
+            <!-- Inicio del código de Evidencias -->
+            <div class="upload-container">
+                <div class="upload-box">
+                    <h3>Subir Archivos</h3>
+                    <button class="btn btn-primary mb-3" id="elegirArchivosBtn">Elegir Archivos</button>
+                    <input type="file"
+                           multiple
+                           id="fileInput"
+                           style="display: none;"
+                           onchange="handleFileUpload(event)" />
+                </div>
+
+                <div class="upload-box">
+                    <h3>Imágenes de Antes</h3>
+                    <button class="btn btn-primary mb-3" id="elegirAntesBtn">Elegir Imágenes</button>
+                    <input type="file"
+                           accept="image/*"
+                           multiple
+                           id="beforeImageInput"
+                           style="display: none;"
+                           onchange="handleBeforeImageUpload(event)" />
+                </div>
+
+                <div class="upload-box">
+                    <h3>Imágenes de Después</h3>
+                    <button class="btn btn-primary mb-3" id="elegirDespuesBtn">Elegir Imágenes</button>
+                    <input type="file"
+                           accept="image/*"
+                           multiple
+                           id="afterImageInput"
+                           style="display: none;"
+                           onchange="handleAfterImageUpload(event)" />
+                </div>
+            </div>
+
+            <div class="uploaded-files" id="uploadedFiles"></div>
+
+            <div class="uploaded-images">
+                <h3>Imágenes de Antes</h3>
+                <div class="image-grid" id="beforeImages"></div>
+
+                <h3>Imágenes de Después</h3>
+                <div class="image-grid" id="afterImages"></div>
+            </div>
+            <!-- Fin del código de Evidencias -->
+            <!-- JavaScript para manejar la subida de archivos e imágenes -->
+            <script>
+                document.getElementById('elegirArchivosBtn').addEventListener('click', function () {
+                    document.getElementById('fileInput').click();
+                });
+
+                document.getElementById('elegirAntesBtn').addEventListener('click', function () {
+                    document.getElementById('beforeImageInput').click();
+                });
+
+                document.getElementById('elegirDespuesBtn').addEventListener('click', function () {
+                    document.getElementById('afterImageInput').click();
+                });
+
+                function handleFileUpload(event) {
+                    const files = event.target.files;
+                    const uploadedFilesContainer = document.getElementById('uploadedFiles');
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const fileElement = document.createElement('div');
+                        const fileLink = document.createElement('a');
+                        fileLink.href = URL.createObjectURL(file);
+                        fileLink.target = "_blank";
+                        fileLink.rel = "noopener noreferrer";
+                        fileLink.textContent = file.name;
+                        fileElement.appendChild(fileLink);
+                        uploadedFilesContainer.appendChild(fileElement);
+                    }
+                }
+
+                function handleBeforeImageUpload(event) {
+                    const files = event.target.files;
+                    const beforeImagesContainer = document.getElementById('beforeImages');
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const imgElement = document.createElement('img');
+                        imgElement.src = URL.createObjectURL(file);
+                        imgElement.alt = `Antes ${i + 1}`;
+                        beforeImagesContainer.appendChild(imgElement);
+                    }
+                }
+
+                function handleAfterImageUpload(event) {
+                    const files = event.target.files;
+                    const afterImagesContainer = document.getElementById('afterImages');
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const imgElement = document.createElement('img');
+                        imgElement.src = URL.createObjectURL(file);
+                        imgElement.alt = `Después ${i + 1}`;
+                        afterImagesContainer.appendChild(imgElement);
+                    }
+                }
+
+                function setActiveTab(tabId) {
+                    const tabs = document.querySelectorAll('.tab-content');
+                    tabs.forEach(tab => {
+                        tab.style.display = 'none';
+                    });
+
+                    document.getElementById(tabId).style.display = 'block';
+                }
+            </script>
+        </div>
+
+
+
+
+
+
+        <!-- Pie de página (se mantiene igual) -->
+        <div class="fixed-section">
+            <form>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Técnico</label>
+                        <input type="text" class="form-control" value="Alberto Sanchez" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Descripción de la falla</label>
+                        <textarea class="form-control" rows="3" placeholder="Ingrese la descripción de la falla"></textarea>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Solución de la falla</label>
+                        <textarea class="form-control" rows="3" placeholder="Ingrese la solución de la falla"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- JavaScript para manejar el modal y cambiar el contenido de las pestañas -->
+    <script>    
+        document.getElementById('agregarActividadBtn').addEventListener('click', function () {
+            document.getElementById('agregarActividadModal').style.display = 'block';
+        });
+
+        document.getElementById('closeModalBtn').addEventListener('click', function () {
+            document.getElementById('agregarActividadModal').style.display = 'none';
+        });
+
+        document.getElementById('cancelarBtn').addEventListener('click', function () {
+            document.getElementById('agregarActividadModal').style.display = 'none';
+        });
+
+
+
+        document.getElementById('agregarActividadForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            // Lógica para guardar la actividad
+            document.getElementById('agregarActividadModal').style.display = 'none';
+        });
+
+        function setActiveTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.style.display = 'none';
+            });
+
+            document.getElementById(tabId).style.display = 'block';
+
+            const buttons = document.querySelectorAll('.tab-buttons button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            document.querySelector(`[onclick="setActiveTab('${tabId}')"]`).classList.add('active');
+        }
+    </script>
+
+
+
+    <!-- Bootstrap JS y dependencias -->
+    <script src="https://cdn.jsdelivr.net/npm/popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <!-- Script personalizado -->
+    <script src="Mantenimientoapt.js"></script>
+</body>
+</html>

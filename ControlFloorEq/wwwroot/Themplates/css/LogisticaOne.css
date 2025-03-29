@@ -1,0 +1,122 @@
+﻿body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.logistica-container {
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.logistica-header {
+    margin-bottom: 20px;
+}
+
+.logistica-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 150px;
+}
+
+    .filter-group label {
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .filter-group input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+/* Contenedor Compacto de Detalles */
+.logistica-details-container {
+    background-color: #fff;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.logistica-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.detail-group {
+    display: flex;
+    flex-direction: column;
+}
+
+    .detail-group label {
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .detail-group input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+/* Paginación */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination-button {
+    background-color: #363838;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Transiciones suaves */
+}
+
+    .pagination-button:hover {
+        background-color: #067eff;
+        transform: scale(1.1); /* Agranda el botón al pasar el cursor */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Añade una sombra */
+    }
+
+/* Media Queries para Responsividad */
+@media (max-width: 1200px) {
+    .filter-group {
+        flex-basis: 45%;
+    }
+
+    .detail-group {
+        flex-basis: 45%;
+    }
+}
+
+@media (max-width: 992px) {
+    .filter-group {
+        flex-basis: 100%;
+    }
+
+    .detail-group {
+        flex-basis: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .logistica-filters, .logistica-details {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

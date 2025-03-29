@@ -1,0 +1,727 @@
+﻿@model IEnumerable<dynamic>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+@* <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+ *@
+<style>
+    /* Estilo adicional para las filas que se pueden hacer clic */
+    thead tr {
+        background-color: gainsboro;
+        color: white;
+    }
+    .clickable-row {
+        cursor: pointer;
+    }
+
+    /* Responsividad */
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+/*     .collapse {
+        display: none;
+    } */
+
+    .badge-success {
+        background-color: #28a745; /* Verde */
+        color: white;
+    }
+
+    .badge-danger {
+        background-color: #dc3545; /* Rojo */
+        color: white;
+    }
+    /* Estilo CSS para ocultar la columna DocEntry */
+    .ocultar-columna {
+        display: none;
+    }
+
+    .table-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .table-scroll {
+        max-height: 300px; /* Ajusta la altura máxima según necesites */
+        overflow-y: auto; /* Activa el scroll vertical */
+    }
+
+
+  
+</style>
+
+
+<div class="container-fluid p-0">
+
+    <div class="mb-3">
+        <h1 class="h3 d-inline align-middle">Solicitud de Compras. </h1>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+                <div class="card-header">
+                    <form action="@Url.Action("PlnSolCompra", "Planning")" method="get">
+                        <input type="text" id="search" name="DocNum" placeholder="Buscar por DocNum" />
+                        <button type="submit">Buscar</button>
+                    </form>
+                   
+                    @*< form id="solicitudCompraForm" class="p-2">
+                        <div class="row g-3">
+                            <!-- Proveedor -->
+                            <div class="col-md-4">
+                                <label for="proveedorInput" class="form-label"><strong>Proveedor</strong></label>
+                                <input list="proveedores" id="proveedorInput" class="form-control" placeholder="Selecciona o escribe un proveedor">
+                                <datalist id="proveedores"></datalist>
+                            </div>
+
+                            <!-- Fecha Necesaria -->
+                            <div class="col-md-4">
+                                <label for="fechaNecesaria" class="form-label"><strong>Fecha Necesaria</strong></label>
+                                <input type="date" class="form-control" id="fechaNecesaria">
+                            </div>
+
+                            <!-- Documento Adjunto -->
+                            <div class="col-md-4">
+                                <label for="documentoAdjunto" class="form-label"><strong>Documento Adjunto</strong></label>
+                                <input type="file" class="form-control" id="documentoAdjunto">
+                            </div>
+                        </div>
+                       
+                    </form> *@
+
+
+                </div>
+                <div class="card-body">              
+                    <table id="ordenesTable" class="table table-bordered table-sm table-responsive">
+                        <thead>
+                            <tr>
+                                <th>Número de Orden</th>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Artículo</th>
+                                <th>Cantidad Planificada</th>
+                                <th>Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordenesTableBody">
+                            @foreach (var orden in Model)
+                            {
+                                <tr class="clickable-row" data-target="#orderLines-@orden.DocNum">
+                                    <td>@orden.DocNum</td>
+                                    <td>@(orden.Fecha_Fabricacion != null ? Convert.ToDateTime(orden.Fecha_Fabricacion).ToString("dd/MM/yyyy") : "N/A")</td>
+                                    <td>@orden.CardCode - @orden.CardName</td>
+                                    <td>@orden.ItemCode - @orden.ProdName</td>
+                                    <td>@Math.Round(orden.PlannedQty, 2)</td>
+                                    <td>
+                                        @if (orden.StatusTexto == "Planificado")
+                                        {
+                                            <span class="badge badge-danger-light">@orden.StatusTexto</span>
+                                        }
+                                        else if (orden.StatusTexto == "Liberado")
+                                        {
+                                            <span class="badge badge-warning-light">@orden.StatusTexto</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-secondary-light">@orden.StatusTexto</span>
+                                        }
+                                    </td>
+                                </tr>
+
+                                <!-- Subtabla inicialmente oculta -->
+                                <tr id="orderLines-@orden.DocNum" class="subtable-row" style="display: none;">
+                                    <td colspan="6">
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    
+                                                    <th>Artículo</th>
+                                                    <th>Descripción</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Stock</th>
+                                                    <th>Stock a Solicitar</th>
+                                                    <th>Seleccionar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in orden.OrderLines)
+                                                {
+                                                    var stockSuficiente = item.StockDisp >= item.PlannedQty;
+                                                    var stockColor = stockSuficiente ? "badge-success" : "badge-danger";
+                                                    var stockTexto = stockSuficiente ? "Suficiente" : "Insuficiente";
+
+                                                    <tr>
+
+                                                        <td>@item.ItemCode</td>
+                                                        <td>@item.ItemName</td>
+                                                        <td>@Math.Round(item.PlannedQty, 2)</td> <!-- Redondear cantidad a 2 decimales -->
+                                                        <td>
+                                                            <span class="badge @stockColor">
+                                                                @Math.Round(item.StockDisp, 2)
+                                                            </span>
+                                                            <small> (@stockTexto) </small>
+                                                        </td>
+                                                        <td>@Math.Round(item.PlannedQty, 2)</td> <!-- Redondear cantidad a 2 decimales -->
+                                                        <td>
+                                                            @if (!stockSuficiente)
+                                                            {
+                                                                <input type="checkbox" class="select-item" data-docnum="@orden.DocNum"
+                                                                       data-docentry="@item.DocEntry"
+                                                                       data-itemcode="@item.ItemCode" 
+                                                                data-itemname="@item.ItemName" data-qty="@item.PlannedQty">
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+
+                    <div class="row mt-3">
+                       
+                            <button id="asignarButton" class="btn btn-primary">🛒 Asignar Artículos</button>
+                       
+                    </div>
+
+
+                </div>
+                <div class="card-body">
+                    <!-- Tabla para mostrar los artículos seleccionados -->
+                    <h3>Artículos Seleccionados</h3>
+                    <table id="articulosSeleccionados" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="ocultar-columna">DocEntry</th>
+                                <th>No Orden Fabricación</th>
+                                <th>Artículo</th>
+                                <th>Cantidad</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                      
+                    </table>
+                    <div class="table-scroll">
+                        <table class="table table-bordered">
+                            <tbody id="tablaSeleccionados">
+                                <!-- Aquí se agregarán los artículos seleccionados -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="row mt-3">
+                  
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#solicitudCompraModal">
+                            Nueva Solicitud de Compra
+                        </button>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="solicitudCompraModal" tabindex="-1" aria-labelledby="solicitudCompraModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="solicitudCompraModalLabel">Solicitud de Compra</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="solicitudCompraForm" class="p-2">
+                    <div class="row g-3">
+                        <!-- Proveedor -->
+                        <div class="col-md-4">
+                            <label for="proveedorInput" class="form-label"><strong>Proveedor</strong></label>
+                            <input list="proveedores" id="proveedorInput" class="form-control" placeholder="Selecciona o escribe un proveedor">
+                            <datalist id="proveedores"></datalist>
+                        </div>
+
+                        <!-- Fecha Necesaria -->
+                        <div class="col-md-4">
+                            <label for="fechaNecesaria" class="form-label"><strong>Fecha Necesaria</strong></label>
+                            <input type="date" class="form-control" id="fechaNecesaria">
+                        </div>
+
+                        <!-- Documento Adjunto -->
+                        <div class="col-md-4">
+                            <label for="documentoAdjunto" class="form-label"><strong>Documento Adjunto</strong></label>
+                            <input type="file" class="form-control" id="documentoAdjunto">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                  <div class="col-md-6 d-grid">
+                            <button id="guardarSeleccionados" class="btn btn-success">📄 Crear Solicitud de Compra</button>
+                        </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+        // Llamar la función cuando se cargue la página
+     document.addEventListener('DOMContentLoaded', cargarProveedores);
+
+     async function cargarProveedores() {
+        try {
+            const response = await fetch('/MasterData/Get_BusinessPartners?Type=S');
+
+            // Verificar si la respuesta es válida
+            if (!response.ok) {
+                throw new Error("Error en la respuesta del servidor");
+            }
+
+            // Intentamos parsear la respuesta como JSON
+            const result = await response.json();
+
+            // Verificar si result es un arreglo de proveedores
+            if (!Array.isArray(result)) {
+                console.error("La respuesta no es un arreglo de proveedores:", result);
+                return;
+            }
+
+            const proveedores = result;
+            const datalist = document.getElementById('proveedores');
+
+            // Limpiar opciones previas
+            datalist.innerHTML = '';
+
+            // Rellenar el datalist con las opciones
+            proveedores.forEach(proveedor => {
+                const option = document.createElement('option');
+                option.value = `${proveedor.CardCode} - ${proveedor.CardName}`;
+                option.id = proveedor.CardCode;  // Asignar el id con el valor de CardCode
+                datalist.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error("Error al cargar proveedores:", error);
+            alert("Hubo un problema al cargar los proveedores. Intenta de nuevo más tarde.");
+        }
+    }
+
+    function seleccionarSinStock() {
+        document.querySelectorAll(".articuloCheckbox").forEach(checkbox => {
+            if (parseInt(checkbox.getAttribute("data-stock")) === 0) {
+                checkbox.checked = true;
+            }
+        });
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        console.log("jQuery cargado correctamente");
+
+        $(".clickable-row").on("click", function () {
+            var targetId = $(this).data("target");
+            $(targetId).toggle(); // Alterna la visibilidad de la subtabla
+        });
+
+        $(".select-item").on("change", function () {
+            var itemId = $(this).data("id");
+            if ($(this).is(":checked")) {
+                console.log("Seleccionado:", itemId);
+            } else {
+                console.log("Desmarcado:", itemId);
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        cargarArticulosGuardados();
+
+        // Al hacer clic en el botón Asignar
+        $('#asignarButton').on('click', function () {
+            var selectedItems = [];
+
+            $('input.select-item:checked').each(function () {
+                var item = {
+                    DocEntry: $(this).data('docentry'),
+                    DocNum: $(this).data('docnum'),
+                    ItemCode: $(this).data('itemcode'),
+                    ItemName: $(this).data('itemname'),
+                    PlannedQty: $(this).data('qty')
+                };
+
+                // Verificar si el artículo ya existe en la tabla
+                if (!articuloExiste(item.ItemCode)) {
+                    selectedItems.push(item);
+                }
+            });
+
+            // Agregar nuevos artículos a la tabla
+            selectedItems.forEach(function (item) {
+                agregarFila(item);
+            });
+
+            guardarEnSessionStorage();
+        });
+
+        // Eliminar artículo de la tabla de seleccionados
+        $(document).on('click', '.btn-eliminar', function () {
+            $(this).closest('tr').remove();
+            guardarEnSessionStorage();
+        });
+    });
+
+    // Función para verificar si un artículo ya existe en la tabla
+    function articuloExiste(itemCode) {
+        var existe = false;
+        $('#tablaSeleccionados tr').each(function () {
+            var codigo = $(this).find('td:eq(1)').text(); // Obtener el código del artículo
+            if (codigo === itemCode) {
+                existe = true;
+                return false; // Salir del bucle
+            }
+        });
+        return existe;
+    }
+
+    // Función para agregar una fila a la tabla
+    function agregarFila(item) {
+        $('#tablaSeleccionados').append(`
+            <tr>
+                <td class="ocultar-columna">${item.DocEntry}</td>
+                <td>${item.DocNum}</td>
+                <td>${item.ItemCode} - ${item.ItemName}</td>
+                <td>${item.PlannedQty}</td>
+                <td>
+                    <button class="btn btn-danger btn-eliminar" data-itemcode="${item.ItemCode}">Eliminar</button>
+                </td>
+            </tr>
+        `);
+    }
+
+    // Guardar la tabla en sessionStorage
+    function guardarEnSessionStorage() {
+        var articulos = [];
+        $('#tablaSeleccionados tr').each(function () {
+            var item = {
+                DocEntry: $(this).find('td:eq(0)').text(),
+                DocNum: $(this).find('td:eq(1)').text(),
+                ItemCode: $(this).find('td:eq(2)').text().split(" - ")[0],
+                ItemName: $(this).find('td:eq(2)').text().split(" - ")[1],
+                PlannedQty: $(this).find('td:eq(3)').text()
+            };
+            articulos.push(item);
+        });
+        sessionStorage.setItem("articulosSeleccionados", JSON.stringify(articulos));
+    }
+
+    // Cargar artículos guardados en sessionStorage al recargar la página
+      function cargarArticulosGuardados() {
+        var articulosGuardados = sessionStorage.getItem("articulosSeleccionados");
+
+        if (articulosGuardados) {
+            try {
+                var articulos = JSON.parse(articulosGuardados);
+                if (Array.isArray(articulos)) {
+                    articulos.forEach(function (item) {
+                        agregarFila(item);
+                    });
+                } else {
+                    console.error("El contenido de sessionStorage no es un array válido.");
+                    sessionStorage.removeItem("articulosSeleccionados"); // Borrar datos corruptos
+                }
+            } catch (error) {
+                console.error("Error al parsear JSON de sessionStorage:", error);
+                sessionStorage.removeItem("articulosSeleccionados"); // Borrar datos corruptos
+            }
+        }
+    }
+
+
+</script>
+
+@* <script>
+     $(document).ready(function () {
+        $('#guardarSeleccionados').on('click', function (e) {
+            e.preventDefault();
+
+            // Obtener valores del formulario
+            var proveedor = $('#proveedorInput').val().trim().split(" - ")[0]; // Solo el código antes del guion
+            var fechaNecesaria = $('#fechaNecesaria').val();
+            var documentoAdjunto = $('#documentoAdjunto')[0].files[0];
+            var articulos = [];
+
+            // Convertir fecha al formato yyyy-MM-dd
+            if (fechaNecesaria) {
+                var fecha = new Date(fechaNecesaria);
+                fechaNecesaria = fecha.toISOString().split('T')[0]; // Obtiene solo "yyyy-MM-dd"
+            }
+
+            // Obtener los artículos seleccionados
+            $('#tablaSeleccionados tr').each(function () {
+                var itemCodeFull = $(this).find("td:eq(2)").text().trim();
+                var itemCode = itemCodeFull.split(" - ")[0]; // Solo el código antes del guion
+
+                var item = {
+                    DocEntry: parseInt($(this).find("td:eq(0)").text()) || 0,
+                    LineId: articulos.length + 1,
+                    U_LineNum: articulos.length + 1,
+                    U_ItemCode: itemCode,
+                    U_CardCode: proveedor,
+                    U_Quantity: parseFloat($(this).find("td:eq(3)").text()) || 0,
+                    U_DocOP: parseInt($(this).find("td:eq(0)").text()) || 0,
+                    U_LineNumOP: parseInt($(this).find("td:eq(1)").text()) || 0,
+                    U_ObjType: "1470000113",
+                    U_Attachments: documentoAdjunto ? documentoAdjunto.name : null,
+                    U_PathFile: documentoAdjunto ? documentoAdjunto.name : null
+                };
+                articulos.push(item);
+            });
+
+            // Validaciones
+            if (!proveedor || !fechaNecesaria || articulos.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Faltan datos',
+                    text: 'Por favor, completa todos los campos y agrega al menos un artículo.',
+                    confirmButtonText: 'Entendido'
+                });
+                return;
+            }
+
+            // Confirmación antes de guardar
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: '¿Quieres guardar esta solicitud de compra?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, guardar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Mostrar loading
+                    Swal.fire({
+                        title: 'Guardando...',
+                        text: 'Por favor, espera.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Crear objeto FormData para enviar el archivo y los datos
+                    var formData = new FormData();
+                    formData.append("DocDate", fechaNecesaria); // Fecha en formato yyyy-MM-dd
+                    if (documentoAdjunto) {
+                        formData.append("FileAttch", documentoAdjunto);
+                    }
+
+                    // Agregar cada artículo al FormData individualmente
+                    articulos.forEach((articulo, index) => {
+                        Object.keys(articulo).forEach(key => {
+                            formData.append(`BISIT_AUT_PRQ1Collection[${index}].${key}`, articulo[key]);
+                        });
+                    });
+
+                    // Enviar los datos a la API
+                    $.ajax({
+                        url: '/Planning/Add_DrafPurchaseRequest', // Reemplaza con tu endpoint real
+                        type: 'POST',
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        success: function (response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Guardado exitoso',
+                                text: 'La solicitud de compra se guardó correctamente.',
+                                confirmButtonText: 'OK'
+                            });
+                            // Reiniciar el formulario y tabla después de guardar
+                            $('#solicitudCompraForm')[0].reset();
+                            $('#tablaSeleccionados').empty();
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error en la solicitud AJAX:", xhr, status, error);
+
+                            let errorMessage = "Hubo un problema al guardar la solicitud.";
+
+                            // Intentar extraer el mensaje del backend si existe
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            } else if (xhr.responseText) {
+                                errorMessage = xhr.responseText;
+                            }
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: errorMessage,
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    }); 
+
+
+
+</script>
+ *@
+<script>
+            $(document).ready(function () {
+        $('#guardarSeleccionados').on('click', function (e) {
+            e.preventDefault();
+
+            // Obtener valores del formulario
+            var proveedor = $('#proveedorInput').val().trim().split(" - ")[0]; // Solo el código antes del guion
+            var fechaNecesaria = $('#fechaNecesaria').val();
+            var documentoAdjunto = $('#documentoAdjunto')[0].files[0];
+            var articulos = [];
+
+            // Convertir fecha al formato yyyy-MM-dd
+            if (fechaNecesaria) {
+                var fecha = new Date(fechaNecesaria);
+                fechaNecesaria = fecha.toISOString().split('T')[0]; // Obtiene solo "yyyy-MM-dd"
+            }
+
+            // Obtener los artículos seleccionados
+            $('#tablaSeleccionados tr').each(function () {
+                var itemCodeFull = $(this).find("td:eq(2)").text().trim();
+                var itemCode = itemCodeFull.split(" - ")[0]; // Solo el código antes del guion
+
+                var item = {
+                    DocEntry: parseInt($(this).find("td:eq(0)").text()) || 0,
+                    LineId: articulos.length + 1,
+                    U_LineNum: articulos.length + 1,
+                    U_ItemCode: itemCode,
+                    U_CardCode: proveedor,
+                    U_Quantity: parseFloat($(this).find("td:eq(3)").text()) || 0,
+                    U_DocOP: parseInt($(this).find("td:eq(0)").text()) || 0,
+                    U_LineNumOP: parseInt($(this).find("td:eq(1)").text()) || 0,
+                    U_ObjType: "1470000113",
+                    U_Attachments: documentoAdjunto ? documentoAdjunto.name : null,
+                    U_PathFile: documentoAdjunto ? documentoAdjunto.name : null
+                };
+                articulos.push(item);
+            });
+
+            // Validaciones
+            if (!proveedor || !fechaNecesaria || articulos.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Faltan datos',
+                    text: 'Por favor, completa todos los campos y agrega al menos un artículo.',
+                    confirmButtonText: 'Entendido'
+                });
+                return;
+            }
+
+            // Confirmación antes de guardar
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: '¿Quieres guardar esta solicitud de compra?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, guardar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Mostrar loading
+                    Swal.fire({
+                        title: 'Guardando...',
+                        text: 'Por favor, espera.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Crear objeto FormData para enviar el archivo y los datos
+                    var formData = new FormData();
+                    formData.append("DocDate", fechaNecesaria); // Fecha en formato yyyy-MM-dd
+                    if (documentoAdjunto) {
+                        formData.append("FileAttch", documentoAdjunto);
+                    }
+
+                    // Agregar cada artículo al FormData individualmente
+                    articulos.forEach((articulo, index) => {
+                        Object.keys(articulo).forEach(key => {
+                            formData.append(`BISIT_AUT_PRQ1Collection[${index}].${key}`, articulo[key]);
+                        });
+                    });
+
+                    // Enviar los datos a la API con fetch
+                    fetch('/Planning/Add_DrafPurchaseRequest', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(async response => {
+                        if (!response.ok) {
+                            throw new Error(await response.text());
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Guardado exitoso',
+                            text: 'La solicitud de compra se guardó correctamente.',
+                            confirmButtonText: 'OK'
+                        });
+
+                        // Reiniciar el formulario y tabla después de guardar
+                        document.getElementById('solicitudCompraForm').reset();
+                        document.getElementById('tablaSeleccionados').innerHTML = '';
+                    })
+                    .catch(error => {
+                        console.error("Error en la solicitud Fetch:", error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.message || "Hubo un problema al guardar la solicitud.",
+                            confirmButtonText: 'OK'
+                        });
+                    });
+                }
+            });
+        });
+    });
+
+
+
+        if (fechaNecesaria) {
+        var fecha = new Date(fechaNecesaria);
+        fechaNecesaria = fecha.toISOString().split('T')[0]; // yyyy-MM-dd
+    }
+
+
+</script>

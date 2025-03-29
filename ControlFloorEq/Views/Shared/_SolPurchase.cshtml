@@ -1,0 +1,393 @@
+﻿@{
+    string xModule = ViewData["xModule"] as string ?? "Valor por defecto";
+}
+<!-- Agrega SweetAlert2 desde CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="mb-2">
+    <label for="proveedorInputPur" class="form-label"><strong>Proveedor</strong></label>
+    <input list="proveedoresPur" id="proveedorInputPur" class="form-control" placeholder="Selecciona o escribe un proveedor">
+    <datalist id="proveedoresPur"></datalist>
+</div>
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label for="fechaRequerida" class="form-label">Fecha Requerida</label>
+        <input type="date" class="form-control text-center" id="fechaRequeridaPur" required>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="dropdown-monedaPur" style="margin-bottom: 8px; display: block;">
+            Moneda:
+        </label>
+        <select class="form-control" id="dropdown-monedaPur" style="width: 100%;">
+            <option value="" disabled selected>Buscar o seleccionar...</option>
+        </select>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between mt-3">
+    <button class="btn btn-primary" onclick="agregarFilaSolCompra()">➕ Agregar Fila</button>
+</div>
+
+
+<div class="table-responsive">
+    <table id="tablaSolCompra" class="table table-bordered text-center align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Clasificación</th>
+                <th>Artículo</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                @*  <th>Impuesto</th> *@
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tablaBodySolCompra">
+            <tr>
+                <td>
+                    <select class="form-control" id="dropdown-clasificacionSolComp" style="width: 100%;">
+                        <option value="" disabled selected>Buscar o seleccionar...</option>
+                    </select>
+                </td>
+                <td>
+                    <input list="articulosPur" id="articulosInputPur" class="form-control" placeholder="Selecciona o escribe un Artículo">
+                    <datalist id="articulosPur"></datalist>
+                </td>
+                <td><input type="number" class="form-control text-center" placeholder="CantidadPur" required></td>
+                <td><input type="number" class="form-control text-center" placeholder="PrecioPur" required></td>
+                @*  <td>
+                <select class="form-control" id="dropdown-impuesto" style="width: 100%;">
+                    <option value="" disabled selected>Buscar o seleccionar...</option>
+                </select>
+            </td> *@
+                <td><button class="btn btn-danger btn-sm" onclick="eliminarFilaSolCompra(this)">🗑</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<div class="mb-3">
+    <label for="comentariosCompras" class="form-label">Comentarios</label>
+    <input type="text" class="form-control" id="comentariosCompras" placeholder="Comentarios" required>
+
+</div>
+
+
+<script>
+    function agregarFilaSolCompra() {
+        let tabla = document.getElementById("tablaSolCompra").querySelector("#tablaBodySolCompra");
+        let nuevaFila = tabla.rows[0].cloneNode(true);
+
+        // Limpiar valores y quitar marcas de error
+        nuevaFila.querySelectorAll("input, select").forEach(el => {
+            el.value = "";
+            el.classList.remove("is-invalid");
+        });
+
+        tabla.appendChild(nuevaFila);
+
+        Swal.fire({
+            icon: "success",
+            title: "Fila agregada",
+            text: "Se ha añadido una nueva fila a la tabla de solicitud de compra.",
+            timer: 1500,
+            showConfirmButton: false
+        });
+    }
+
+    function eliminarFilaSolCompra(boton) {
+        let fila = boton.closest("tr");
+        let tabla = document.getElementById("tablaSolCompra").querySelector("#tablaBodySolCompra");
+
+        if (tabla.rows.length > 1) {
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: "Esta fila se eliminará de la tabla.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fila.remove();
+                    Swal.fire({
+                        icon: "success",
+                        title: "Eliminado",
+                        text: "La fila ha sido eliminada.",
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Debe haber al menos una fila en la tabla de solicitud de compra.",
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+    }
+
+
+ 
+</script>
+
+<style>
+    .table-responsive {
+        max-height: 60vh; /* Evita que la tabla se extienda demasiado */
+        overflow-y: auto;
+    }
+
+    .is-invalid {
+        border: 2px solid red !important;
+    }
+
+    th {
+        white-space: nowrap; /* Evita que los títulos se corten */
+    }
+
+    td input, td select {
+        width: 100%; /* Ajusta los campos a la celda */
+        padding: 5px;
+    }
+
+    .d-flex {
+        gap: 10px; /* Espacio entre los botones */
+    }
+</style>
+
+<script>
+     
+            // Llamar la función cuando se cargue la página
+     document.addEventListener('DOMContentLoaded', cargarProveedores);
+     document.addEventListener('DOMContentLoaded', cargarMonedas);
+     document.addEventListener("DOMContentLoaded", function () {
+          let xModule = "Mtto";  // Aquí defines el módulo
+          cargarClasificacion(xModule);
+      });
+  //      document.addEventListener('DOMContentLoaded', cargarImpuestos);
+  //    document.addEventListener('DOMContentLoaded', cargarItems);
+
+     async function cargarProveedores() {
+        try {
+            const response = await fetch('/MasterData/Get_BusinessPartners?Type=S');
+
+            // Verificar si la respuesta es válida
+            if (!response.ok) {
+                throw new Error("Error en la respuesta del servidor");
+            }
+
+            // Intentamos parsear la respuesta como JSON
+            const result = await response.json();
+
+            // Verificar si result es un arreglo de proveedores
+            if (!Array.isArray(result)) {
+                console.error("La respuesta no es un arreglo de proveedores:", result);
+                return;
+            }
+
+            const proveedores = result;
+              const datalist = document.getElementById('proveedoresPur');
+
+            // Limpiar opciones previas
+            datalist.innerHTML = '';
+
+            // Rellenar el datalist con las opciones
+            proveedores.forEach(proveedor => {
+                const option = document.createElement('option');
+                option.value = `${proveedor.CardCode} - ${proveedor.CardName}`;
+                option.id = proveedor.CardCode;  // Asignar el id con el valor de CardCode
+                datalist.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error("Error al cargar proveedores:", error);
+            alert("Hubo un problema al cargar los proveedores. Intenta de nuevo más tarde.");
+        }
+    }
+
+     async function cargarMonedas() {
+        try {
+            const response = await fetch('/MasterData/Currencys');
+
+            // Verificar si la respuesta es válida
+            if (!response.ok) {
+                throw new Error("Error en la respuesta del servidor");
+            }
+
+            // Intentamos parsear la respuesta como JSON
+            const result = await response.json();
+
+            // Verificar si result es un arreglo de moneda
+            if (!Array.isArray(result)) {
+                console.error("La respuesta no es un arreglo de moneda:", result);
+                return;
+            }
+
+            const monedas = result;
+            const dropdown = document.getElementById('dropdown-monedaPur');
+
+            // Limpiar las opciones previas
+            dropdown.innerHTML = '<option value="" disabled selected>Buscar o seleccionar...</option>';
+
+            // Rellenar el select con las opciones
+            monedas.forEach(moneda => {
+                const option = document.createElement('option');
+                option.value = moneda.CurrCode; // Asignamos el IdBascula como el valor de la opción
+                option.textContent = `${moneda.CurrCode} - ${moneda.CurrName}`;  // Mostrar el Name y Ubicacion
+                dropdown.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error("Error al cargar monedas:", error);
+            alert("Hubo un problema al cargar las moneda. Intenta de nuevo más tarde.");
+        }
+    }
+
+    async function cargarClasificacion(module) {
+        try {
+            const url = `/MasterData/ItemClassification?Module=${encodeURIComponent(module)}`;
+            console.log("Solicitando Pur:", url);
+
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+              console.log("Datos recibidos SolPur:", result);
+
+            if (!Array.isArray(result) || result.length === 0) {
+                console.error("La respuesta no contiene datos válidos:", result);
+                return;
+            }
+
+            // Llenar el dropdown
+              const dropdown = document.getElementById('dropdown-clasificacionSolComp');
+            dropdown.innerHTML = '<option value="" disabled selected>Buscar o seleccionar...</option>';
+
+            result.forEach(clasificacion => {
+                const option = document.createElement('option');
+                option.value = clasificacion.Code;
+                option.textContent = `${clasificacion.Code} - ${clasificacion.Name}`;
+                dropdown.appendChild(option);
+            });
+
+            console.log("Dropdown clasificacion actualizado correctamente.");
+
+        } catch (error) {
+            console.error("Error al cargar clasificacion:", error);
+            alert("Hubo un problema al cargar las clasificaciones. Intenta de nuevo más tarde.");
+        }
+    }
+
+    // Llamar a la función con un módulo de prueba
+    document.addEventListener("DOMContentLoaded", function () {
+        cargarClasificacion("Mtto");
+    });
+
+    // Llamada de prueba con un módulo de ejemplo
+    document.addEventListener("DOMContentLoaded", function () {
+        cargarClasificacion("Mtto");
+    });
+
+
+     async function cargarImpuestos() {
+        try {
+            const response = await fetch('/MasterData/Taxs');
+
+            // Verificar si la respuesta es válida
+            if (!response.ok) {
+                throw new Error("Error en la respuesta del servidor");
+            }
+
+            // Intentamos parsear la respuesta como JSON
+            const result = await response.json();
+
+            // Verificar si result es un arreglo de Impuesto
+            if (!Array.isArray(result)) {
+                console.error("La respuesta no es un arreglo de Impuesto:", result);
+                return;
+            }
+
+            const Impuestos = result;
+            const dropdown = document.getElementById('dropdown-impuesto');
+
+            // Limpiar las opciones previas
+            dropdown.innerHTML = '<option value="" disabled selected>Buscar o seleccionar...</option>';
+
+            // Rellenar el select con las opciones
+            Impuestos.forEach(Impuesto => {
+                const option = document.createElement('option');
+                option.value = Impuesto.Code; // Asignamos el IdBascula como el valor de la opción
+                option.textContent = `${Impuesto.Code} - ${Impuesto.Name}`;  // Mostrar el Name y Ubicacion
+                dropdown.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error("Error al cargar Impuestos:", error);
+            alert("Hubo un problema al cargar las Impuestos. Intenta de nuevo más tarde.");
+        }
+    }
+
+     document.addEventListener('DOMContentLoaded', function() {
+        // Cargar los artículos al cargar la página, sin filtro inicial
+           let xModule = "Mtto";  // Aquí defines el módulo
+          cargarItems(0,xModule);
+
+        // Escuchar el cambio en el dropdown-clasificacion para filtrar artículos
+          const dropdownClasificacion = document.getElementById('dropdown-clasificacionSolComp');
+        dropdownClasificacion.addEventListener('change', function() {
+            // Llamar a cargarItems con el grupo seleccionado
+              cargarItems(dropdownClasificacion.value,xModule);
+        });
+    });
+
+
+      async function cargarItems(groupCode = '0', module) {
+        try {
+         //   const response = await fetch(`/MasterData/Get_Items?GroupCode=${groupCode}`);
+            const url = `/MasterData/Get_Items?GroupCode=${encodeURIComponent(groupCode)}&Module=${encodeURIComponent(module)}`;
+
+          // Depuración: Ver la URL en consola
+          console.log("Enviando solicitud a:", url);
+
+          const response = await fetch(url);
+
+            // Verificar si la respuesta es válida
+            if (!response.ok) {
+                throw new Error("Error en la respuesta del servidor");
+            }
+
+            // Intentamos parsear la respuesta como JSON
+            const result = await response.json();
+
+            // Verificar si result es un arreglo de proveedores
+            if (!Array.isArray(result)) {
+                console.error("La respuesta no es un arreglo de articulos:", result);
+                return;
+            }
+
+            const articulos = result;
+              const datalist = document.getElementById('articulosPur');
+
+            // Limpiar opciones previas
+            datalist.innerHTML = '';
+
+            // Rellenar el datalist con las opciones
+            articulos.forEach(articulo => {
+                const option = document.createElement('option');
+                option.value = `${articulo.ItemCode} - ${articulo.ItemName}`;
+                option.id = articulo.ItemCode;  // Asignar el id con el valor de CardCode
+                datalist.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error("Error al cargar articulos:", error);
+            alert("Hubo un problema al cargar los articulos. Intenta de nuevo más tarde.");
+        }
+    }
+
+</script>

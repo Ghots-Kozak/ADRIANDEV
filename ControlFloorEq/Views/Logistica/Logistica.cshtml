@@ -1,0 +1,402 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logística</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="~/themplates/css/Logistica.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container-fluid logistica-new-container">
+        <!-- Botones de Crear e Imprimir Ruta -->
+        <div class="top-buttons mb-4">
+            <button class="btn btn-primary top-button">
+                <i class="fas fa-plus"></i> Crear Ruta
+            </button>
+            <button class="btn btn-primary top-button">
+                <i class="fas fa-print"></i> Imprimir Ruta
+            </button>
+        </div>
+
+        <!-- Cabecera -->
+        <div class="header-container mb-4">
+            <div class="logistica-new-header">
+                <div class="logistica-new-filters">
+                    <div class="filter-group">
+                        <label for="nro-ruta">No. de ruta:</label>
+                        <input type="text" id="nro-ruta" name="nro-ruta" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label for="fecha-ruta">Fecha de ruta:</label>
+                        <input type="date" id="fecha-ruta" name="fecha-ruta" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label for="empleado">Empleado:</label>
+                        <input type="text" id="empleado" name="empleado" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label for="tipo-transporte">Tipo de transporte:</label>
+                        <input type="text" id="tipo-transporte" name="tipo-transporte" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label for="unidad">Unidad:</label>
+                        <input type="text" id="unidad" name="unidad" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label for="transportista">Transportista:</label>
+                        <input type="text" id="transportista" name="transportista" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label for="status">Status:</label>
+                        <input type="text" id="status" name="status" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label for="fecha-embarque">Fecha de embarque:</label>
+                        <input type="date" id="fecha-embarque" name="fecha-embarque" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label for="hora-embarque">Hora de embarque:</label>
+                        <input type="time" id="hora-embarque" name="hora-embarque" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label for="fecha-entrega">Fecha de entrega:</label>
+                        <input type="date" id="fecha-entrega" name="fecha-entrega" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label for="hora-entrega">Hora de entrega:</label>
+                        <input type="time" id="hora-entrega" name="hora-entrega" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <!-- Botones dentro de la cabecera -->
+            <div class="button-group mt-4">
+                <button class="btn btn-success">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+                <button class="btn btn-danger">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn btn-primary">
+                    <i class="fas fa-route"></i> Cierre de ruta
+                </button>
+            </div>
+        </div>
+
+        <!-- SECCION DE BOTONES -->
+        <div class="buttons-container mb-4">
+            <div class="tab-buttons">
+                <button class="btn btn-warning large-button" onclick="setActiveTab('listaPedidos')">
+                    Lista pedidos
+                </button>
+                <button class="btn btn-secondary large-button" onclick="setActiveTab('solicitudRecoleccion')">
+                    Solicitud de recolección
+                </button>
+                <button class="btn btn-secondary large-button" onclick="setActiveTab('solicitudCompra')">
+                    Solicitud de compra / Transporte
+                </button>
+                <button class="btn btn-secondary large-button" onclick="setActiveTab('facturacion')">
+                    Facturación
+                </button>
+                <button class="btn btn-secondary large-button" onclick="setActiveTab('reingresos')">
+                    Reingresos
+                </button>
+                <button class="btn btn-secondary large-button" onclick="setActiveTab('evidencias')">
+                    Evidencias
+                </button>
+            </div>
+        </div>
+
+        <!-- Sección de Lista Pedidos -->
+        <div id="listaPedidos" class="tab-content">
+            <!-- Contenido de Lista Pedidos -->
+        </div>
+
+        <!-- Sección de Solicitud de Recolección -->
+        <div id="solicitudRecoleccion" class="tab-content" style="display: none;">
+            <!-- Contenido de Solicitud de Recolección -->
+        </div>
+
+
+
+
+
+        <!-- Sección de Solicitud de Compra / Transporte -->
+        <div id="solicitudCompra" class="tab-content" style="display: none;">
+            <button class="btn btn-primary mb-3" onclick="openModal()">Agregar Solicitud</button>
+            <!-- Contenido de Solicitud de Compra / Transporte -->
+            <form>
+                <div class="form-group">
+                    <label>Número de Solicitud</label>
+                    <input type="text" class="form-control" placeholder="Número de Solicitud" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Solicitud</label>
+                    <input type="date" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Hora de la solicitud</label>
+                    <input type="time" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Solicitante</label>
+                    <input type="text" class="form-control" placeholder="Solicitante">
+                </div>
+                <div class="form-group">
+                    <label>Proveedor</label>
+                    <input type="text" class="form-control" placeholder="Proveedor">
+                </div>
+                <div class="form-group">
+                    <label>Nº de producto</label>
+                    <input type="text" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Producto</label>
+                    <input type="text" class="form-control" placeholder="Producto">
+                </div>
+                <div class="form-group">
+                    <label>Comentarios</label>
+                    <textarea class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Documento Adjunto</label>
+                    <input type="file" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Estatus</label>
+                    <input type="text" class="form-control" disabled>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-danger me-2">Cancelar</button>
+                    <button type="button" class="btn btn-success">Guardar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Modal para Agregar Solicitud -->
+        <div id="customModal" class="custom-modal" style="display: none;">
+            <div class="custom-modal-content">
+                <span class="close-button" onclick="closeModal()">&times;</span>
+                <h2>SOLICITUD DE COMPRA DE SERVICIO</h2>
+                <form>
+                    <div class="form-group">
+                        <label>Clasificación</label>
+                        <input type="text" class="form-control" placeholder="Clasificación">
+                    </div>
+                    <div class="form-group">
+                        <label>Artículo</label>
+                        <input type="text" class="form-control" placeholder="Artículo">
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <input type="text" class="form-control" placeholder="Descripción">
+                    </div>
+                    <div class="form-group">
+                        <label>Cantidad</label>
+                        <input type="number" class="form-control" placeholder="Cantidad">
+                    </div>
+                    <div class="form-group">
+                        <label>Precio</label>
+                        <input type="text" class="form-control" placeholder="Precio">
+                    </div>
+                    <div class="form-group">
+                        <label>Proveedor</label>
+                        <input type="text" class="form-control" placeholder="Proveedor">
+                    </div>
+                    <div class="form-group">
+                        <label>Impuesto</label>
+                        <input type="text" class="form-control" placeholder="IVAAC16 - IVA Acreditable 16%">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha requerida</label>
+                        <input type="date" class="form-control" value="2024-12-15">
+                    </div>
+                    <div class="form-group">
+                        <label>Moneda</label>
+                        <input type="text" class="form-control" placeholder="US Dollar">
+                    </div>
+                    <div class="form-group">
+                        <label>Texto libre</label>
+                        <textarea class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Guardar</button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            function openModal() {
+                document.getElementById('customModal').style.display = 'block';
+            }
+
+            function closeModal() {
+                document.getElementById('customModal').style.display = 'none';
+            }
+        </script>
+
+
+        <!-- Sección de Facturación -->
+        <div id="facturacion" class="tab-content" style="display: none;">
+            <!-- Contenido de Facturación -->
+        </div>
+
+        <!-- Sección de Reingresos -->
+        <div id="reingresos" class="tab-content" style="display: none;">
+            <!-- Contenido de Reingresos -->
+        </div>
+
+        <!-- Sección de Evidencias -->
+        <div id="evidencias" class="tab-content" style="display: none;">
+            <h2>Subir Evidencias</h2>
+
+            <div class="upload-container">
+                <div class="upload-box">
+                    <h3>Subir Archivos</h3>
+                    <button class="btn btn-primary mb-3" onclick="document.getElementById('fileInput').click()">Elegir Archivos</button>
+                    <input id="fileInput"
+                           type="file"
+                           multiple
+                           style="display: none;"
+                           onchange="handleFileUpload(event)" />
+                </div>
+
+                <div class="upload-box">
+                    <h3>Imágenes de Antes</h3>
+                    <button class="btn btn-primary mb-3" onclick="document.getElementById('beforeImageInput').click()">Elegir Imágenes</button>
+                    <input id="beforeImageInput"
+                           type="file"
+                           accept="image/*"
+                           multiple
+                           style="display: none;"
+                           onchange="handleBeforeImageUpload(event)" />
+                </div>
+
+                <div class="upload-box">
+                    <h3>Imágenes de Después</h3>
+                    <button class="btn btn-primary mb-3" onclick="document.getElementById('afterImageInput').click()">Elegir Imágenes</button>
+                    <input id="afterImageInput"
+                           type="file"
+                           accept="image/*"
+                           multiple
+                           style="display: none;"
+                           onchange="handleAfterImageUpload(event)" />
+                </div>
+            </div>
+
+            <div class="uploaded-files" id="uploadedFiles"></div>
+
+            <div class="uploaded-images">
+                <h3>Imágenes de Antes</h3>
+                <div class="image-grid" id="beforeImages"></div>
+
+                <h3>Imágenes de Después</h3>
+                <div class="image-grid" id="afterImages"></div>
+            </div>
+        </div>
+
+        <script>
+            function handleFileUpload(event) {
+                const files = event.target.files;
+                const uploadedFiles = document.getElementById('uploadedFiles');
+                uploadedFiles.innerHTML = '';
+                Array.from(files).forEach((file, index) => {
+                    const fileLink = document.createElement('a');
+                    fileLink.href = URL.createObjectURL(file);
+                    fileLink.target = '_blank';
+                    fileLink.rel = 'noopener noreferrer';
+                    fileLink.textContent = file.name;
+                    uploadedFiles.appendChild(fileLink);
+                });
+            }
+
+            function handleBeforeImageUpload(event) {
+                const files = event.target.files;
+                const beforeImages = document.getElementById('beforeImages');
+                beforeImages.innerHTML = '';
+                Array.from(files).forEach((image, index) => {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = URL.createObjectURL(image);
+                    imgElement.alt = `Antes ${index + 1}`;
+                    beforeImages.appendChild(imgElement);
+                });
+            }
+
+            function handleAfterImageUpload(event) {
+                const files = event.target.files;
+                const afterImages = document.getElementById('afterImages');
+                afterImages.innerHTML = '';
+                Array.from(files).forEach((image, index) => {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = URL.createObjectURL(image);
+                    imgElement.alt = `Después ${index + 1}`;
+                    afterImages.appendChild(imgElement);
+                });
+            }
+        </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+        function setActiveTab(tabId) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            const tabButtons = document.querySelectorAll('.tab-buttons .btn');
+
+            tabContents.forEach(content => {
+                content.style.display = 'none';
+            });
+
+            tabButtons.forEach(button => {
+                button.classList.remove('btn-warning');
+                button.classList.add('btn-secondary');
+            });
+
+            document.getElementById(tabId).style.display = 'block';
+            document.querySelector(`button[onclick="setActiveTab('${tabId}')"]`).classList.remove('btn-secondary');
+            document.querySelector(`button[onclick="setActiveTab('${tabId}')"]`).classList.add('btn-warning');
+        }
+
+        function openModal() {
+            document.getElementById('customModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('customModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

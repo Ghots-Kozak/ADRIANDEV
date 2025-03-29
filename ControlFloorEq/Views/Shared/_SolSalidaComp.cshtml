@@ -1,0 +1,52 @@
+﻿
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label for="fechaRequerida" class="form-label">Fecha Salida</label>
+        <input type="date" class="form-control text-center" id="fechaRequerida" required>
+    </div>
+    
+</div>
+
+<div class="d-flex justify-content-between mt-3">
+    <button class="btn btn-primary" onclick="agregarFila()">➕ Agregar Fila</button>
+</div>
+
+
+<div class="table-responsive">
+    <table class="table table-bordered text-center align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Clasificación</th>
+                <th>Artículo</th>
+
+                <th>Cantidad</th>
+             
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tablaBody">
+            <tr>
+                <td>
+                    <select class="form-control" id="dropdown-clasificacion" style="width: 100%;">
+                        <option value="" disabled selected>Buscar o seleccionar...</option>
+                    </select>
+                </td>
+                <td>
+                    <input list="articulos" id="articulosInput" class="form-control" placeholder="Selecciona o escribe un Artículo">
+                    <datalist id="articulos"></datalist>
+
+                </td>
+
+                <td><input type="number" class="form-control text-center" placeholder="Cantidad" required></td>
+               
+                <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">🗑</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="mb-3">
+    <label for="comentariosCompras" class="form-label">Comentarios</label>
+    <input type="text" class="form-control" id="comentariosCompras" placeholder="Comentarios" required>
+
+</div>

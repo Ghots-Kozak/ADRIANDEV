@@ -1,0 +1,212 @@
+﻿body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.logistica-new-container {
+    padding: 20px;
+}
+
+/* Estilos para los botones superiores */
+.top-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+    .top-buttons .top-button {
+        margin-right: 10px;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+        .top-buttons .top-button:hover {
+            transform: scale(1.05);
+            background-color: #0056b3;
+            color: white;
+        }
+
+/* Estilos para la cabecera */
+.header-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.logistica-new-header .logistica-new-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.logistica-new-header .filter-group {
+    flex: 1;
+}
+
+    .logistica-new-header .filter-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+    }
+
+/* Estilos para el grupo de botones */
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+}
+
+    .button-group .btn {
+        margin-left: 10px;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+        .button-group .btn:hover {
+            transform: scale(1.05);
+        }
+
+/* Estilos para los botones de pestañas */
+.tab-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+    .tab-buttons .large-button {
+        flex: 1;
+        margin-right: 10px;
+        padding: 15px;
+        border-radius: 5px;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+        .tab-buttons .large-button:last-child {
+            margin-right: 0;
+        }
+
+        .tab-buttons .large-button:hover {
+            transform: scale(1.05);
+        }
+
+/* Estilos para el contenido de las pestañas */
+.tab-content {
+    display: none;
+}
+
+    .tab-content.active {
+        display: block;
+    }
+
+/* Estilos para el modal personalizado */
+.custom-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.custom-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 600px;
+    position: relative;
+    max-height: 90%;
+    overflow-y: auto;
+    /* Centrando el contenido del modal */
+    margin: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+    .custom-modal-content .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .custom-modal-content .form-group {
+        margin-bottom: 15px;
+    }
+
+        .custom-modal-content .form-group input,
+        .custom-modal-content .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+        }
+
+    .custom-modal-content .btn {
+        margin-right: 10px;
+    }
+
+
+
+/* Estilos para la sección de Evidencias */
+#evidencias {
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+    #evidencias .upload-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    #evidencias .upload-box {
+        flex: 1;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+        #evidencias .upload-box h3 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        #evidencias .upload-box .btn {
+            display: block;
+            margin: 0 auto;
+        }
+
+    #evidencias .uploaded-files {
+        margin-top: 20px;
+    }
+
+    #evidencias .uploaded-images {
+        margin-top: 20px;
+    }
+
+        #evidencias .uploaded-images h3 {
+            margin-bottom: 10px;
+        }
+
+    #evidencias .image-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+        #evidencias .image-grid img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }

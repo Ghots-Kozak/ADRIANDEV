@@ -1,0 +1,419 @@
+﻿@model dynamic
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int index = 0;
+}
+
+
+
+<!-- para el boton de descarga  JSZip (Required for Excel export) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+<!-- PDFMake (Optional for PDF export) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<!-- Buttons Excel export (Required for Excel export) -->
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+
+
+<style>
+    #simpletablePedAnt tr:hover {
+        background-color: #f5f5f5; /* Color de fondo cuando pasas el mouse */
+        cursor: pointer; /* Cambia el cursor para indicar que la fila es clickeable */
+    }
+
+    /* Evita que las columnas crezcan demasiado */
+    #ordersTable th, #ordersTable td {
+        white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+        overflow: visible;
+        text-overflow: ellipsis; /* Agrega "..." si el texto es muy largo */
+     
+    }
+
+    /* Asegura que la tabla no se salga de la pantalla */
+    .dataTables_wrapper {
+        overflow-x: auto;
+    }
+
+
+</style>
+  
+<div class="container-fluid p-0">
+
+    <div class="mb-3">
+        <h1 class="h3 d-inline align-middle">Programación de Producción</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Listado Órdenes de Producción</h5>
+
+                </div>
+                <div class="card-body">
+                    <div class="dt-responsive table-responsive">
+                        <div id="simpletablePedAnt_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                            <div class="d-flex justify-content-end mb-3">
+                                <h5 class="fw-bold fs-5">
+                                  
+                                    #Ordenes Liberadas: <span id="totalOrdenesLiberadas" class="badge bg-info fs-6">0</span> |
+                                    #Ordenes Planificadas: <span id="totalOrdenesPlanificadas" class="badge bg-primary fs-6">0</span> |
+                                    #Ordenes Pausadas: <span id="totalOrdenesPausadas" class="badge bg-secondary fs-6">0</span> |
+                                    #Peso Neto Pendiente: <span id="totalPesoNetoPendiente" class="badge bg-warning fs-6">0</span> |
+                                    #Peso Bruto Pendiente: <span id="totalPesoBrutoPendiente" class="badge bg-dark fs-6">0</span>
+                                </h5>
+                            </div>
+
+                            <table id="ordersTable" class="display table table-striped nowrap" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">#</th> <!-- Omite el filtro de búsqueda para esta columna -->
+                                       @*  <th style="width: 80px;">DocEntry</th> *@
+                                        <th style="width: 70px;">OP</th>
+                                        <th style="width: 100px;">Fecha Fabricación</th>
+                                        <th style="width: 80px;">Estatus</th>
+                                        <th style="width: 80px;">OV</th>
+                                        <th style="width: 100px;">Fecha de Entrega OV</th>
+                                        <th style="width: 30px;">Cliente</th>
+                                        <th style="width: 30px;">Producto</th>
+                                        <th style="width: 30px;">Presentación</th>
+                                        <th style="width: 80px;">Tipo Peso</th>
+                                        <th style="width: 80px;">Cantidad Planificada</th>
+                                        <th style="width: 80px;">Peso Bruto</th>
+                                        <th style="width: 80px;">Peso Neto</th>
+                                    </tr>
+
+                                    <tr>
+                                        <th></th> <!-- Deja vacío para no mostrar el campo de búsqueda en esta columna -->
+                                        @* <th><input type="text" placeholder="B.. DocEntry" class="column-search" style="width: 80px;" /></th> *@
+                                        <th><input type="text" placeholder="B.. OP" class="column-search" style="width: 70px;" /></th>
+                                        <th><input type="text" placeholder="B.. Fecha Fabricación" class="column-search" style="width: 100px;" /></th>
+                                        <th><input type="text" placeholder="B.. Estatus" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="B.. OV" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="B.. Fecha de Entrega" class="column-search" style="width: 100px;" /></th>
+                                        <th><input type="text" placeholder="B.. Cliente" class="column-search" /></th>
+                                        <th><input type="text" placeholder="B.. Producto" class="column-search" /></th>
+                                        <th><input type="text" placeholder="B.. Presentación" class="column-search" style="width: 90px;" /></th>
+                                        <th><input type="text" placeholder="B.. Tipo Peso" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="B.. Cantidad Planificada" class="column-search" style="width: 90px;" /></th>
+                                        <th><input type="text" placeholder="B.. Peso Bruto" class="column-search" style="width: 90px;" /></th>
+                                        <th><input type="text" placeholder="B.. Peso Neto" class="column-search" style="width: 90px;" /></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model)
+                                    {
+                                        var rowClass = (Model.IndexOf(order) % 2 == 0) ? "even" : "odd";
+                                        string statusColor = order.StatusTexto == "Planificado" ? "badge-danger-light" :
+                                        order.StatusTexto == "Liberado" ? "badge-warning-light" :
+                                        "badge-secondary-light";
+
+                                        <tr class="@rowClass" data-docentry="@order.DocEntry" style="cursor:pointer;">
+                                            <td>@(++index)</td> 
+                                          @*   <td>@order.DocEntry</td> *@
+                                            <td>@order.DocNum</td>
+                                            <td>@order.Fecha_Fabricacion.ToString("yyyy-MM-dd")</td>
+                                            <td><span class="badge @statusColor">@order.StatusTexto</span></td>
+                                            <td>@order.OV</td>
+                                            <td>@order.Fecha_Entrega_OV.ToString("yyyy-MM-dd")</td>
+                                            <td>@order.CardCode @order.CardName</td>
+                                            <td>@order.ItemCode @order.ProdName</td>
+                                            <td>@order.Uom</td>
+                                            <td>@order.TipoPeso</td>
+                                            <td>@order.PlannedQty.ToString("F2")</td>
+                                            <td>@order.WeightB.ToString("F2")</td>
+                                            <td>@order.WeightN.ToString("F2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  
+</div>
+<script>
+
+    //  $(document).ready(function() {
+    //     // Asegurar que las fechas en el input tienen el formato correcto
+    //     $('#ordersTable input[type="date"]').each(function() {
+    //         var dateValue = $(this).val();
+    //         if (dateValue) {
+    //             var date = new Date(dateValue);
+    //             $(this).val(date.toISOString().split('T')[0]); // Formato: yyyy-MM-dd
+    //         }
+    //     });
+    // });
+      
+
+    // $(document).ready(function() {
+    //     var table = $('#ordersTable').DataTable({
+    //         "scrollX": true,
+    //         "paging": true,
+    //         "lengthChange": true,
+    //         "searching": true,  // Necesario para los filtros individuales
+    //         "ordering": true,
+    //         "info": true, 
+    //         "autoWidth": true,
+    //         "responsive": false,
+    //         "columnDefs": [
+    //           //  { "targets": 1, "visible": true }, // Oculta DocEntry
+    //             // { "targets": [5, 10, 11, 12], "width": "80px" },
+    //             // { "targets": [0, 2, 4], "width": "20px" },
+    //             // { "targets": [7, 8], "width": "80px" },
+    //             { "targets": "_all", "className": "dt-nowrap" }
+    //         ],
+    //         "language": {
+    //             "search": "Buscar:",
+    //             "lengthMenu": "Mostrar _MENU_ registros por página",
+    //             "zeroRecords": "No se encontraron resultados",
+    //             "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+    //             "infoEmpty": "No hay registros disponibles",
+    //             "infoFiltered": "(filtrado de _MAX_ registros en total)",
+    //             "paginate": {
+    //                 "first": "Primero",
+    //                 "last": "Último",
+    //                 "next": "Siguiente",
+    //                 "previous": "Anterior"
+    //             }
+    //         }
+    //     });
+
+    //     // **Asegurar que los inputs ocupen el ancho de su columna**
+    //     $('#ordersTable thead input.column-search').css({
+    //         "width": "100%",
+    //         "box-sizing": "border-box",
+    //         "padding": "2px"
+    //     });
+
+    //     // **Corrección: Filtro para fechas específicamente**
+    //     table.columns().every(function(index) {
+    //         // Filtrar para fechas (inputs tipo date)
+    //         if ($('#ordersTable thead th').eq(index).find('input[type="date"]').length > 0) {
+    //             $('input[type="date"]').eq(index).on('change', function() {
+    //                 var dateValue = this.value;
+    //                 if (dateValue) {
+    //                     // Aplicar filtro por fecha
+    //                     table.column(index).search(dateValue).draw();
+    //                 } else {
+    //                     // Restablecer filtro de fecha si está vacío
+    //                     table.column(index).search('').draw();
+    //                 }
+    //             }); 
+    //         } else {
+    //             // Filtro general para otras columnas
+    //             $('input.column-search').eq(index).on('keyup change', function() {
+    //                 if (table.column(index).search() !== this.value) {
+    //                     table.column(index).search(this.value).draw();
+    //                 }
+    //             });
+    //         }
+    //     });
+    // });
+        $(document).ready(function() {
+        var table = $('#ordersTable').DataTable({
+            "scrollX": true,
+            "paging": true,
+            "lengthChange": true,
+            "searching": true, // Necesario para los filtros individuales
+            "ordering": true,
+            "info": true,
+            "autoWidth": true,
+            "responsive": false, 
+            "columnDefs": [
+                // { "targets": 1, "visible": false }, // Oculta DocEntry
+                { "targets": "_all", "className": "dt-nowrap" }
+            ],
+            "language": {
+                "search": "Buscar:",
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "No hay registros disponibles",
+                "infoFiltered": "(filtrado de _MAX_ registros en total)",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            }
+        });
+
+        // Asegurar que los inputs ocupen el ancho de su columna
+        $('#ordersTable thead input.column-search').css({
+            "width": "100%",
+            "box-sizing": "border-box",
+            "padding": "2px"
+        });
+
+        // Filtros individuales para cada columna
+        table.columns().every(function(index) {
+        // Asegúrate de que la columna no sea la primera (índice 0)
+            if (index > 0) {
+                $('input.column-search').eq(index - 1).on('keyup change', function() {
+                    if (table.column(index).search() !== this.value) {
+                        table.column(index).search(this.value).draw();
+                    }
+                });
+            }
+        });
+
+
+    });
+
+
+
+
+    //     // Inicialización de DataTables
+    // $(document).ready(function () {
+    //     // Cargar los pedidos
+    //     cargarPlnProgOrdenesProd();
+    // });
+
+     function cargarPlnProgOrdenesProd() {
+        jQuery.ajax({
+            url: '/Planning/ListarPlnProgOrdenesProdAsync',
+            type: "GET",
+            xhrFields: { withCredentials: true },
+            success: function (data) {
+                if (Array.isArray(data) && data.length > 0) {
+                    var rows = '';
+
+                    data.forEach((item, index) => {
+                        let rowClass = (index % 2 === 0) ? 'even' : 'odd';
+                         // Determinar la clase de color según StatusTexto
+                        let statusColor = item.StatusTexto === "Planificado"
+                            ? "badge-danger-light"  // Rojo
+                            : item.StatusTexto === "Liberado"
+                            ? "badge-warning-light"  // Amarillo
+                            : "badge-secondary-light"; // Color por defecto
+
+                        rows += `
+                           <tr class="${rowClass}" data-docentry="${item.DocEntry}" style="cursor:pointer;">
+                                <td>${index + 1}</td>
+                                <td style="display:none;">${item.DocEntry}</td>
+                                <td>${item.DocNum}</td>
+
+                                <td>${new Date(item.Fecha_Fabricacion).toLocaleDateString()}</td>
+                                <td><span class="badge ${statusColor}">${item.StatusTexto}</span></td>
+                                <td>${item.OV}</td>
+
+                                <td>${item.CardName}</td>
+                                <td>${item.ItemCode}</td>
+                                <td>${item.ProdName}</td>
+
+                                <td>${item.Uom}</td>
+                                <td>${item.PlannedQty}</td>
+                                <td>${item.WeightB.toFixed(2)}</td>
+                                <td>${item.WeightN.toFixed(2)}</td>
+
+
+                            </tr>`;
+                    });
+
+                    // Insertar filas en el tbody de la tabla
+                    $('#simpletablePedAnt tbody').html(rows);
+
+                    // Re-inicializar DataTable
+                    $('#simpletablePedAnt').DataTable({
+                        "language": {
+                           "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/Spanish.json"
+                        },
+                        "destroy": true,
+                        "columnDefs": [
+                            {
+                                "targets": [1], // Aquí el índice de la columna que deseas ocultar
+                                "visible": false
+                            }
+                        ]
+                    });
+                } else {
+                    console.log("No se encontraron datos.");
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log("Error en AJAX:", status, error, xhr.responseText);
+            }
+        });
+    }
+
+
+    $(document).on("click", "#ordersTable tbody tr", function() {
+        let docEntry = $(this).find("td:eq(1)").text().trim(); // Obtiene el texto de la segunda columna (DocEntry)
+
+        if (docEntry) {
+            window.location.href = `/Planning/PlnProgramProd?DocEntry=${docEntry}`;
+        } else {
+            console.error("DocEntry no encontrado.");
+        }
+    });
+
+</script>
+
+<script>
+    $(document).ready(function() {
+        var table = $('#ordersTable').DataTable();
+
+        // Inicializar variables para los totales
+        var totalCantidad = 0;
+        var totalPesoNeto = 0;
+        var totalPesoBruto = 0;
+        var totalPendiente = 0;
+
+        var totalOrdenesLiberadas = 0;
+        var totalOrdenesPlanificadas = 0;
+        var totalOrdenesPausadas = 0;
+        var totalPesoNetoPendiente = 0;
+        var totalPesoBrutoPendiente = 0;
+
+        // Recorrer las filas de la tabla para sumar las cantidades y pesos según el estatus
+        table.rows().every(function() {
+            var data = this.data();
+
+            var cantidadPlanificada = parseFloat(data[10]); // Cantidad Planificada (columna 10)
+            var pesoNeto = parseFloat(data[12]); // Peso Neto (columna 12)
+            var pesoBruto = parseFloat(data[11]); // Peso Bruto (columna 11)
+          var status = $(data[4]).text().trim(); // Estatus (columna 5)
+            console.log(cantidadPlanificada, pesoNeto, pesoBruto, status)
+            // Actualizar los totales generales
+            totalCantidad += cantidadPlanificada;
+            totalPesoNeto += pesoNeto;
+            totalPesoBruto += pesoBruto;
+
+            // Calcular según el estatus
+            if (status === "Liberado") {
+                totalOrdenesLiberadas += cantidadPlanificada;
+            } else if (status === "Planificado") {
+                totalOrdenesPlanificadas += cantidadPlanificada;
+            } else if (status === "Pausado") {
+                totalOrdenesPausadas += cantidadPlanificada;
+            } 
+
+            // Calcular Peso Neto y Peso Bruto Pendiente
+           // if (status === "Pendiente") {
+                totalPesoNetoPendiente += pesoNeto;
+                totalPesoBrutoPendiente += pesoBruto;
+           // }
+        });
+
+        // Actualizar los valores en el HTML
+        $('#totalCantidadBadge').text(totalCantidad.toFixed(2));
+        $('#totalPesoNetoBadge').text(totalPesoNeto.toFixed(2));
+        $('#totalPesoBrutoBadge').text(totalPesoBruto.toFixed(2));
+        $('#totalPendienteBadge').text(totalPendiente.toFixed(2));
+
+        $('#totalOrdenesLiberadas').text(totalOrdenesLiberadas.toFixed(2));
+        $('#totalOrdenesPlanificadas').text(totalOrdenesPlanificadas.toFixed(2));
+        $('#totalOrdenesPausadas').text(totalOrdenesPausadas.toFixed(2));
+        $('#totalPesoNetoPendiente').text(totalPesoNetoPendiente.toFixed(2));
+        $('#totalPesoBrutoPendiente').text(totalPesoBrutoPendiente.toFixed(2));
+    });
+
+</script>

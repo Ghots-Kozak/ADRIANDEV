@@ -1,0 +1,91 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml"; // El archivo correcto es "_Layout.cshtml"
+}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="container mt-4">
+    <h3>Dashboard</h3>
+    <div id="chartsContainer"></div>
+</div>
+
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+        fetch('/Home/getCharts')
+            .then(response => response.json())
+            .then(charts => {
+                console.log("Gráficos obtenidos:", charts);
+
+                charts.forEach(chart => {
+                    // Crear contenedor del gráfico
+                    let chartContainer = document.createElement("div");
+                    chartContainer.classList.add("card", "mt-3", "p-3");
+                    chartContainer.innerHTML = `
+                        <div class="card-header bg-secondary text-white">${chart.Name}</div>
+                        <div class="card-body">
+                            <canvas id="chart-${chart.Id}"></canvas>
+                        </div>
+                    `;
+                    document.getElementById("chartsContainer").appendChild(chartContainer);
+
+                    // Obtener datos del gráfico
+                   fetch(`/Home/getChartData/${chart.Id}`)
+    .then(response => response.json())
+    .then(data => {
+        console.log(`📊 Gráfico ${chart.Id} - Datos recibidos:`, data);
+
+        // Verificar si los nombres de columnas existen en los datos
+        let labelsColumn = chart.LabelsColumn;
+        let valuesColumn = chart.ValuesColumn;
+
+        if (!data.length) {
+            console.error(`⚠️ No hay datos para el gráfico ${chart.Id}`);
+            return;
+        }
+
+        let sampleData = data[0];
+        console.log(`🔎 Ejemplo de un objeto en los datos:`, sampleData);
+
+        if (!(labelsColumn in sampleData) || !(valuesColumn in sampleData)) {
+            console.error(`❌ Las columnas definidas no coinciden con los datos recibidos.`);
+            console.error(`🔍 Se esperaba '${labelsColumn}' y '${valuesColumn}', pero los datos contienen:`, Object.keys(sampleData));
+            return;
+        }
+
+        // Mapear labels y valores
+           let labels = data.map(item => item[labelsColumn] || item[labelsColumn.toLowerCase()]);
+           let values = data.map(item => item[valuesColumn] || item[valuesColumn.toLowerCase()]);
+
+
+        console.log(`📊 Gráfico ${chart.Id} - Labels:`, labels);
+        console.log(`📊 Gráfico ${chart.Id} - Values:`, values);
+
+        let ctx = document.getElementById(`chart-${chart.Id}`);
+        if (!ctx) {
+            console.error(`❌ Canvas no encontrado para ID: chart-${chart.Id}`);
+            return;
+        }
+
+        new Chart(ctx.getContext("2d"), {
+            type: chart.Tipo || 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: chart.Name,
+                    data: values,
+                    backgroundColor: ['blue', 'green', 'red', 'yellow', 'black'],
+                    borderColor: ['blue', 'green', 'red', 'yellow', 'black'],
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true }
+        });
+    })
+    .catch(error => console.error("Error al obtener datos del gráfico:", error));
+
+                });
+            })
+            .catch(error => console.error("❌ Error al obtener gráficos:", error));
+    });
+
+</script>
+

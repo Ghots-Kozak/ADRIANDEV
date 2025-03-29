@@ -1,0 +1,311 @@
+﻿@{
+    string xModule = ViewData["xModule"] as string ?? "0";
+}
+<!-- Agrega SweetAlert2 desde CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label for="fechaRequerida" class="form-label">Fecha Requerida</label>
+        <input type="date" class="form-control text-center" id="fechaRequeridaTr" required>
+    </div>
+   
+</div>
+
+<div class="d-flex justify-content-between mt-3">
+    <button class="btn btn-primary" onclick="agregarFila()">➕ Agregar Fila</button>
+</div>
+
+
+<div class="table-responsive">
+    <table id="tablaTraslados" class="table table-bordered text-center align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th colspan="6" class="text-center">Traslados de Artículos</th>
+            </tr>
+            <tr>
+                <th>Clasificación</th>
+                <th>Artículo</th>
+                <th>Cantidad</th>
+                <th>Almacén Origen</th>
+                <th>Almacén Destino</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tablaBody">
+            <tr>
+                <td>
+                    <select class="form-control" id="dropdown-clasificacionTr" style="width: 100%;">
+                        <option value="" disabled selected>Buscar o seleccionar...</option>
+                    </select>
+                </td>
+                <td>
+                    <input list="articulos" id="articulosInput" class="form-control" placeholder="Selecciona o escribe un Artículo">
+                    <datalist id="articulos"></datalist>
+                </td>
+                <td><input type="number" class="form-control text-center" placeholder="Cantidad" required></td>
+                <td>
+                    <select class="form-control" id="dropdown-WhsOrgn" style="width: 100%;">
+                        <option value="" disabled selected>Buscar o seleccionar...</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-control" id="dropdown-WhsDstno" style="width: 100%;">
+                        <option value="" disabled selected>Buscar o seleccionar...</option>
+                    </select>
+                </td>
+                <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">🗑</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="mb-3">
+    <label for="comentariosTraslado" class="form-label">Comentarios</label>
+    <input type="text" class="form-control" id="comentariosTraslado" placeholder="Comentarios" required>
+
+</div>
+
+
+<script>
+    function agregarFila() {
+        let tabla = document.getElementById("tablaTraslados").querySelector("#tablaBody");
+        let nuevaFila = tabla.rows[0].cloneNode(true);
+
+        // Limpiar valores y quitar marcas de error
+        nuevaFila.querySelectorAll("input, select").forEach(el => {
+            el.value = "";
+            el.classList.remove("is-invalid");
+        });
+
+        tabla.appendChild(nuevaFila);
+
+        Swal.fire({
+            icon: "success",
+            title: "Fila agregada",
+            text: "Se ha añadido una nueva fila a la tabla.",
+            timer: 1500,
+            showConfirmButton: false
+        });
+    }
+
+
+    function eliminarFila(boton) {
+        let fila = boton.closest("tr");
+        let tabla = document.getElementById("tablaTraslados").querySelector("#tablaBody");
+
+        if (tabla.rows.length > 1) {
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: "Esta fila se eliminará de la tabla.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fila.remove();
+                    Swal.fire({
+                        icon: "success",
+                        title: "Eliminado",
+                        text: "La fila ha sido eliminada.",
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Debe haber al menos una fila.",
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+    }
+
+</script>
+
+<style>
+    .table-responsive {
+        max-height: 60vh; /* Evita que la tabla se extienda demasiado */
+        overflow-y: auto;
+    }
+
+    .is-invalid {
+        border: 2px solid red !important;
+    }
+
+    th {
+        white-space: nowrap; /* Evita que los títulos se corten */
+    }
+
+    td input, td select {
+        width: 100%; /* Ajusta los campos a la celda */
+        padding: 5px;
+    }
+
+    .d-flex {
+        gap: 10px; /* Espacio entre los botones */
+    }
+</style>
+
+<script>
+
+          // Llamar la función cuando se cargue la página
+     
+    //   document.addEventListener('DOMContentLoaded', cargarWhs);
+    document.addEventListener("DOMContentLoaded", function () {
+          let xModule = "Mtto";  // Aquí defines el módulo
+          cargarClasificacionTr(xModule);
+          cargarWhs(xModule);
+      });
+
+       async function cargarClasificacionTr(module) {
+          try {
+                const url = `/MasterData/ItemClassification?Module=${encodeURIComponent(module)}`;
+            console.log("Solicitando Tr:", url);
+           //   const response = await fetch('/MasterData/ItemClassification');
+
+            const response = await fetch(url);
+
+              // Verificar si la respuesta es válida
+              if (!response.ok) {
+                  throw new Error("Error en la respuesta del servidor");
+              }
+
+              // Intentamos parsear la respuesta como JSON
+              const result = await response.json();
+               console.log("Datos recibidos SolTr:", result);
+
+              // Verificar si result es un arreglo de clasificacion
+              if (!Array.isArray(result)) {
+                  console.error("La respuesta no es un arreglo de clasificacion:", result);
+                  return;
+              }
+
+              const clasificacions = result;
+              const dropdown = document.getElementById('dropdown-clasificacionTr');
+
+              // Limpiar las opciones previas
+              dropdown.innerHTML = '<option value="" disabled selected>Buscar o seleccionar...</option>';
+
+              // Rellenar el select con las opciones
+              clasificacions.forEach(clasificacion => {
+                  const option = document.createElement('option');
+                  option.value = clasificacion.Code; // Asignamos el IdBascula como el valor de la opción
+                  option.textContent = `${clasificacion.Code} - ${clasificacion.Name}`;  // Mostrar el Name y Ubicacion
+                  dropdown.appendChild(option);
+              });
+
+          } catch (error) {
+              console.error("Error al cargar clasificacion:", error);
+              alert("Hubo un problema al cargar las clasificacion. Intenta de nuevo más tarde.");
+          }
+      }
+
+       async function cargarWhs(module) {
+          try {
+               const url = `/MasterData/Get_WhareHousesModule?Module=${encodeURIComponent(module)}`;
+              const response = await fetch(url);
+
+              // Verificar si la respuesta es válida
+              if (!response.ok) {
+                  throw new Error("Error en la respuesta del servidor");
+              }
+
+              // Intentamos parsear la respuesta como JSON
+              const result = await response.json();
+
+              // Verificar si result es un arreglo de Almacen
+              if (!Array.isArray(result)) {
+                  console.error("La respuesta no es un arreglo de Almacen:", result);
+                  return;
+              }
+
+              const Almacens = result;
+              const dropdownWhsOrgn = document.getElementById('dropdown-WhsOrgn');
+              const dropdownWhsDstno = document.getElementById('dropdown-WhsDstno');
+
+              console.log(result);
+              // Limpiar las opciones previas
+              dropdownWhsOrgn.innerHTML = '<option value="" disabled selected>Buscar o seleccionar...</option>';
+              dropdownWhsDstno.innerHTML = '<option value="" disabled selected>Buscar o seleccionar...</option>';
+
+              // Rellenar el select con las opciones
+              Almacens.forEach(Almacen => {
+                  const option = document.createElement('option');
+                  option.value = Almacen.WhsCode; // Asignamos el IdBascula como el valor de la opción
+                  option.textContent = `${Almacen.WhsCode} - ${Almacen.WhsName}`;  // Mostrar el Name y Ubicacion                
+                  dropdownWhsDstno.appendChild(option);
+              });
+
+               Almacens.forEach(Almacen => {
+                  const option = document.createElement('option');
+                  option.value = Almacen.WhsCode; // Asignamos el IdBascula como el valor de la opción
+                  option.textContent = `${Almacen.WhsCode} - ${Almacen.WhsName}`;  // Mostrar el Name y Ubicacion
+                  console.log(`${Almacen.WhsCode} - ${Almacen.WhsName}`);
+                  dropdownWhsOrgn.appendChild(option);
+                  
+              });
+
+          } catch (error) {
+              console.error("Error al cargar Almacen:", error);
+              alert("Hubo un problema al cargar las Almacens. Intenta de nuevo más tarde.");
+          }
+      }
+
+       document.addEventListener('DOMContentLoaded', function() {
+          // Cargar los artículos al cargar la página, sin filtro inicial
+            let xModule = "Mtto";
+          cargarItems(0,xModule);
+
+          // Escuchar el cambio en el dropdown-clasificacion para filtrar artículos
+          const dropdownClasificacion = document.getElementById('dropdown-clasificacionTr');
+          dropdownClasificacion.addEventListener('change', function() {
+              // Llamar a cargarItems con el grupo seleccionado
+              cargarItems(dropdownClasificacion.value,xModule);
+          });
+      });
+
+
+      async function cargarItems(groupCode = '0', Module) {
+          try {
+              const response = await fetch(`/MasterData/Get_Items?GroupCode=${groupCode}`);
+
+              // Verificar si la respuesta es válida
+              if (!response.ok) {
+                  throw new Error("Error en la respuesta del servidor");
+              }
+
+              // Intentamos parsear la respuesta como JSON
+              const result = await response.json();
+
+              // Verificar si result es un arreglo de proveedores
+              if (!Array.isArray(result)) {
+                  console.error("La respuesta no es un arreglo de articulos:", result);
+                  return;
+              }
+
+              const articulos = result;
+              const datalist = document.getElementById('articulos');
+
+              // Limpiar opciones previas
+              datalist.innerHTML = '';
+
+              // Rellenar el datalist con las opciones
+              articulos.forEach(articulo => {
+                  const option = document.createElement('option');
+                  option.value = `${articulo.ItemCode} - ${articulo.ItemName}`;
+                  option.id = articulo.ItemCode;  // Asignar el id con el valor de CardCode
+                  datalist.appendChild(option);
+              });
+
+          } catch (error) {
+              console.error("Error al cargar articulos:", error);
+              alert("Hubo un problema al cargar los articulos. Intenta de nuevo más tarde.");
+          }
+      }
+
+</script>

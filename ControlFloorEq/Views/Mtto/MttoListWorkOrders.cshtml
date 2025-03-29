@@ -1,0 +1,517 @@
+﻿@model dynamic
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml"; // El archivo correcto es "_Layout.cshtml"
+}
+
+<style>
+    #simpletablePedAnt tr:hover {
+        background-color: #f5f5f5; /* Color de fondo cuando pasas el mouse */
+        cursor: pointer; /* Cambia el cursor para indicar que la fila es clickeable */
+    }
+</style>
+<style>
+    .modal-header {
+        background: linear-gradient(45deg, #333333, #000000);
+        color: white;
+    }
+
+    .modal-content {
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-label {
+        font-weight: bold;
+    }
+
+    .form-control {
+        border-radius: 5px;
+    }
+
+    .btn-primary {
+        background-color: #333333;
+        border-color: #333333;
+    }
+
+        .btn-primary:hover {
+            background-color: #000000;
+            border-color: #000000;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+</style>
+
+
+<div class="container-fluid p-0">
+      
+
+    @* <!-- Botón para abrir Mantenimiento.cshtml -->
+    <button type="button" class="btn btn-success"
+            onclick="window.open('@Url.Action("Mantenimiento", "Mantenimiento")', '_blank')">
+        Ir a Mantenimiento
+    </button>
+ *@
+    <div class="mb-3">
+        <h1 class="h3 d-inline align-middle">Solicitud de Trabajo</h1>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#solicitudModal">
+            <i class="bi bi-file-earmark-plus"></i> Nueva Solicitud
+        </button>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+
+                <div class="card-body">
+                    <div class="dt-responsive table-responsive">
+                        <div id="simpletablePedAnt_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                            <table id="simpletablePedAnt" class="table table-striped table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th> <!-- Nueva columna para el contador -->
+                                        <th>Solicitud</th>
+                                        <th>Fecha De Orden</th>
+                                        <th>Prioridad</th> <!--tooltip-->
+                                        <th>Hora</th>
+                                        <th>Solicitante</th>
+                                        <th>Locación</th>
+                                        <th>Acción</th>
+                                    </tr>
+
+                                    <tr>
+                                        <th></th> <!-- Deja vacío para no mostrar el campo de búsqueda en esta columna -->
+                                        @* <th><input type="text" placeholder="B.. DocEntry" class="column-search" style="width: 80px;" /></th> *@
+                                        <th><input type="text" placeholder="Buscar Solicitud" class="column-search" /></th>
+                                        <th><input type="text" placeholder="Buscar Fecha" class="column-search"  /></th>
+                                        <th><input type="text" placeholder="Buscar Prioridad" class="column-search"  /></th>
+                                        <th><input type="text" placeholder="Buscar Hora" class="column-search" /></th>
+                                        <th><input type="text" placeholder="Buscar Solicitante" class="column-search"  /></th>
+                                        <th><input type="text" placeholder="Buscar Locación" class="column-search"  /></th>
+                                        <th></th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null)
+                                    {
+                                        int index = 1; // Inicializamos el contador
+                                        foreach (var doc in Model)
+                                        {
+                                            <tr>
+                                                <td>@index</td> <!-- Número de fila -->
+                                                <td>@doc.IdSolWor</td>
+                                                <td>@(doc.DocDate != null ? Convert.ToDateTime(doc.DocDate).ToString("dd/MM/yyyy") : "N/A")</td>
+                                                <td>
+                                                    <span class="badge @(doc.Priority == "H" ? "badge-danger-light" : doc.Priority == "M" ? "badge-warning-light" : "badge-secondary-light")">
+                                                        @doc.Priority - @(doc.Priority == "H" ? "Alta" : doc.Priority == "M" ? "Media" : "Baja")
+                                                    </span>
+                                                </td>
+
+                                                <td>@doc.CreateTime</td>
+                                                <td>@doc.NameSol</td>
+                                                <td>@doc.Location</td>
+                                                <td>
+                                                    @if (doc.DocStatus == "O")
+                                                    {
+                                                        <button class="btn btn-sm btn-info" onclick="redirigirAMttoCallServices('@doc.IdSolWor')">
+                                                            <i class="fas fa-eye"></i> Abierto
+                                                        </button>
+                                                    }
+                                                    else if (doc.DocStatus == "A")
+                                                    {
+                                                        <button class="btn btn-sm btn-success" onclick="crearYEnviar('@doc.IdSolWor')">
+                                                            <i class="fas fa-paper-plane"></i> Crear y Enviar
+                                                        </button>
+                                                    }
+                                                </td>
+                                            </tr>
+                                            index++; // Aumentamos el contador en cada iteración
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="solicitudModal" tabindex="-1" aria-labelledby="solicitudModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="solicitudModalLabel">Nueva Solicitud</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="solicitudForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Fecha <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control required" id="DocDate">
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Prioridad <span class="text-danger">*</span></label>
+                            <select class="form-control required" id="Priority">
+                                <option value="">Seleccione</option>
+                                <option value="H">Alta</option>
+                                <option value="M" selected>Media</option>
+                                <option value="L">Baja</option>
+                            </select>
+                            <div class="invalid-feedback">Debe seleccionar una prioridad.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Hora de Creación <span class="text-danger">*</span></label>
+                            <input type="time" class="form-control required" id="CreateTime">
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ubicación <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control required" id="Location">
+                            <div class="invalid-feedback">Ingrese la ubicación.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <strong>Cliente:</strong>
+                            <input list="clientes" id="clientesInput" class="form-control" placeholder="Selecciona o escribe un clientes">
+                            <datalist id="clientes"></datalist>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Máquina <span class="text-danger">*</span></label>
+                            <select id="producto" class="form-control">
+                                <option value="">Escriba para buscar una máquina</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+
+                        <div class="col-md-100">
+                            <label class="form-label">Título <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control required" id="titulo">
+                            <div class="invalid-feedback">Ingrese un título.</div>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="MttoExt">
+                            <label class="form-check-label">Mantenimiento Externo</label>
+                        </div>
+                    </div>
+                    @*   <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Estado</label>
+                            <input type="text" class="form-control" value="Abierto" id="NameStatus" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Usuario <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control required" id="IdUser">
+                            <div class="invalid-feedback">Este campo es obligatorio.</div>
+                        </div>
+                    </div> *@
+                    <div class="mb-3">
+                        <label class="form-label">Comentarios</label>
+                        <textarea class="form-control" id="Remarks" rows="3"></textarea>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#simpletablePedAnt').DataTable({
+            "paging": true,      // Habilita paginación
+            "searching": true,   // Habilita búsqueda general
+            "ordering": true,    // Habilita ordenamiento
+            "info": true,        // Muestra información sobre la tabla
+            "lengthMenu": [10, 25, 50, 100], // Opciones de cantidad de filas
+            "columnDefs": [
+                { "orderable": false, "targets": [0, 7] } // Desactiva orden en contador y acciones
+            ],
+            "language": {
+                "search": "Buscar:",
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "No hay registros disponibles",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            }
+        });
+
+        // Búsqueda en columnas específicas
+        $('#simpletablePedAnt thead .column-search').on('keyup change', function () {
+            var colIndex = $(this).parent().index();
+            table.column(colIndex).search(this.value).draw();
+        });
+    });
+</script>
+
+<script>
+
+
+    document.addEventListener('DOMContentLoaded', loadMachines);
+    document.addEventListener('DOMContentLoaded', cargarClientes);
+
+
+    async function loadMachines() {
+
+            $("#producto").html('<option value="">Cargando...</option>');
+
+            $.ajax({
+                url: "/MasterData/Get_Machine?ItemCode=" ,  // Pasando ItemCode en la URL
+                type: "GET",
+                success: function (data) {
+                    console.log("Respuesta del servidor:", data);
+
+                    $("#producto").empty().append('<option value="">Seleccione una máquina</option>');
+
+                    // Recorriendo los productos devueltos en la respuesta
+                    $.each(data, function (index, producto) {
+                        // Accede a las propiedades correctas del objeto
+                        $("#producto").append(`<option value="${producto.VisResCode}">${producto.ResName}</option>`);
+                    });
+                },
+                error: function () {
+                    alert("Error al cargar las máquinas.");
+                }
+            });
+        }
+
+    async function cargarClientes() {
+        try {
+            const response = await fetch('/MasterData/Get_BusinessPartners?Type=C');
+
+            // Verificar si la respuesta es válida
+            if (!response.ok) {
+                throw new Error("Error en la respuesta del servidor");
+            }
+
+            // Intentamos parsear la respuesta como JSON
+            const result = await response.json();
+
+            // Verificar si result es un arreglo de Clientes
+            if (!Array.isArray(result)) {
+                console.error("La respuesta no es un arreglo de Clientes:", result);
+                return;
+            }
+
+            const clientes = result;
+            const datalist = document.getElementById('clientes');
+
+            // Limpiar opciones previas
+            datalist.innerHTML = '';
+
+            // Rellenar el datalist con las opciones
+            clientes.forEach(cliente => {
+                const option = document.createElement('option');
+                option.value = `${cliente.CardCode} - ${cliente.CardName}`;
+                option.id = cliente.CardCode;  // Asignar el id con el valor de CardCode
+                datalist.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error("Error al cargar cliente:", error);
+            alert("Hubo un problema al cargar los cliente. Intenta de nuevo más tarde.");
+        }
+    }
+
+</script>
+
+<script>
+
+    function redirigirAMttoCallServices(idSolWor) {
+        window.location.href = `/Mtto/ServiceCall?IdSolWor=${idSolWor}`;
+    }
+
+    function confirmarCrearYEnviar(idSolWor) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¿Deseas crear una orden de servicio?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, crear'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                crearYEnviar(idSolWor);
+            }
+        });
+    }
+
+        function crearYEnviar(idSolWor) {
+        // Mostrar el indicador de carga
+        Swal.fire({
+            title: 'Creando...',
+            text: 'Por favor, espere mientras se crea la orden de servicio.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Llamar al controlador
+        fetch(`/Mtto/ServiceCall?IdSolWor=${idSolWor}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            return response.json().then(data => {
+                if (!response.ok) {
+                    throw data; // Lanza el error para que lo capture el catch
+                }
+                return data;
+            });
+        })
+        .then(data => {
+            console.log(data);
+            // Validar la respuesta
+            if (!data.IsError) {
+                Swal.fire(
+                    'Creado!',
+                    data.Message || 'Llamada de Servicio creada exitosamente.',
+                    'success'
+                ).then(() => {
+                    // Redirigir a la vista correspondiente
+                    window.location.href = `/Mtto/ServiceCall?IdSolWor=${idSolWor}`;
+                });
+            } else {
+                Swal.fire(
+                    'Error!',
+                    data.Message || 'Ocurrió un error.',
+                    'error'
+                );
+            }
+        })
+        .catch(error => {
+            console.error("Error en la solicitud:", error);
+            Swal.fire(
+                'Error!',
+                error.error || error.message || 'Error interno del servidor.',
+                'error'
+            );
+        });
+    }
+
+
+</script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("btnGuardar").addEventListener("click", function() {
+            // Obtener los valores de los campos del formulario
+            var formData = {
+                DocDate: document.getElementById("DocDate").value,
+                Priority: document.getElementById("Priority").value,
+                CreateTime: document.getElementById("CreateTime").value,
+                Location: document.getElementById("Location").value,
+                DocStatus: 'A',
+                Machine: document.getElementById("producto").value,
+                Others: document.getElementById("titulo").value,
+                Remarks: document.getElementById("Remarks").value,
+                MttoExt: document.getElementById("MttoExt").checked ? 1 : 0 // Convertir a int
+            };
+            console.log(formData);
+
+            // Validar que los campos obligatorios estén completos
+            if (!formData.DocDate || !formData.Priority || !formData.CreateTime || !formData.Location || !formData.Machine  || !formData.Machine) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Campos incompletos',
+                    text: 'Por favor complete todos los campos obligatorios.'
+                });
+                return;
+            }
+
+            // Confirmar antes de enviar
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¿Deseas guardar esta solicitud?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, guardar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Enviar los datos al controlador usando fetch
+                        fetch("/Mtto/SolWork", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(formData)
+                        })
+                        .then(response => {
+                            return response.json().then(data => {
+                                if (!response.ok) {
+                                    throw data; // Lanza el error para que lo capture el catch
+                                }
+                                return data;
+                            });
+                        })
+                        .then(data => {
+                            if (data.isError) { // Ahora verificamos isError en lugar de success
+                                Swal.fire(
+                                    'Error!',
+                                    data.message || 'Ocurrió un error inesperado.',
+                                    'error'
+                                );
+                            } else {
+                                Swal.fire(
+                                    'Guardado!',
+                                    data.message || 'Operación exitosa.',
+                                    'success'
+                                ).then(() => {
+                                    $('#solicitudModal').modal('hide');
+                                    location.reload();
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire(
+                                'Error!',
+                                error.error || error.message || 'Error al procesar la solicitud.',
+                                'error'
+                            );
+                        });
+
+
+
+                }
+            });
+        });
+    });
+
+</script>

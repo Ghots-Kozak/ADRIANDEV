@@ -1,0 +1,168 @@
+﻿<!-- Agrega SweetAlert2 desde CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="mb-3">
+    <label for="proveedor" class="form-label">Proveedor</label>
+    <input type="text" class="form-control" id="proveedor" placeholder="Proveedor">
+</div>
+<div class="mb-3">
+    <label for="fechaRequerida" class="form-label">Fecha Requerida</label>
+    <input type="date" class="form-control text-center" id="fechaRequerida" required>
+</div>
+<div class="mb-3">
+    <label for="moneda" class="form-label">Moneda</label>
+    <select class="form-select" id="moneda" required>
+        <option value="">Seleccione</option>
+        <option>Opción 1</option>
+        <option>Opción 2</option>
+    </select>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered text-center align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Clasificación</th>
+                <th>Artículo</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Impuesto</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tablaBody">
+            <tr>
+                <td>
+                    <input list="clasificacion" class="form-control" placeholder="Clasificación" required>
+                    <datalist id="clasificacion"></datalist>
+                </td>
+                <td><input type="text" class="form-control" placeholder="Artículo" required></td>
+                <td><input type="text" class="form-control" placeholder="Descripción" required></td>
+                <td><input type="number" class="form-control text-center" placeholder="Cantidad" required></td>
+                <td><input type="number" class="form-control text-center" placeholder="Precio" required></td>
+                <td>
+                    <select class="form-select" required>
+                        <option value="">Seleccione</option>
+                        <option>Opción 1</option>
+                        <option>Opción 2</option>
+                    </select>
+                </td>
+                <td><button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">🗑</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="mb-3">
+    <label for="comentarios" class="form-label">Comentarios</label>
+    <input type="text" class="form-control" id="comentarios" placeholder="Texto libre" required>
+</div>
+
+<div class="d-flex justify-content-between mt-3">
+    <button class="btn btn-primary" onclick="agregarFila()">➕ Agregar Fila</button>
+    @* <button class="btn btn-success" onclick="crearCompra()">🛒 Crear Compra</button> *@
+</div>
+
+<script>
+    function agregarFila() {
+        let tabla = document.getElementById("tablaBody");
+        let nuevaFila = tabla.rows[0].cloneNode(true);
+
+        // Limpiar valores y quitar marcas de error
+        nuevaFila.querySelectorAll("input, select").forEach(el => {
+            el.value = "";
+            el.classList.remove("is-invalid");
+        });
+
+        tabla.appendChild(nuevaFila);
+
+        Swal.fire({
+            icon: "success",
+            title: "Fila agregada",
+            text: "Se ha añadido una nueva fila a la tabla.",
+            timer: 1500,
+            showConfirmButton: false
+        });
+    }
+
+    function eliminarFila(boton) {
+        let fila = boton.closest("tr");
+        let tabla = document.getElementById("tablaBody");
+
+        if (tabla.rows.length > 1) {
+            Swal.fire({
+                title: "¿Estás seguro?",
+                text: "Esta fila se eliminará de la tabla.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fila.remove();
+                    Swal.fire("Eliminado", "La fila ha sido eliminada.", "success");
+                }
+            });
+        } else {
+            Swal.fire("Error", "Debe haber al menos una fila.", "error");
+        }
+    }
+
+    function crearCompra() {
+        let filas = document.querySelectorAll("#tablaBody tr");
+        let camposIncompletos = false;
+
+        filas.forEach(fila => {
+            fila.querySelectorAll("input, select").forEach(campo => {
+                if (!campo.value) {
+                    campo.classList.add("is-invalid"); // Resaltar en rojo
+                    camposIncompletos = true;
+                } else {
+                    campo.classList.remove("is-invalid");
+                }
+            });
+        });
+
+        if (camposIncompletos) {
+            Swal.fire({
+                icon: "error",
+                title: "Campos vacíos",
+                text: "Por favor, complete todos los campos antes de crear la compra.",
+            });
+        } else {
+            Swal.fire({
+                icon: "success",
+                title: "Compra creada",
+                text: "Los datos han sido registrados correctamente.",
+                showConfirmButton: false,
+                timer: 2000
+            });
+            // Aquí puedes enviar los datos al servidor con fetch/AJAX
+        }
+    }
+</script>
+
+<style>
+    .table-responsive {
+        max-height: 60vh; /* Evita que la tabla se extienda demasiado */
+        overflow-y: auto;
+    }
+
+    .is-invalid {
+        border: 2px solid red !important;
+    }
+
+    th {
+        white-space: nowrap; /* Evita que los títulos se corten */
+    }
+
+    td input, td select {
+        width: 100%; /* Ajusta los campos a la celda */
+        padding: 5px;
+    }
+
+    .d-flex {
+        gap: 10px; /* Espacio entre los botones */
+    }
+</style>

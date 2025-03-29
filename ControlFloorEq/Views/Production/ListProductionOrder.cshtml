@@ -1,0 +1,155 @@
+﻿@model dynamic
+@{
+    int index = 0;
+}
+
+
+<style>
+
+
+    /* Para garantizar que los botones en la tabla no se desborden */
+    table.dataTable {
+        width: 100% !important; /* Fuerza la tabla a ocupar todo el ancho del contenedor */
+    }
+
+</style>
+
+
+<div class="container-fluid p-0">
+
+    <div class="mb-3">
+        <h1 class="h3 d-inline align-middle">Ordenes de Fabricación</h1>
+
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Listado </h5>
+
+                </div>
+                <div class="card-body">
+                    <div class="dt-responsive table-responsive">
+                        <div id="simpletablePedAnt_wrapper" class="dataTables_wrapper dt-bootstrap4">
+
+
+                            <table id="ordenesTable" class="display ordenes-produccion-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>OP</th>
+                                        <th>Fecha De Orden</th>
+                                        <th>Estatus</th>
+                                        <th>Pedido Del Cliente</th>
+                                        <th>Cliente</th>
+                                        <th>N° De Producto</th>
+                                        <th>Producto</th>
+                                        <th>Presentación</th>
+                                        <th>Cantidad Planificada</th>
+                                        <th>Peso Bruto</th>
+                                        <th>Peso Neto</th>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <th><input type="text" placeholder="Buscar OP" class="column-search" /></th>
+                                        <th><input type="text" placeholder="Buscar Fecha" class="column-search" /></th>
+                                        <th><input type="text" placeholder="Buscar Estatus" class="column-search" /></th>
+                                        <th><input type="text" placeholder="Buscar Pedido" class="column-search" /></th>
+                                        <th><input type="text" placeholder="Buscar Cliente" class="column-search" /></th>
+                                        <th><input type="text" placeholder="Buscar Producto" class="column-search" /></th>
+                                        <th><input type="text" placeholder="Buscar Producto" class="column-search" /></th>
+                                        <th><input type="text" placeholder="Buscar Presentación" class="column-search" /></th>
+                                        <th><input type="text" placeholder="Buscar Cantidad" class="column-search" /></th>
+                                        <th><input type="text" placeholder="Buscar Peso Bruto" class="column-search" /></th>
+                                        <th><input type="text" placeholder="Buscar Peso Neto" class="column-search" /></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model)
+                                    {
+                                        <tr style="cursor: pointer;" onclick="navigateToOrder(@order.DocEntry)">
+                                            <td>@(++index)</td>
+                                            <td>@order.DocNum</td>
+                                            <td>@order.Fecha_Fabricacion.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                <span style="
+                                                background-color: @(order.StatusTexto == "Planificado" ? "#ffca2c" : "#157347");
+                                                padding: 5px;
+                                                margin-left: 10px;
+                                                color: @(order.StatusTexto == "Planificado" ? "#000" : "#fff");
+                                                border-radius: 5px;">
+                                                    @order.StatusTexto
+                                                </span>
+                                            </td>
+                                            <td>@order.OV</td>
+                                            <td>@order.CardName</td>
+                                            <td>@order.ItemCode</td>
+                                            <td>@order.ProdName</td>
+                                            <td>@order.Uom</td>
+                                            <td>@order.PlannedQty.ToString("F2")</td>
+                                            <td>@order.WeightB.ToString("F2")</td>
+                                            <td>@order.WeightN.ToString("F2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#ordenesTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "language": {
+                "search": "Buscar:",
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "No hay registros disponibles",
+                "infoFiltered": "(filtrado de _MAX_ registros en total)",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            }
+        });
+
+        // Agregar búsqueda por columna
+        $('#ordenesTable thead tr:eq(1) th input').on('keyup change', function () {
+            let columnIndex = $(this).parent().index();
+            table.column(columnIndex).search(this.value).draw();
+        });
+    });
+
+    // function navigateToOrder(docEntry) {
+    //     var storedSubMenus = localStorage.getItem("subMenus");
+    //     if (storedSubMenus) {
+    //         var subMenusArray = JSON.parse(storedSubMenus);
+    //         var url = subMenusArray.permisos[0].url + "/" + docEntry;
+    //         window.location.href = url;
+    //     }
+    // }
+
+ 
+    // Función que maneja la redirección al seleccionar una fila de la tabla
+    function navigateToOrder(docEntry) {
+           // Redirigir a la acción WPS del controlador, pasando el DocEntry en la URL
+           window.location.href = '/Production/WPS?DocEntry=' + docEntry;
+       }
+
+
+</script>

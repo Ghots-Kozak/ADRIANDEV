@@ -1,0 +1,408 @@
+﻿@model dynamic
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int index = 0;
+}
+
+
+ 
+
+
+<!-- para el boton de descarga  JSZip (Required for Excel export) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+<!-- PDFMake (Optional for PDF export) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script> 
+<!-- Buttons Excel export (Required for Excel export) -->
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+
+
+<div class="container-fluid p-0">
+
+    <div class="mb-3">
+        <h1 class="h3 d-inline align-middle">Programación de entrega</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Órdenes de Venta</h5>
+
+                </div>
+                <div class="card-body">
+                    <div class="dt-responsive table-responsive">
+                        <div id="simpletablePedAnt_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                            <div class="d-flex justify-content-end mb-3">
+                                <h5 class="fw-bold fs-5">
+                                    Cantidad Total: <span id="totalCantidadBadge" class="badge bg-primary fs-6">0</span> |
+                                    Total Peso Neto: <span id="totalPesoNetoBadge" class="badge bg-success fs-6">0</span> |
+                                    Total Peso Bruto: <span id="totalPesoBrutoBadge" class="badge bg-warning text-dark fs-6">0</span> |
+                                    Total Cantidad Pendiente: <span id="totalPendienteBadge" class="badge bg-danger fs-6">0</span>
+                                </h5> 
+                            </div>
+
+
+                            <table id="ordersTable" class="display table table-striped nowrap" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th style="width: 80px;">Orden de Venta</th>
+                                        <th style="width: 80px;">DocEntry</th>
+                                        <th style="width: 80px;">LineNum</th>
+                                        <th style="width: 80px;">Fecha OV</th>
+                                        <th style="width: 80px;">Fecha Venc.</th>
+                                        <th>Cliente</th>
+                                        <th style="width: 80px;">Referencia</th>
+                                        <th>Producto</th>
+                                        <th style="width: 80px;">Presentación</th>
+                                        <th style="width: 80px;">Estado</th>
+                                        <th style="width: 80px;">Cantidad</th>
+                                        <th style="width: 80px;">Cantidad Pendiente</th>
+                                        <th style="width: 80px;">Stock Disponible</th>
+                                        <th style="width: 80px;">Almacén</th>
+                                        <th style="width: 80px;">Lote</th>
+                                        <th style="width: 80px;">Peso Neto</th>
+                                        <th style="width: 80px;">Peso Bruto</th>
+                                        <th style="width: 80px;">Stock General</th>
+
+                                        <th>WPS</th>
+                                        <th>Entrega</th>   
+                                       
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <th><input type="text" placeholder="Buscar OV" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar DocEntry" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar LineNum" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar Fecha OV" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar Fecha Venc." class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar Cliente" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar Referencia" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar Producto" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar Presentación" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar Estado" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar Cantidad" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar Cant. Pendiente" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar Stock Disp." class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar Almacén" class="column-search" style="width: 80px;" /></th>
+
+                                        <th><input type="text" placeholder="Buscar Lote" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar Peso Neto" class="column-search" style="width: 80px;" /></th>
+                                        <th><input type="text" placeholder="Buscar Peso Bruto" class="column-search" /></th>
+                                        <th><input type="text" placeholder="Buscar Stock General" class="column-search" /></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model)
+                                    {
+                                        <tr>
+                                            <td>@(++index)</td>
+                                            <td>@order.DocNum</td>
+                                            <td>@order.DocEntry</td>
+                                            <td>@order.LineNum</td>
+                                            <td>@order.DocDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@order.DocDueDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@order.CardCode @order.CardName</td>
+                                            <td>@order.Referencia</td>
+                                            <td>@order.ItemCode @order.ItemName</td>
+                                            <td>@order.Presentacion</td>
+
+                                            <td>
+                                                <span class="badge @(order.LineStatus == "C" ? "bg-danger" : "bg-dark")">
+                                                    @(order.LineStatus == "O" ? "Abierto" : "Cerrado")
+                                                </span>
+                                            </td>
+                                            <td>@(order.Quantity?.ToString("F2") ?? "0")</td>                                          
+                                            <td>@(order.OpenQty?.ToString("F2") ?? "0")</td>
+                                            <td>
+                                                @if (order.StockDisp <= 0)
+                                                {
+                                                    <span class="badge bg-danger">Sin Stock</span>
+                                                }
+                                                else if (order.StockDisp < 10)
+                                                {
+                                                    <span class="badge bg-warning text-dark">Bajo (@order.StockDisp.ToString("F2"))</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">Disponible (@order.StockDisp.ToString("F2"))</span>
+                                                }
+                                            </td>
+                                            <td>@order.WhsCode</td>
+
+                                               <td>@order.Batch</td>
+                                           <td>@order.PesoBT.ToString("F2")</td>
+                                           <td>@order.PesoNT.ToString("F2")</td>
+                                           <td>
+                                                @if (order.StockGral <= 0)
+                                                {
+                                                    <span class="badge bg-danger">Sin Stock</span>
+                                                }
+                                                else if (order.StockGral < 10)
+                                                {
+                                                    <span class="badge bg-warning text-dark">Bajo (@order.StockGral.ToString("F2"))</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">Disponible (@order.StockGral.ToString("F2"))</span>
+                                                }
+                                            </td> 
+
+                                           
+                                            <!-- Botón "Crear WPS" o Badge "Creado en WPS" -->
+                                            <td>
+                                                @if (order.StatusOP == null || order.StatusOP == 0)
+                                                {
+                                                    <button class="btn btn-danger btn-sm" onclick="crearWPS(@order.DocEntry, @order.LineNum)">
+                                                        <i class="fa fa-check"></i> Crear WPS
+                                                    </button>
+                                                }
+                                                else 
+                                                {
+                                                    <span class="badge bg-success text-white">Creado en WPS</span>
+                                                }
+                                            </td>
+                                            <!-- Botón "Entregar" o Badge "En Ruta" -->
+                                            <td>
+                                                @if (order.StatusRuta == "L")
+                                                {
+                                                    <span class="badge bg-success text-white">En Ruta</span>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-primary btn-sm" onclick="CambioRuta(@order.DocEntry, @order.LineNum)">
+                                                        <i class="fa fa-eye"></i> Entregar
+                                                    </button>
+                                                }
+                                            </td>
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<script>
+       function limpiarNumero(valor) {
+        let numero = valor.replace(/[^\d.-]/g, '').trim(); // Elimina todo excepto dígitos, puntos y signos negativos
+        return parseFloat(numero) || 0;
+    }
+
+    function calcularTotales() {
+        let totalCantidad = 0, totalPesoNeto = 0, totalPesoBruto = 0, totalPendiente = 0;
+
+        $("#ordersTable tbody tr").each(function () {
+            totalCantidad += limpiarNumero($(this).find("td:eq(11)").text().trim());
+            totalPesoNeto += limpiarNumero($(this).find("td:eq(17)").text().trim());
+            totalPesoBruto += limpiarNumero($(this).find("td:eq(18)").text().trim()); // Ahora se limpiará correctamente
+            totalPendiente += limpiarNumero($(this).find("td:eq(12)").text().trim());
+
+            console.log('Peso Bruto (Limpio):', limpiarNumero($(this).find("td:eq(18)").text().trim())); // Depuración
+        });
+
+        $("#totalCantidadBadge").text(totalCantidad.toFixed(2));
+        $("#totalPesoNetoBadge").text(totalPesoNeto.toFixed(2));
+        $("#totalPesoBrutoBadge").text(totalPesoBruto.toFixed(2));
+        $("#totalPendienteBadge").text(totalPendiente.toFixed(2));
+
+        console.log("Total Cantidad:", totalCantidad,
+    "Total Peso Neto:", totalPesoNeto,
+    "Total Peso Bruto:", totalPesoBruto,
+    "Total Pendiente:", totalPendiente);
+
+
+    }
+
+
+
+    $(document).ready(function () {
+        calcularTotales();
+        $('#ordersTable').on('draw.dt', calcularTotales); // Para DataTables
+    });
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        var table = $('#ordersTable').DataTable({
+            "scrollX": true, // Permite desplazamiento horizontal
+            "paging": true, // Habilita la paginación
+            "lengthChange": true, // Permite cambiar cantidad de filas a mostrar
+            "searching": true, // Habilita la búsqueda global
+            "ordering": true, // Permite ordenar columnas
+            "info": true, // Muestra información del paginador
+            "autoWidth": false, // Evita deformaciones por tamaño automático
+            "columnDefs": [
+                { "width": "100px", "targets": [0, 1, 2, 3] }, // Ajusta ancho de columnas clave
+                { "width": "200px", "targets": [4, 5, 6] }, // Ajuste específico en algunas columnas
+                { targets: [2, 3], visible: false } 
+            ], 
+            "language": {
+                "search": "Buscar:",
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "No hay registros disponibles",
+                "infoFiltered": "(filtrado de _MAX_ registros en total)",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            },
+            "dom": 'Bfrtip', // Esto agrega los botones en la parte superior
+            "buttons": [
+                {
+                    extend: 'excelHtml5',
+                    text: 'Exportar a Excel',
+                    title: 'Pedidos', // Título del archivo exportado
+                    exportOptions: {
+                        columns: ':visible' // Exporta solo las columnas visibles
+                    }
+                } 
+            ]
+        });
+
+        // Aplicar filtros por cada columna individualmente
+        $('.column-search').on('keyup change', function () {
+            var colIndex = $(this).parent().index();
+            table.column(colIndex).search(this.value).draw();
+        });
+    });
+</script>
+
+<script>
+
+  
+
+    function crearWPS(docEntry, lineNum) {
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción creara una Orden de Fabricación",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#28a745",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, Crear",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Mostrar mensaje de carga mientras se procesa la solicitud
+                Swal.fire({
+                    title: "Procesando...",
+                    text: "Por favor, espera mientras se crea el documento.",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                console.log(docEntry, lineNum);
+                // Llamada AJAX para marcar como entregado
+                $.ajax({
+                    url: `/Planning/MarcarOrdenEntregada?DocEntry=${docEntry}&LineNum=${lineNum}`,
+                    type: "POST",
+                    success: function(response) {
+
+                        Swal.fire({
+                            title: "¡Creado!",
+                            text: response.message,
+                            icon: "success"
+                        }).then(() => {
+                            window.location.reload(); // Refrescar la página
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            title: "Error",
+                            text: xhr.responseJSON?.message || "No se pudo procesar la solicitud.",
+                            icon: "error"
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+
+
+     function CambioRuta(DocEntry, LineNum) {
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Se actualizará el estado de la orden a 'Delivered'.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, actualizar",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Procesando...",
+                    text: "Por favor, espera...",
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading(); // Muestra el loader
+                    }
+                });
+
+                fetch(`/Planning/Update_Order_Delivery?DocEntry=${DocEntry}&LineNum=${LineNum}&Status=L`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    Swal.close(); // Cierra el loader antes de mostrar el mensaje
+
+                    if (data.success) {
+                        Swal.fire({
+                            title: "¡Éxito!",
+                            text: "Orden actualizada correctamente.",
+                            icon: "success"
+                        }).then(() => {
+                            window.location.reload(); // Refrescar la página
+                        });
+                    } else {
+                        Swal.fire({
+                            title: "Error",
+                            text: data.message || "Hubo un error al actualizar la orden.",
+                            icon: "error"
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.close(); // Cierra el loader en caso de error
+
+                    Swal.fire({
+                        title: "Error",
+                        text: "Ocurrió un problema en la solicitud. Verifica tu conexión.",
+                        icon: "error"
+                    });
+
+                    console.error("Error en la solicitud:", error);
+                });
+            }
+        });
+    }
+
+ 
+</script>

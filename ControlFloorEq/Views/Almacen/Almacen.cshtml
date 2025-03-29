@@ -1,0 +1,613 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Entradas de Mercancía</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="~/themplates/css/Almacen.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container-fluid almacen">
+        <!-- Botón de búsqueda -->
+        <div class="search-section mb-4 d-flex justify-content-end">
+            <button class="btn btn-secondary" onclick="showSearchHeaderModal()">
+                <i class="fas fa-search"></i> Buscar
+            </button>
+        </div>
+
+        <!-- Cabecera -->
+        <header class="mb-4 d-flex justify-content-between align-items-center">
+            <h1>Gestión de Entradas de Mercancía</h1>
+            <button id="estado-button" class="btn btn-success" onclick="toggleEstado()">Abierto</button>
+        </header>
+
+        <!-- Formulario de cabecera -->
+        <div class="form-header mb-4">
+            <div class="row">
+                <div class="col-md-2 form-group">
+                    <label>Número de Pedido</label>
+                    <input type="text" class="form-control">
+                </div>
+                <div class="col-md-2 form-group">
+                    <label>Fecha Pedido</label>
+                    <input type="date" class="form-control">
+                </div>
+                <div class="col-md-2 form-group">
+                    <label>Fecha Vencimiento</label>
+                    <input type="date" class="form-control">
+                </div>
+                <div class="col-md-2 form-group">
+                    <label>Referencia proveedor</label>
+                    <input type="text" class="form-control">
+                </div>
+                <div class="col-md-2 form-group">
+                    <label>Código de proveedor</label>
+                    <input type="text" class="form-control">
+                </div>
+                <div class="col-md-2 form-group">
+                    <label>Proveedor</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control">
+                        <button class="btn btn-secondary"><i class="fas fa-print"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2 form-group">
+                    <label>Número de Solicitud</label>
+                    <input type="text" class="form-control">
+                </div>
+                <div class="col-md-2 form-group">
+                    <label>Fecha Solicitud</label>
+                    <input type="date" class="form-control">
+                </div>
+                <div class="col-md-2 form-group">
+                    <label>Fecha Requerida</label>
+                    <input type="date" class="form-control">
+                </div>
+                <div class="col-md-2 form-group">
+                    <label>Depto. Solicitante</label>
+                    <input type="text" class="form-control">
+                </div>
+                <div class="col-md-2 form-group">
+                    <label>Solicitante</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control">
+                        <button class="btn btn-secondary"><i class="fas fa-print"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones para los módulos -->
+        <div class="module-buttons mb-4">
+            <button class="btn btn-outline-primary module-button active" onclick="setActiveModule('entrada')">
+                <i class="fas fa-box"></i> Entrada de mercancía
+            </button>
+            <button class="btn btn-outline-primary module-button" onclick="setActiveModule('calidad')">
+                <i class="fas fa-check"></i> Control de calidad
+            </button>
+            <button class="btn btn-outline-primary module-button" onclick="setActiveModule('devolucion')">
+                <i class="fas fa-undo"></i> Devolución de mercancía
+            </button>
+            <button class="btn btn-outline-primary module-button" onclick="setActiveModule('anexos')">
+                <i class="fas fa-paperclip"></i> Anexos
+            </button>
+        </div>
+
+        <div id="entrada" class="module-content active">
+            <!-- Contenido de Entrada de Mercancía -->
+            <h2>Entrada de Mercancía</h2>
+            <div class="entrada-mercancia-table">
+                <div class="table-header">
+                    <div>Número de Entrada</div>
+                    <div>Fecha de entrada</div>
+                    <div>Nº referencia</div>
+                    <div>Usuario</div>
+                    <div>Nº de producto</div>
+                    <div>Producto</div>
+                    <div>Cantidad Pedido</div>
+                    <div>Almacén</div>
+                    <div>Lote</div>
+                    <div>Fecha de ingreso</div>
+                    <div>Fecha Fab.</div>
+                    <div>Fecha vencimiento</div>
+                    <div>Cantidad Recibida</div>
+                </div>
+                <div class="table-row">
+                    <div><input type="text" value="2006" class="form-control" /></div>
+                    <div><input type="date" value="2024-09-12" class="form-control" /></div>
+                    <div><input type="text" value="456" class="form-control" /></div>
+                    <div><input type="text" value="Juan Perez" class="form-control" /></div>
+                    <div><input type="text" value="MP-00054" class="form-control" /></div>
+                    <div><input type="text" value="TARIMAS" class="form-control" /></div>
+                    <div><input type="number" value="300" class="form-control" /></div>
+                    <div><input type="text" value="ALM-002" class="form-control" /></div>
+                    <div><input type="text" value="2006" class="form-control" /></div>
+                    <div><input type="date" value="2024-09-12" class="form-control" /></div>
+                    <div><input type="date" value="2024-09-12" class="form-control" /></div>
+                    <div><input type="date" value="2024-09-12" class="form-control" /></div>
+                    <div><input type="number" value="3000" class="form-control" /></div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="showAddModal()"><i class="fas fa-plus"></i> Agregar</button>
+                <button id="estadoEntradaButton" class="btn btn-success" onclick="toggleEstadoEntrada()">Abierto</button>
+                <button class="btn btn-secondary" onclick="showSearchModal()"><i class="fas fa-search"></i> Buscar Entrada</button>
+                <button class="btn btn-secondary"><i class="fas fa-print"></i> Imprimir Entrada</button>
+            </div>
+            <div class="additional-container mt-4">
+                <div class="form-group">
+                    <label for="comentarios">Comentarios</label>
+                    <textarea id="comentarios" class="form-control" placeholder="Escriba sus comentarios"></textarea>
+                </div>
+            </div>
+
+            <!-- Ventana emergente de agregar -->
+            <div id="addModal" class="modal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Creación de lote</h5>
+                            <button type="button" class="btn-close" onclick="closeAddModal()" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-header">
+                                <div>Lote</div>
+                                <div>Fecha ingreso</div>
+                                <div>Fecha vencimiento</div>
+                                <div>Referencia 1</div>
+                                <div>Cantidad</div>
+                            </div>
+                            <div class="table-row">
+                                <div><input type="text" class="form-control" /></div>
+                                <div><input type="date" class="form-control" /></div>
+                                <div><input type="date" class="form-control" /></div>
+                                <div><input type="text" class="form-control" /></div>
+                                <div><input type="number" class="form-control" /></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary"><i class="fas fa-plus"></i> Asignar lote</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ventana emergente de búsqueda -->
+            <div id="searchModal" class="modal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Resultados de Búsqueda</h5>
+                            <button type="button" class="btn-close" onclick="closeSearchModal()" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="filters mb-3">
+                                <select class="form-select mb-2">
+                                    <option>Selecciona Pedido</option>
+                                </select>
+                                <select class="form-select mb-2">
+                                    <option>Selecciona Fecha</option>
+                                </select>
+                                <select class="form-select mb-2">
+                                    <option>Selecciona Cliente</option>
+                                </select>
+                                <select class="form-select mb-2">
+                                    <option>Selecciona Sucursal</option>
+                                </select>
+                                <select class="form-select mb-2">
+                                    <option>Selecciona Dirección</option>
+                                </select>
+                                <select class="form-select mb-2">
+                                    <option>Selecciona Persona de contacto</option>
+                                </select>
+                                <select class="form-select mb-2">
+                                    <option>Selecciona Estatus</option>
+                                </select>
+                            </div>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Entrada #</th>
+                                        <th>Fecha</th>
+                                        <th>Cliente</th>
+                                        <th>Sucursal</th>
+                                        <th>Dirección</th>
+                                        <th>Persona de contacto</th>
+                                        <th>Estatus</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1451</td>
+                                        <td>13-12-2024</td>
+                                        <td>EXECUTONE DE MONTERREY S.A. DE C.V.</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>JESUS SMITH</td>
+                                        <td>Cerrada</td>
+                                    </tr>
+                                    <tr>
+                                        <td>1450</td>
+                                        <td>30-11-2024</td>
+                                        <td>PAHUSA PRODUCTOS INDUSTRIALES</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>SANDY JACOBO</td>
+                                        <td>Cerrada</td>
+                                    </tr>
+                                    <!-- Añadir más filas según sea necesario -->
+                                </tbody>
+                            </table>
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-secondary">Anterior</button>
+                                <button class="btn btn-secondary">Siguiente</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function showAddModal() {
+                var addModal = new bootstrap.Modal(document.getElementById('addModal'), {});
+                addModal.show();
+            }
+
+            function closeAddModal() {
+                var addModal = bootstrap.Modal.getInstance(document.getElementById('addModal'));
+                addModal.hide();
+            }
+
+            function showSearchModal() {
+                var searchModal = new bootstrap.Modal(document.getElementById('searchModal'), {});
+                searchModal.show();
+            }
+
+            function closeSearchModal() {
+                var searchModal = bootstrap.Modal.getInstance(document.getElementById('searchModal'));
+                searchModal.hide();
+            }
+
+            function toggleEstadoEntrada() {
+                var estadoButton = document.getElementById('estadoEntradaButton');
+                if (estadoButton.classList.contains('btn-success')) {
+                    estadoButton.classList.remove('btn-success');
+                    estadoButton.classList.add('btn-danger');
+                    estadoButton.textContent = 'Cerrado';
+                } else {
+                    estadoButton.classList.remove('btn-danger');
+                    estadoButton.classList.add('btn-success');
+                    estadoButton.textContent = 'Abierto';
+                }
+            }
+        </script>
+
+
+
+
+
+
+
+
+
+
+        <div id="calidad" class="module-content">
+            <!-- Contenido de Control de Calidad -->
+            <h2>Control de Calidad</h2>
+            <div class="control-calidad-table">
+                <div class="table-header">
+                    <div>Número de Entrada</div>
+                    <div>Fecha de entrada</div>
+                    <div>Nº referencia</div>
+                    <div>Usuario</div>
+                    <div>Nº de producto</div>
+                    <div>Producto</div>
+                    <div>Cantidad Pedido</div>
+                    <div>Almacén</div>
+                    <div>Lote</div>
+                    <div>Fecha de ingreso</div>
+                    <div>Fecha Fab.</div>
+                    <div>Fecha vencimiento</div>
+                    <div>Cantidad Recibida</div>
+                    <div>Cantidad Conforme</div>
+                    <div>Aceptar y transferir</div>
+                </div>
+                <div class="table-row">
+                    <div><input type="text" value="2006" class="form-control" /></div>
+                    <div><input type="date" value="2024-09-12" class="form-control" /></div>
+                    <div><input type="text" value="456" class="form-control" /></div>
+                    <div><input type="text" value="Juan Perez" class="form-control" /></div>
+                    <div><input type="text" value="MP-00054" class="form-control" /></div>
+                    <div><input type="text" value="TARIMAS" class="form-control" /></div>
+                    <div><input type="number" value="300" class="form-control" /></div>
+                    <div><input type="text" value="ALM-002" class="form-control" /></div>
+                    <div><input type="text" value="2006" class="form-control" /></div>
+                    <div><input type="date" value="2024-09-12" class="form-control" /></div>
+                    <div><input type="date" value="2024-09-12" class="form-control" /></div>
+                    <div><input type="date" value="2024-09-12" class="form-control" /></div>
+                    <div><input type="number" value="3000" class="form-control" /></div>
+                    <div><input type="number" value="3000" class="form-control" /></div>
+                    <div><input type="checkbox" checked class="form-check-input" /></div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button id="estadoCalidadButton" class="btn btn-success" onclick="toggleEstadoCalidad()">Abierto</button>
+                <button class="btn btn-secondary"><i class="fas fa-search"></i> Buscar Entrada</button>
+                <button class="btn btn-secondary"><i class="fas fa-print"></i> Imprimir Entrada</button>
+            </div>
+            <div class="additional-container mt-4">
+                <div class="form-group">
+                    <label for="comentariosCalidad">Comentarios</label>
+                    <textarea id="comentariosCalidad" class="form-control" placeholder="Escriba sus comentarios"></textarea>
+                </div>
+                <div class="upload-section">
+                    <div class="upload-box">
+                        <h3>Subir Archivo</h3>
+                        <button class="btn btn-primary"><i class="fas fa-upload"></i> Subir Archivo</button>
+                    </div>
+                </div>
+                <div class="upload-section mt-3">
+                    <div class="upload-box">
+                        <h3>Subir Archivo</h3>
+                        <button class="btn btn-primary"><i class="fas fa-upload"></i> Subir Archivo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function toggleEstadoCalidad() {
+                var estadoButton = document.getElementById('estadoCalidadButton');
+                if (estadoButton.classList.contains('btn-success')) {
+                    estadoButton.classList.remove('btn-success');
+                    estadoButton.classList.add('btn-danger');
+                    estadoButton.textContent = 'Cerrado';
+                } else {
+                    estadoButton.classList.remove('btn-danger');
+                    estadoButton.classList.add('btn-success');
+                    estadoButton.textContent = 'Abierto';
+                }
+            }
+        </script>
+
+
+
+
+
+
+
+
+
+
+
+        <div id="devolucion" class="module-content">
+            <!-- Contenido de Devolución de Mercancía -->
+            <h2>Devolución de Mercancía</h2>
+            <div class="devolucion-mercancia-table">
+                <div class="table-header">
+                    <div>Número de Entrada</div>
+                    <div>Fecha de entrada</div>
+                    <div>Nº referencia</div>
+                    <div>Usuario</div>
+                    <div>Nº de producto</div>
+                    <div>Producto</div>
+                    <div>Cantidad Pedido</div>
+                    <div>Almacén</div>
+                    <div>Lote</div>
+                    <div>Fecha de ingreso</div>
+                    <div>Fecha Fab.</div>
+                    <div>Fecha vencimiento</div>
+                    <div>Cantidad Recibida</div>
+                    <div class="field-red">Cantidad a devolver</div> <!-- Campo extra marcado en rojo -->
+                </div>
+                <div class="table-row">
+                    <div><input type="text" value="2006" class="form-control" /></div>
+                    <div><input type="date" value="2024-09-12" class="form-control" /></div>
+                    <div><input type="text" value="456" class="form-control" /></div>
+                    <div><input type="text" value="Juan Perez" class="form-control" /></div>
+                    <div><input type="text" value="MP-00054" class="form-control" /></div>
+                    <div><input type="text" value="TARIMAS" class="form-control" /></div>
+                    <div><input type="number" value="300" class="form-control" /></div>
+                    <div><input type="text" value="ALM-002" class="form-control" /></div>
+                    <div><input type="text" value="2006" class="form-control" /></div>
+                    <div><input type="date" value="2024-09-12" class="form-control" /></div>
+                    <div><input type="date" value="2024-09-12" class="form-control" /></div>
+                    <div><input type="date" value="2024-09-12" class="form-control" /></div>
+                    <div><input type="number" value="3000" class="form-control" /></div>
+                    <div><input type="number" class="form-control input-red" value="3000" /></div> <!-- Campo extra marcado en rojo -->
+                </div>
+            </div>
+            <div class="form-actions">
+                <button id="estadoDevolucionButton" class="btn btn-success" onclick="toggleEstadoDevolucion()">Abierto</button>
+                <button class="btn btn-secondary"><i class="fas fa-search"></i> Buscar Entrada</button>
+                <button class="btn btn-secondary"><i class="fas fa-print"></i> Imprimir Entrada</button>
+            </div>
+            <div class="additional-container mt-4">
+                <div class="form-group">
+                    <label for="comentariosDevolucion">Comentarios</label>
+                    <textarea id="comentariosDevolucion" class="form-control" placeholder="Escriba sus comentarios"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function toggleEstadoDevolucion() {
+                var estadoButton = document.getElementById('estadoDevolucionButton');
+                if (estadoButton.classList.contains('btn-success')) {
+                    estadoButton.classList.remove('btn-success');
+                    estadoButton.classList.add('btn-danger');
+                    estadoButton.textContent = 'Cerrado';
+                } else {
+                    estadoButton.classList.remove('btn-danger');
+                    estadoButton.classList.add('btn-success');
+                    estadoButton.textContent = 'Abierto';
+                }
+            }
+        </script>
+
+
+        <div id="anexos" class="module-content">
+            <!-- Contenido de Anexos -->
+            <h2>Subir Archivos e Imágenes</h2>
+            <div class="upload-section">
+                <div class="upload-box">
+                    <h3>Subir Archivos</h3>
+                    <input type="file" multiple class="form-control" onchange="handleFileUpload(event)" />
+                </div>
+                <div class="upload-box">
+                    <h3>Imágenes de antes</h3>
+                    <input type="file" accept="image/*" multiple class="form-control" onchange="handleImageUpload(event)" />
+                </div>
+                <div class="upload-box">
+                    <h3>Imágenes de después</h3>
+                    <input type="file" accept="image/*" multiple class="form-control" onchange="handleImageUpload(event)" />
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function handleFileUpload(event) {
+                const files = event.target.files;
+                console.log(files);
+                // Aquí puedes agregar la lógica para manejar la subida de archivos
+            }
+
+            function handleImageUpload(event) {
+                const files = event.target.files;
+                console.log(files);
+                // Aquí puedes agregar la lógica para manejar la subida de imágenes
+            }
+        </script>
+
+
+        <!-- Ventana emergente de búsqueda -->
+        <div id="searchHeaderModal" class="modal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Resultados de Búsqueda</h5>
+                        <button type="button" class="btn-close" onclick="closeSearchHeaderModal()" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="filters mb-3">
+                            <select class="form-select mb-2">
+                                <option>Selecciona Pedido</option>
+                            </select>
+                            <select class="form-select mb-2">
+                                <option>Selecciona Fecha</option>
+                            </select>
+                            <select class="form-select mb-2">
+                                <option>Selecciona Cliente</option>
+                            </select>
+                            <select class="form-select mb-2">
+                                <option>Selecciona Sucursal</option>
+                            </select>
+                            <select class="form-select mb-2">
+                                <option>Selecciona Dirección</option>
+                            </select>
+                            <select class="form-select mb-2">
+                                <option>Selecciona Persona de contacto</option>
+                            </select>
+                            <select class="form-select mb-2">
+                                <option>Selecciona Estatus</option>
+                            </select>
+                        </div>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Pedido #</th>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Sucursal</th>
+                                    <th>Dirección</th>
+                                    <th>Persona de contacto</th>
+                                    <th>Estatus</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>12345</td>
+                                    <td>2025-01-15</td>
+                                    <td>Cliente A</td>
+                                    <td>Sucursal 1</td>
+                                    <td>Dirección 1</td>
+                                    <td>Contacto 1</td>
+                                    <td>Abierta</td>
+                                </tr>
+                                <!-- Añadir más filas según sea necesario -->
+                            </tbody>
+                        </table>
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-secondary">Anterior</button>
+                            <button class="btn btn-secondary">Siguiente</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function showSearchHeaderModal() {
+                var searchHeaderModal = new bootstrap.Modal(document.getElementById('searchHeaderModal'), {});
+                searchHeaderModal.show();
+            }
+
+            function closeSearchHeaderModal() {
+                var searchHeaderModal = bootstrap.Modal.getInstance(document.getElementById('searchHeaderModal'));
+                searchHeaderModal.hide();
+            }
+        </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="Almacenapt.js"></script>
+    <script>
+        function setActiveModule(moduleId) {
+            var modules = document.querySelectorAll('.module-content');
+            var buttons = document.querySelectorAll('.module-button');
+
+            modules.forEach(function (module) {
+                module.classList.remove('active');
+            });
+
+            buttons.forEach(function (button) {
+                button.classList.remove('active');
+            });
+
+            document.getElementById(moduleId).classList.add('active');
+            document.querySelector('[onclick="setActiveModule(\'' + moduleId + '\')"]').classList.add('active');
+        }
+
+        function toggleEstado() {
+            var estadoButton = document.getElementById('estado-button');
+            if (estadoButton.classList.contains('btn-success')) {
+                estadoButton.classList.remove('btn-success');
+                estadoButton.classList.add('btn-danger');
+                estadoButton.textContent = 'Cerrado';
+            } else {
+                estadoButton.classList.remove('btn-danger');
+                estadoButton.classList.add('btn-success');
+                estadoButton.textContent = 'Abierto';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1730 @@
+﻿@model dynamic
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int? lastStageId = null;
+}
+
+<!-- SweetAlert2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css" rel="stylesheet">
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.js"></script>
+
+<style>
+    #machineList {
+    max-height: 300px; /* Ajusta la altura según sea necesario */
+    overflow-y: auto; /* Activa el desplazamiento vertical */
+    }
+
+    #producto {
+    position: relative;
+    z-index: 1056; /* Bootstrap modals suelen estar en 1055 */
+    width: 100% !important;
+    }
+
+    .modal {
+    z-index: 1056 !important;
+    }
+    /* Estilo para los botones */
+    .botones-container {
+    display: flex;
+    gap: 10px; /* Espacio entre los botones */
+    justify-content: flex-start; /* Alinear a la izquierda */
+    width: 100%; /* Asegura que los botones ocupen todo el espacio disponible */
+    }
+
+    /* Botones negros */
+    .btn-negro {
+    background-color: #000000; /* Negro */
+    border: 1px solid #333333; /* Borde gris oscuro */
+    color: #FFFFFF; /* Texto blanco */
+    }
+
+    .btn-negro:hover {
+    background-color: #333333; /* Gris oscuro al pasar el mouse */
+    border-color: #555555; /* Borde más claro */
+    }
+
+    .is-invalid {
+    border: 2px solid red !important;
+    background-color: #ffe6e6; /* Fondo ligero */
+    }
+
+    .is-valid {
+    border: 2px solid green !important;
+    background-color: #e6ffe6; /* Fondo ligero */
+    }
+
+
+</style>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+
+<div class="container-fluid p-0">
+
+    @if (Model != null)
+    {
+        <div class="mb-3">
+            <a href="javascript:window.history.back();">
+                ⬅ Regresar
+            </a>
+            <h1 class="h3 d-inline align-middle">  Orden de Producción <strong># @Model.DocNum</strong></h1>
+
+            <input type="text" id="DocEntry" value="@Model.DocEntry" hidden="hidden" />
+           
+            <input type="text" id="StatusDisp" value="@(Model.StatusDisp ?? 0)" hidden="hidden" />
+
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>Fecha de Orden:</strong> @Model.Fecha_Fabricacion.ToString("dd-MM-yyyy")</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Número De Cliente:</strong> @Model.CardCode</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Nombre:</strong> @Model.CardName</p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Estatus:</strong>
+                            <button class="btn btn-sm"
+                            style="background-color: @Model.Colorbutton; color: @Model.ColorTextbtn; cursor: pointer; width: auto;"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="De clic para cambiar el estado"
+                                    onclick="updateStatus(event, '@Model.DocEntry', '@Model.Status', '@Model.ItemCode', '@Model.StatusDisp')">
+                                <span class="button-text">@Model.StatusTexto</span>
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            </button>
+                            @if (@Model.StatusDisp <= 0)
+                            {
+                                <span style="color: red;">Sin Stock suficiente</span>
+                            }
+                            else
+                            {
+                                <span style="color: green;">Stock disponible</span>
+                            }
+
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Pedido Del Cliente:</strong> @Model.OV</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>N° De Producto:</strong>@Model.ItemCode</p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <p><strong>Producto:</strong> @Model.ProdName</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Presentacion: </strong> @Model.Uom</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Tipo de Peso: </strong> @Model.TipoPeso</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Almacén: </strong> @Model.Warehouse - @Model.WhsName</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Cantidad Planificada:</strong> @Math.Round(Model.PlannedQty, 2)  <strong>@Model.UnitName :</strong>   @Math.Round(Model.Unit, 2) </p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Peso Bruto: </strong>@Math.Round(Model.WeightB, 2)</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Peso Neto: </strong>@Math.Round(Model.WeightN, 2)</p>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="inputTarimas">Tarimas a Producir</label>
+                            <input type="number" class="form-control" id="inputTarimas" value="@Model.QtyPallet"
+                                   onblur="updateField('QtyPallet', this.value)">
+                        </div>
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="inputRollos">Rollos por Tarima</label>
+                            <input type="number" class="form-control" id="inputRollos" value="@Model.RolxPallet"
+                                   onblur="updateField('RolxPallet', this.value)">
+                        </div>
+                        <div class="mb-3 col-md-2">
+                            <label class="form-label" for="inputMetImprsn">Método de Impresión</label>
+                            <input type="text" class="form-control" id="inputMetImprsn" value="@Model.MethodPrint"
+                                   onblur="updateField('MethodPrint', this.value)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="mb-3 col-md-2">
+                            <button class="btn btn-primary btn-lg w-100" data-bs-toggle="modal" data-bs-target="#machineModal"
+                            @(Model.ActionMachine >0  ? "disabled" : "")>
+                                <i class="align-middle" data-feather="settings"></i> Agregar Máquina
+                            </button>
+
+                        </div>
+                        @* <div class="mb-3 col-md-2">
+                            <button class="btn btn-primary btn-lg w-100" data-bs-toggle="modal" data-bs-target="#linnerModal" onclick="loadComponents(109)">
+                                <i class="align-middle" data-feather="grid"></i> Agregar Linner
+                            </button>
+                        </div>
+
+                        <div class="mb-3 col-md-2">
+                            <button class="btn btn-primary btn-lg w-100" data-bs-toggle="modal" data-bs-target="#tarimaModal" onclick="loadComponents(108)">
+                                <i class="align-middle" data-feather="layers"></i> Agregar Tarima
+                            </button>
+                        </div> *@
+                        <div class="mb-3 col-md-2">                      
+                            <button class="btn btn-primary btn-lg w-100"  onclick="loadComponents(109)"
+                            @(Model.ActionLinner > 0 ? "disabled" : "") >
+                                <i class="align-middle" data-feather="grid"></i> Agregar Linner
+                            </button>
+                        </div>
+
+                        <div class="mb-3 col-md-2" >
+                            <button class="btn btn-primary btn-lg w-100" onclick="loadComponents(108)"
+                            @(Model.ActionTarima > 0 ? "disabled" : "")>
+                                <i class="align-middle" data-feather="layers"></i> Agregar Tarima
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<div class="card flex-fill">
+    <div class="card-header">
+        <h3>Componentes y Máquinas Requeridos</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Tipo</th>
+                    <th>Código y Nombre</th>
+                    <th>Grupo de Artículo</th>
+                    <th>Almacén</th>
+                    <th>Unidad de Medida</th>
+                    <th>Cantidad Planificada</th>
+                    <th>Cantidad Emitida</th>
+                    <th>Stock Disponible</th>
+                    <th>Fecha Inicio</th>
+                    <th>Fecha Fin</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                        @foreach (var item in Model.MachineLines)
+                        {
+                            if (lastStageId != item.StageId)
+                            {
+                                <tr class="table-primary">
+                                    <td colspan="11" class="text-center fw-bold">@item.StageName</td>
+                                </tr>
+                                lastStageId = item.StageId;
+                            }
+
+                            <tr style="background-color: #d2b48c;">
+                                <td>
+                                    <i class="fas fa-cogs text-primary"></i>
+                                    Componente:
+                                    @if (item.TypeComp == 107)
+                                    {
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-cogs"></i> Máquina
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-question-circle"></i> Otro
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <strong>@item.ItemCode</strong>
+                                    <div class="text-muted">@item.ItemName</div>
+                                </td>
+                                <td>@item.ItmsGrpNam</td>
+                                <td>@item.WhsCode</td>
+                                <td colspan="4"></td>
+                                <td>@item.StartDate.ToString("dd-MM-yyyy")</td>
+                                <td>@item.EndDate.ToString("dd-MM-yyyy")</td>
+                                <td colspan="2">
+                                    <button class="btn btn-warning btn-sm"
+                                            onclick="mostrarModalCambioMaquina('@item.ItemCode', '@item.TypeComp', '@item.LineNum')">
+                                        <i class="fas fa-exchange-alt"></i> Cambio de Máquina
+                                    </button>
+                                   @*  <button class="btn btn-success btn-sm" onclick="solicitarSC('@item.ItemCode', '@Model.DocEntry', '@item.LineNum')">
+                                        <i class="fas fa-shopping-cart"></i> Solicitar (SC)
+                                    </button> *@
+                                </td>
+                            </tr>
+                        }
+
+                        @foreach (var item in Model.OrderLines)
+                        {
+                            if (lastStageId != item.StageId)
+                            {
+                                <tr class="table-primary">
+                                    <td colspan="11" class="text-center fw-bold">@item.StageName</td>
+                                </tr>
+                                lastStageId = item.StageId;
+                            }
+
+                            <tr>
+                                <td>
+                                    <i class="fas fa-cogs text-primary"></i>
+                                    Componente:
+                                    @if (item.TypeComp == 109)
+                                    {
+                                        <span class="badge bg-primary">
+                                            <i class="fas fa-cogs"></i> Linner
+                                        </span>
+                                    }
+                                    else if (item.TypeComp == 108)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-pallet"></i> Tarima
+                                        </span>
+                                    }
+                                    else if (item.TypeComp == 107)
+                                    {
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-cogs"></i> Máquina
+                                        </span>
+                                    }
+                                    else if (item.TypeComp == 106)
+                                    {
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-flask"></i> Fórmula
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-question-circle"></i> Otro
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <strong>@item.ItemCode</strong>
+                                    <div class="text-muted">@item.ItemName</div>
+                                </td>
+                                <td>@item.ItmsGrpNam</td>
+                                <td>@item.WhsCode</td>
+                                <td>@item.NameUom</td>
+                                <td>@Math.Round(item.PlannedQty, 2)</td>
+                                <td>@Math.Round(item.IssuedQty, 2)</td>
+                                <td class="@(item.StockDisp < 0 ? "text-danger fw-bold" : "")">
+                                    @Math.Round(item.StockDisp, 2)
+                                </td>
+                                <td>@item.StartDate.ToString("dd-MM-yyyy")</td>
+                                <td>@item.EndDate.ToString("dd-MM-yyyy")</td>
+                                <td>
+                                  @*   if (@item.TypeComp == 109)
+                                    {
+                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#linnerModal" onclick="cambiarComponentes('@item.ItemCode', @item.TypeComp, @item.LineNum)">
+                                            <i class="fas fa-exchange-alt"></i> Cambio de Linner
+                                        </button>
+                                     
+                                    } *@ 
+                                    @if (@item.TypeComp == 108)
+                                    {
+                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#tarimaModal" onclick="cambiarComponentes('@item.ItemCode', @item.TypeComp, @item.LineNum)">
+                                            <i class="fas fa-exchange-alt"></i> Cambio de Tarima
+                                        </button>
+                                       @*  <button class="btn btn-success btn-sm" onclick="solicitarSC('@item.ItemCode', '@Model.DocEntry', '@item.LineNum', '@item.PlannedQty', '@item.WhsCode')">
+                                            <i class="fas fa-shopping-cart"></i> Solicitar (SC)
+                                        </button> *@
+                                    }
+                                </td>
+                            </tr>
+                        }
+               
+              
+            </tbody>
+        </table>
+    </div>
+</div>
+
+    }
+    else
+    {
+        <p>No hay datos disponibles.</p>
+    }
+
+</div>
+
+
+<div class="modal fade" id="machineModal" tabindex="-1" aria-labelledby="machineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="machineModalLabel">Seleccionar Máquina <div id="itemCodeField" style="display: inline; font-weight: normal; font-size: 14px; color: #555;">@Model.ItemCode</div></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Select para buscar -->
+                <div class="w-100">
+                    <select id="producto" class="form-control">
+                        <option value="">Escriba para buscar una máquina</option>
+                    </select>
+                </div>
+                <!-- Campo de búsqueda -->
+                <div class="mb-3">
+                    <input type="hidden" class="form-control" id="machineItemCode" readonly>
+                
+                    <input type="hidden" class="form-control" id="machineTypeComp" readonly>
+                
+                    <input type="hidden" class="form-control" id="machineLineNum" readonly>
+                </div>
+                <div class="mb-3">
+                    <br />
+                    <label for="searchMezcla" class="form-label">Buscar por Mezcla</label>
+                    <input type="text" id="searchMezcla" class="form-control" placeholder="Buscar por Mezcla" aria-label="Buscar por Mezcla">
+                </div>
+                <!-- Botones para expandir y contraer -->
+                <div class="botones-container">
+                    <button id="expandirTodos" class="btn btn-negro">Expandir Todos</button>
+                    <button id="contraerTodos" class="btn btn-negro">Contraer Todos</button>
+                </div>
+                <!-- Tabla de máquinas -->
+                <div class="table-container">
+                    <table class="table table-striped table-hover mt-3">
+                        <thead>
+                            <tr>
+                                <th>Seleccionar</th>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Cantidad</th>
+                                <th>Almacén</th>
+                                <th>Stock</th>
+                                <th>Stock Disponible</th>
+                            </tr>
+                        </thead>
+                        <tbody id="machineList">
+                            <!-- Aquí se llenarán las filas con los datos obtenidos del controlador -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+                <!-- Botones de acción de la modal -->
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="addMachineBtn">Agregar</button>
+                <button type="button" id="updateMachineBtn" class="btn btn-success" style="display: none;">Actualizar</button> <!-- Botón de actualizar (oculto por defecto) -->
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Linner -->
+<div class="modal fade" id="linnerModal" tabindex="-1" aria-labelledby="linnerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="linnerModalLabel">Linners</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Seleccionar</th>
+                            @*   <th>Código</th> *@
+                            <th>Nombre</th>
+                            <th>Cantidad</th>
+                            <th>Almacén</th>
+                            <th>ObjType</th>
+                        </tr>
+                    </thead>
+                    <tbody id="componentListLinners">
+                        <!-- Aquí se llenarán los componentes dinámicamente con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" id="addLinnerBtn" class="btn btn-primary">Agregar Linner</button> <!-- Botón de agregar -->
+                <button type="button" id="updateLinnerBtn" class="btn btn-success" style="display: none;">Actualizar Linner</button> <!-- Botón de actualizar (oculto por defecto) -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Tarima -->
+<div class="modal fade" id="tarimaModal" tabindex="-1" aria-labelledby="tarimaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tarimaModalLabel">Tarimas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Seleccionar</th>
+                            @* <th>Código</th> *@
+                            <th>Nombre</th>
+                            <th>Cantidad</th>
+                            <th>Almacén</th>
+                            <th>ObjTypes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="componentListTarimas">
+                        <!-- Aquí se llenarán los componentes dinámicamente con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" id="addTarimaBtn" class="btn btn-primary">Agregar Tarima</button> <!-- Botón de agregar -->
+                <button type="button" id="updateTarimaBtn" class="btn btn-success" style="display: none;">Actualizar Tarima</button> <!-- Botón de actualizar (oculto por defecto) -->
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Compras -->
+<div class="modal fade" id="solicitudCompraModal" tabindex="-1" aria-labelledby="solicitudCompraLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="solicitudCompraLabel">Solicitud De Compra - <label for="ScItemCode" class="form-label" />
+                  
+                    </h5>
+                <input type="hidden" id="itemCodeHidden">
+                <input type="hidden" id="docEntryHidden">
+                <input type="hidden" id="lineNumHidden">
+                <input type="hidden" id="quantityHidden">
+                <input type="hidden" id="whsCodeHidden">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="solicitudCompraForm">
+                    <!-- Proveedor -->
+                       @*  <div class="mb-3">
+                            <label for="proveedor" class="form-label">Proveedor</label>
+                            <select id="proveedorSelect" class="form-select">
+                                <option value="">Seleccione un proveedor</option>
+                            </select>
+                        </div> *@
+                    <strong>Proveedor:</strong>
+                    <input list="proveedores" id="proveedorInput" class="form-control" placeholder="Selecciona o escribe un proveedor">
+                    <datalist id="proveedores"></datalist>
+
+                    <!-- Fecha Necesaria -->
+                    <div class="mb-3">
+                        <label for="fechaNecesaria" class="form-label">Fecha Necesaria</label>
+                        <input type="date" class="form-control" id="fechaNecesaria">
+                    </div>
+
+                    <!-- Cantidad a Solicitar -->
+                    <div class="mb-3">
+                        <label for="cantidadSolicitar" class="form-label">Cantidad a Solicitar</label>
+                        <input type="number" class="form-control" id="cantidadSolicitar">
+                    </div>
+
+                    <!-- Documento Adjunto -->
+                    <div class="mb-3">
+                        <label for="documentoAdjunto" class="form-label">Documento Adjunto</label>
+                        <input type="file" class="form-control" id="documentoAdjunto">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmarSolicitud">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agregar Linners y Tarimas -->
+<script>
+
+        function loadComponents(GroupCode) {
+        // Validación antes de abrir el modal
+        const tarimas = document.getElementById("inputTarimas").value.trim();
+        const rollos = document.getElementById("inputRollos").value.trim();
+        const metodoImpresion = document.getElementById("inputMetImprsn").value.trim();
+
+        if (tarimas === "" || rollos === "" || metodoImpresion === "") {
+            Swal.fire({
+                icon: "warning",
+                title: "Campos incompletos",
+                text: "Por favor, complete todos los campos antes de continuar.",
+                confirmButtonText: "Entendido"
+            });
+            return; // No abrir el modal si los campos están incompletos
+        }
+
+        const modalTitle = GroupCode === 109 ? 'Linners' : 'Tarimas';
+        const modalId = GroupCode === 109 ? 'linnerModal' : 'tarimaModal';
+        const buttonId = GroupCode === 109 ? 'addLinnerBtn' : 'addTarimaBtn';
+        const loadingPanel = document.getElementById('loadingSpinner'); // Panel de carga
+
+        const modalTitleElement = document.querySelector(`#${modalId} .modal-title`);
+        modalTitleElement.textContent = `Seleccionar ${modalTitle}`;
+
+        console.log(buttonId, modalTitleElement);
+
+        // Deshabilitar botón mientras se cargan los datos
+        toggleButtons(true, false, GroupCode); // Habilita Agregar, Deshabilita Actualizar
+
+        loadComponentsData(GroupCode)
+            .then(data => {
+                populateTableWithComponents(data, modalTitle);
+
+                // Asegurar que solo se añade un evento una vez
+                document.getElementById(buttonId).onclick = function () {
+                    handleComponentSelection(data, modalTitle, buttonId, loadingPanel, GroupCode);
+                };
+
+                // Abrir el modal usando la API de Bootstrap
+                const modalElement = new bootstrap.Modal(document.getElementById(modalId));
+                modalElement.show(); // Abre el modal correctamente usando Bootstrap
+            })
+            .catch(error => {
+                console.error('Error fetching components:', error);
+                loadingPanel.style.display = 'none'; // Ocultar loading panel en caso de error
+            });
+    }
+
+
+      // Función para cargar los datos de los componentes
+      function loadComponentsData(GroupCode) {
+          return fetch(`/MasterData/Get_Components?GroupCode=${GroupCode}`)
+              .then(response => response.json());
+      }
+
+      function populateTableWithComponents(data, modalTitle) {
+          const tableBody = document.getElementById(`componentList${modalTitle}`);
+
+          // Verificar si la tabla existe
+          if (!tableBody) {
+              console.error(`No se encontró la tabla con el id: componentList${modalTitle}`);
+              return; // Detener la ejecución si no se encuentra la tabla
+          }
+
+          tableBody.innerHTML = '';
+
+          if (data && data.length > 0) {
+              data.forEach(component => {
+                  const row = document.createElement('tr');
+                  row.innerHTML = `
+                      <td><input type="radio" name="component" value="${component.ItemCode}" id="${component.ItemCode}">${component.ItemCode}</td>
+    @*  <td>${component.ItemCode}</td> *@
+                      <td>${component.ItemName}</td>
+                      <td>${component.Quantity}</td>
+                      <td>${component.Warehouse}</td>
+                      <td>${component.ObjType}</td>
+                  `;
+                  tableBody.appendChild(row);
+              });
+          } else {
+              tableBody.innerHTML = '<tr><td colspan="6">No se encontraron componentes.</td></tr>';
+          }
+      }
+
+      // Función para manejar la selección de un componente
+      function handleComponentSelection(data, modalTitle, buttonId, loadingPanel, GroupCode, LineNum = null, ItemCode = null, isUpdate = false) {
+          const selectedComponent = document.querySelector('input[name="component"]:checked');
+
+          if (!selectedComponent && !ItemCode) {
+              alert('Por favor selecciona un componente.');
+              return;
+          }
+          console.log(data);
+
+          const componentItemCode =  selectedComponent.value;
+          console.log('Componente seleccionado:', componentItemCode);
+
+          const docEntryElement = document.getElementById("DocEntry");
+          if (!docEntryElement) {
+              console.error("No se encontró el input DocEntry");
+              return;
+          }
+          const docEntry = docEntryElement.value.trim();
+
+          if (!docEntry) {
+              console.error("El valor de DocEntry está vacío");
+              return;
+          }
+
+          console.log("DocEntry:", docEntry);
+
+           const component = data.find(c => c.ItemCode === componentItemCode);
+            if (!component) {
+                console.error(`Componente con ItemCode ${componentItemCode} no encontrado en la lista de datos.`);
+                return;
+            }
+
+          console.log('Componente encontrado:', component);
+
+          const machineData = {
+              ItemNo: component.ItemCode,
+              ItemType: component.ObjType,
+              PlannedQuantity: component.Quantity,
+              Warehouse: component.WhareHose,
+              LineNumReplace: LineNum,
+              ItemName: component.ItemName
+          };
+
+
+          showConfirmation(modalTitle, machineData, docEntry, loadingPanel, GroupCode, isUpdate, buttonId);
+      }
+
+      // Función para mostrar la confirmación de SweetAlert2
+      function showConfirmation(modalTitle, machineData, docEntry, loadingPanel, GroupCode, isUpdate = false,  LineNum = null) {
+          Swal.fire({
+              title: '¿Estás seguro?',
+              text: `¿Deseas ${isUpdate ? 'actualizar' : 'agregar'} este ${modalTitle.toLowerCase()}?`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: `Sí, ${isUpdate ? 'actualizar' : 'agregar'}`,
+              cancelButtonText: 'No, cancelar'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  if (loadingPanel) loadingPanel.style.display = 'block';
+
+                    console.log(machineData, docEntry, loadingPanel, GroupCode, LineNum);
+                  const actionFunction = isUpdate ? updateComponentInPlanning : addComponentToPlanning;
+                  actionFunction(machineData, docEntry, loadingPanel, GroupCode, LineNum);
+              }
+          });
+      }
+
+      // Función para agregar el componente a la planificación
+      function addComponentToPlanning(machineData, docEntry, loadingPanel, GroupCode, LineNum = null) {
+          const modalTitle = GroupCode === 109 ? 'Linners' : 'Tarimas';
+          const modalId = GroupCode === 109 ? 'linnerModal' : 'tarimaModal';
+
+            fetch(`/Planning/Add_ComponentsOrUpdate?DocEntry=${docEntry}&Status=0`, {
+              method: 'PATCH',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(machineData)
+          })
+          .then(response => response.json())
+          .then(data => {
+              loadingPanel.style.display = 'none';
+              if (data.success) {
+                 // Swal.fire('¡Agregado!', `El componente ha sido agregado correctamente.`, 'success');
+                       location.reload();
+              }  else {
+                            Swal.fire('Error', data.error || 'Hubo un problema al actualizar el componente.', 'error');
+                        }
+          })
+          .catch(error => {
+              loadingPanel.style.display = 'none';
+              console.error('Error al agregar el componente:', error);
+              Swal.fire('Error', 'Hubo un problema al procesar la solicitud.', 'error');
+
+          });
+      }
+
+              // Función para mostrar/ocultar botones
+      function toggleButtons(enableAgregar, enableActualizar, GroupCode) {
+          let botonAgregar, botonActualizar;
+
+          // Determinar los botones según el GroupCode
+          if (GroupCode === 109) {  // Linner
+              botonAgregar = document.getElementById('addLinnerBtn');
+              botonActualizar = document.getElementById('updateLinnerBtn');
+          } else {  // Tarima o cualquier otro código de grupo
+              botonAgregar = document.getElementById('addTarimaBtn');
+              botonActualizar = document.getElementById('updateTarimaBtn');
+          }
+
+          // Mostrar u ocultar los botones
+          if (botonAgregar) botonAgregar.style.display = enableAgregar ? 'inline-block' : 'none';
+          if (botonActualizar) botonActualizar.style.display = enableActualizar ? 'inline-block' : 'none';
+      }
+
+    @*   // Eventos al abrir los modales
+    document.getElementById('linnerModal').addEventListener('shown.bs.modal', function () {
+        loadComponents(109);
+    });
+
+    document.getElementById('tarimaModal').addEventListener('shown.bs.modal', function () {
+        loadComponents(108);
+    }); *@
+</script>
+<!-- Update Linners y Tarimas -->
+<script>
+
+    function cambiarComponentes(ItemCode, GroupCode, LineNum) {
+        const modalTitle = GroupCode === 109 ? 'Linners' : 'Tarimas';
+        const modalId = GroupCode === 109 ? 'linnerModal' : 'tarimaModal';
+        const buttonId = GroupCode === 109 ? 'updateLinnerBtn' : 'updateTarimaBtn';
+        const loadingPanel = document.getElementById('loadingSpinner'); // Panel de carga
+
+        const modalTitleElement = document.querySelector(`#${modalId} .modal-title`);
+        modalTitleElement.textContent = `Seleccionar ${modalTitle}`;
+
+        console.log(buttonId, modalTitleElement, GroupCode, LineNum);
+        // Deshabilitar botón mientras se cargan los datos
+        toggleButtons(false, true, GroupCode); // Habilita solo el botón de actualizar
+
+        loadComponentsData(GroupCode)
+            .then(data => {
+                populateTableWithComponents(data, modalTitle);
+
+            console.log(data, modalTitle);
+
+                // Asegurar que solo se añade un evento una vez
+                document.getElementById(buttonId).onclick = function () {
+                    handleComponentSelection(data, modalTitle, buttonId, loadingPanel, GroupCode, LineNum, ItemCode, true );
+                };
+            })
+            .catch(error => {
+                console.error('Error fetching components:', error);
+                loadingPanel.style.display = 'none'; // Ocultar loading panel en caso de error
+
+            });
+
+    }
+
+     // Función para actualizar el componente en la planificación
+    function updateComponentInPlanning(component, docEntry, loadingPanel, GroupCode, LineNum = null) {
+
+        console.log(component);
+                // Aquí debes hacer la llamada a la API para actualizar el componente
+                fetch(`/Planning/Add_ComponentsOrUpdate?DocEntry=${docEntry}&Status=1`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(component)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        loadingPanel.style.display = 'none';
+                        if (data.success) {
+    @*  Swal.fire('¡Actualizado!', 'El componente ha sido actualizado correctamente.', 'success'); *@
+                             location.reload();
+                        } else {
+                            Swal.fire('Error', data.error || 'Hubo un problema al actualizar el componente.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        loadingPanel.style.display = 'none';
+                        console.error('Error al actualizar el componente:', error);
+                        Swal.fire('Error', 'Hubo un problema al procesar la solicitud.', 'error');
+                    });
+
+    }
+
+</script>
+
+<!-- Actualizar campos de usuaio -->
+<script>
+
+
+    function updateField(fieldName, fieldValue) {
+        const docEntry = document.getElementById("DocEntry")?.value;
+        if (!docEntry) {
+            console.error("❌ DocEntry no encontrado");
+            return;
+        }
+
+        // 🔹 Leer los valores actuales de los inputs
+        let pallet = parseInt(document.getElementById("inputTarimas")?.value) || 0;
+        let rollo = parseFloat(document.getElementById("inputRollos")?.value) || 0;
+        let etiqueta = document.getElementById("inputMetImprsn")?.value || "";
+
+        // 🔹 Solo actualizar el valor que se modificó
+        if (fieldName === "QtyPallet") pallet = parseInt(fieldValue) || 0;
+        if (fieldName === "RolxPallet") rollo = parseFloat(fieldValue) || 0;
+        if (fieldName === "MethodPrint") etiqueta = fieldValue;
+
+        // 🔹 Construir la URL con los valores actuales
+        let url = `/Planning/PalletOrRollos?DocEntry=${docEntry}`
+            + `&Pallet=${pallet}`
+            + `&Rollo=${rollo}`
+            + `&Etiqueta=${encodeURIComponent(etiqueta)}`;
+
+        console.log(`🟡 Enviando actualización:`, url);
+
+        fetch(url, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" }
+        })
+        .then(response => response.text()) // Ver respuesta en texto antes de parsear JSON
+        .then(text => {
+            try {
+                return JSON.parse(text);
+            } catch (error) {
+                console.error("❌ Error al convertir la respuesta a JSON:", text);
+                throw new Error("Respuesta no válida del servidor");
+            }
+        })
+        .then(result => {
+            if (result.IsError) {
+                console.error(`❌ Error al actualizar ${fieldName}:`, result.Message);
+            } else {
+                console.log(`✅ ${fieldName} actualizado correctamente.`);
+            }
+        })
+        .catch(error => console.error("❌ Error en la solicitud:", error));
+    }
+ 
+   
+
+</script>
+
+<!-- Obtener listado de  Maquinas -->
+<script>
+
+        $(document).ready(function () {
+        $("#producto").select2({
+            placeholder: "Escriba para buscar...",
+            allowClear: true,
+            width: '100%', // Hace que ocupe todo el ancho disponible
+            dropdownParent: $("#machineModal")
+        });
+
+        // Al abrir el modal, cargar los datos desde el servidor
+        $('#machineModal').on('shown.bs.modal', function () {
+            console.log("Cargando máquinas...");
+            loadMachines();
+        });
+
+        // Evento al seleccionar una máquina
+        $("#producto").on("select2:select", function (e) {
+            let machineCode = e.params.data.id;
+            let itemCode = $("#itemCodeField").text().trim(); // Obtener ItemCode
+
+            // Llamar a la API para obtener los detalles de la máquina
+            $.ajax({
+                url: `/MasterData/Get_Mezclas?Machine=${machineCode}&ItemCode=${itemCode}`, // Enviar parámetros
+                method: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    $("#machineList").empty(); // Limpiar la tabla antes de agregar nuevas filas
+                    data.forEach(agregarFila);
+                },
+                error: function () {
+                    alert("Error al obtener los datos de la máquina.");
+                }
+            });
+        });
+
+        function loadMachines() {
+            const itemCode = $("#itemCodeField").text().trim();  // O .val() si es un campo de formulario
+            console.log("ItemCode (del DOM): ", itemCode);
+
+            if (!itemCode) {
+                alert("No se pudo obtener el código del producto.");
+                return;
+            }
+
+            $("#producto").html('<option value="">Cargando...</option>');
+
+            $.ajax({
+                url: "/MasterData/Get_Machine?ItemCode=" + encodeURIComponent(itemCode),  // Pasando ItemCode en la URL
+                type: "GET",
+                success: function (data) {
+                    console.log("Respuesta del servidor:", data);
+
+                    $("#producto").empty().append('<option value="">Seleccione una máquina</option>');
+
+                    // Recorriendo los productos devueltos en la respuesta
+                    $.each(data, function (index, producto) {
+                        // Accede a las propiedades correctas del objeto
+                        $("#producto").append(`<option value="${producto.VisResCode}">${producto.ResName}</option>`);
+                    });
+                },
+                error: function () {
+                    alert("Error al cargar las máquinas.");
+                }
+            });
+        }
+    });
+
+
+   @*   $(document).ready(function () {
+         $("#producto").select2({
+             placeholder: "Escriba para buscar...",
+            allowClear: true,
+            width: '100%', // Hace que ocupe todo el ancho disponible
+            dropdownParent: $("#machineModal")
+        });
+
+        $(document).ready(function () {
+            $('#machineModal').on('shown.bs.modal', function () {
+                  loadMachines();
+            });
+        });
+
+        // Evento al seleccionar una máquina
+        $("#producto").on("select2:select", function (e) {
+            let machineCode = e.params.data.id;
+            let itemCode = $("#itemCodeField").text().trim(); // Obtener ItemCode
+
+            // Llamar a la API para obtener los detalles de la máquina
+            $.ajax({
+                url: `/MasterData/Get_Mezclas?Machine=${machineCode}&ItemCode=${itemCode}`, // Enviar parámetros
+                method: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    $("#machineList").empty(); // Limpiar la tabla antes de agregar nuevas filas
+                    data.forEach(agregarFila);
+                },
+                error: function () {
+                    alert("Error al obtener los datos de la máquina.");
+                }
+            });
+        });
+
+        function loadMachines() {
+            const itemCode = $("#itemCodeField").text();  // O .val() si es un campo de formulario
+            console.log("ItemCode (del DOM): ", itemCode);
+
+            if (!itemCode) {
+                alert("No se pudo obtener el código del producto.");
+                return;
+            }
+
+            $("#producto").html('<option value="">Cargando...</option>');
+            $.ajax({
+                url: "/MasterData/Get_Machine?ItemCode=" + encodeURIComponent(itemCode),  // Pasando ItemCode en la URL
+                type: "GET",
+                success: function (data) {
+                    console.log("Respuesta del servidor:", data);
+
+                    $("#producto").empty().append('<option value="">Seleccione una máquina</option>');
+
+                    // Recorriendo los productos devueltos en la respuesta
+                    $.each(data, function (index, producto) {
+                        // Accede a las propiedades correctas del objeto
+                        $("#producto").append(`<option value="${producto.VisResCode}">${producto.ResName}</option>`);
+                    });
+                },
+                error: function () {
+                    alert("Error al cargar las máquinas.");
+                }
+            });
+        }
+
+    });
+ *@
+    function toggleModalButtons(isUpdating, itemCode = "") {
+        // Control de visibilidad de botones
+        document.getElementById("addMachineBtn").style.display = isUpdating ? "none" : "inline-block";
+        document.getElementById("updateMachineBtn").style.display = isUpdating ? "inline-block" : "none";
+
+        // Guardar itemCode en el modal si es una actualización
+        $('#machineModal').data('itemCode', itemCode);
+
+        // Abrir el modal
+        var modal = new bootstrap.Modal(document.getElementById('machineModal'));
+        modal.show();
+    }
+
+
+</script>
+
+<!-- Estructura de tabla mezclas -->
+<script>
+    $(document).ready(function () {
+        // Acción al hacer clic en la cabecera de mezcla (expandir/contraer)
+        $(document).on("click", ".mezcla-header", function () {
+            let mezclaId = $(this).data("mezcla");
+            let icon = $(this).children("td").find("span");
+
+            // Mostrar/ocultar las filas asociadas con la mezcla
+            $(`.mezcla-${mezclaId}`).toggle();
+
+            // Cambiar el ícono de expandir/contraer
+            if ($(`.mezcla-${mezclaId}`).is(":visible")) {
+                icon.text("▼");
+            } else {
+                icon.text("▶");
+            }
+        });
+
+        // Al cargar la página, contraer todos los grupos de mezcla y ocultar las filas
+        $(".mezcla-header").each(function() {
+            let mezclaId = $(this).data("mezcla");
+            $(`.mezcla-${mezclaId}`).hide();  // Ocultar las filas de la mezcla
+            let icon = $(this).children("td").find("span");
+            icon.text("▶");  // Asegurarse de que el icono esté como contraído
+        });
+
+        // Eliminar la funcionalidad de expandir/contraer para el cañón, solo mostramos las filas de cañones sin interacción.
+        $(".canon-header").each(function() {
+            let canonId = $(this).data("canon");
+            $(`.canon-${canonId}`).hide();  // Asegurarse de que las filas de los cañones estén ocultas al inicio
+        });
+
+        // Funcionalidad para expandir todos los grupos
+        $("#expandirTodos").click(function () {
+            $(".mezcla-header").each(function () {
+                let mezclaId = $(this).data("mezcla");
+                $(`.mezcla-${mezclaId}`).show();  // Mostrar todas las filas de la mezcla
+                let icon = $(this).children("td").find("span");
+                icon.text("▼");  // Asegurarse de que el icono sea el de expandido
+            });
+        });
+
+        // Funcionalidad para contraer todos los grupos
+        $("#contraerTodos").click(function () {
+            $(".mezcla-header").each(function () {
+                let mezclaId = $(this).data("mezcla");
+                $(`.mezcla-${mezclaId}`).hide();  // Ocultar todas las filas de la mezcla
+                let icon = $(this).children("td").find("span");
+                icon.text("▶");  // Asegurarse de que el icono sea el de contraído
+            });
+        });
+    });
+
+    // Función para agregar filas a la tabla
+    function agregarFila(machine) {
+        let mezclaId = `mezcla-${machine.IdMezcla}`;
+        let canonId = `canon-${machine.IdMezcla}-${machine.IdCanon}`;
+
+        // Si la mezcla no existe, agregar el encabezado para la mezcla
+        let mezclaRow = $(`#${mezclaId}`);
+        if (mezclaRow.length === 0) {
+            let mezclaHeader = `
+                <tr id="${mezclaId}" class="table-dark text-white mezcla-header" data-mezcla="${machine.IdMezcla}" style="cursor:pointer;">
+                    <td colspan="7" class="fw-bold text-center">
+                        <input type="checkbox" name="mezcla" class="mezcla-checkbox" data-mezcla="${machine.IdMezcla}" style="margin-right: 10px;">
+                        <span>▶</span> ${machine.IdMezcla} - Formula: ${machine.IdForm}
+                    </td>
+                </tr>
+            `;
+            $("#machineList").append(mezclaHeader);
+        }
+
+        // Si el cañón no existe dentro de la mezcla, agregar su encabezado sin funcionalidad de expandir/contraer
+        let canonRow = $(`#${canonId}`);
+        if (canonRow.length === 0) {
+            let canonHeader = `
+                <tr id="${canonId}" class="table-primary canon-header mezcla-${machine.IdMezcla}" data-canon="${machine.IdCanon}" style="cursor:pointer;">
+                    <td colspan="7" class="fw-bold text-center">${machine.IdName}</td>
+                </tr>
+            `;
+            $(`#${mezclaId}`).after(canonHeader);
+        }
+
+        // Agregar la fila de los productos debajo del grupo correspondiente
+        let stockDispColor = machine.StockDisp > 0 ? 'green' : 'red';  // Establecer el color basado en el stock disponible
+        let fila = `
+            <tr class="mezcla-${machine.IdMezcla} canon-${machine.IdMezcla}-${machine.IdCanon}">
+                <td>${machine.IdMezcla}</td>
+                <td>${machine.Code}</td>
+                <td>${machine.ItemName}</td>
+                <td>${machine.Quantity.toFixed(3)}</td>
+                <td>${machine.WhsCode}</td>
+                <td>${machine.Stock.toFixed(3)}</td>
+                <td style="color: ${stockDispColor};">${machine.StockDisp.toFixed(3)}</td>
+              
+            </tr>
+        `;
+        $(`#${canonId}`).after(fila);
+    }
+
+    $(document).ready(function () {
+        // Función de búsqueda en el campo searchMezcla
+        $("#searchMezcla").on("keyup", function () {
+            let searchTerm = $(this).val().toLowerCase();  // Obtener el término de búsqueda en minúsculas
+
+            // Filtrar las mezclas
+            $(".mezcla-header").each(function () {
+                let mezclaText = $(this).text().toLowerCase();  // Obtener el texto del encabezado de la mezcla
+                if (mezclaText.indexOf(searchTerm) === -1) {
+                    $(this).hide();  // Ocultar la mezcla si no coincide
+                } else {
+                    $(this).show();  // Mostrar la mezcla si coincide
+                }
+
+                // También ocultar/mostrar las filas asociadas con la mezcla
+                let mezclaId = $(this).data("mezcla");
+                if ($(this).is(":visible")) {
+                    $(`.mezcla-${mezclaId}`).show();  // Mostrar las filas si la mezcla es visible
+                } else {
+                    $(`.mezcla-${mezclaId}`).hide();  // Ocultar las filas si la mezcla está oculta
+                }
+            });
+        });
+    });
+
+</script>
+
+<!-- Agregar  Maquinas -->
+<script>
+
+    $(document).ready(function () {
+        // Evento al hacer clic en el botón "Agregar Máquina"
+        $('#addMachineBtn').click(function () {
+            addMachineOrUpdatePlaneacion(null, 0 );
+        });
+    });
+
+    // Función para obtener la mezcla seleccionada
+    function getSelectedMezcla() {
+        let selectedRow = $(".mezcla-header").filter(function () {
+            return $(this).find("input.mezcla-checkbox").is(":checked");
+        });
+
+        if (selectedRow.length === 0) return null; // No hay ninguna mezcla seleccionada
+
+        let mezclaId = selectedRow.data("mezcla"); // Obtener el ID de la mezcla desde el atributo data-mezcla
+        let detalleRow = $(`tr.mezcla-${mezclaId}`).first(); // Obtener la primera fila de detalles de esa mezcla
+
+        if (detalleRow.length === 0) return null; // Si no hay detalles, retornar null
+
+        return {
+            IdMezcla: mezclaId,
+            VisResCode: detalleRow.find("td:eq(1)").text().trim(), // Code
+            ItemName: detalleRow.find("td:eq(2)").text().trim(),
+            Quantity: parseFloat(detalleRow.find("td:eq(3)").text().trim()) || 0, // Evita NaN
+            Warehouse: detalleRow.find("td:eq(4)").text().trim(), // Warehouse
+            Stock: parseFloat(detalleRow.find("td:eq(5)").text().trim()) || 0,
+            StockDisp: parseFloat(detalleRow.find("td:eq(6)").text().trim()) || 0
+        };
+       
+    }
+
+    // Función para obtener los datos de la máquina seleccionada
+    function getMachineData(LineNum) {
+        let selectedValueMachine = $("#producto").val();
+        let selectedTextMachine = $("#producto option:selected").text();
+
+        if (!selectedValueMachine) {
+            Swal.fire({
+                icon: "warning",
+                title: "Seleccione una máquina",
+                text: "Debe seleccionar una máquina antes de continuar.",
+            });
+            return null;
+        }
+
+        let mezcla = getSelectedMezcla();
+        if (!mezcla) {
+            Swal.fire({
+                icon: "warning",
+                title: "Seleccione una mezcla",
+                text: "Debe seleccionar al menos una mezcla antes de agregar.",
+            });
+            return null;
+        }
+
+        return {
+            ItemNo: selectedValueMachine,
+            ItemType: 290,
+            PlannedQuantity: 1,
+            Warehouse: mezcla.WhsHose,
+            LineNumReplace: LineNum,
+            ItemName: selectedTextMachine,
+            IdMezcla: mezcla.IdMezcla
+        };
+    }
+
+    // Función para enviar la solicitud AJAX
+    function sendMachineUpdateRequest(docEntry, status, machineData) {
+        Swal.fire({
+            title: "Procesando...",
+            text: "Por favor, espere.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: `/Planning/Add_MachineOrUpdate?DocEntry=${docEntry}&Status=${parseInt(status, 10) || 0}`,
+            type: "PATCH",
+            contentType: "application/json",
+            data: JSON.stringify(machineData),
+            success: function () {
+                Swal.fire({
+                    icon: "success",
+                    title: "Operación exitosa",
+                    text: "La máquina fue agregada o actualizada correctamente.",
+                });
+                 location.reload();
+            },
+                error: function (xhr) {
+                let errorMessage = "Hubo un problema al procesar la solicitud.";
+
+                try {
+                    let response = JSON.parse(xhr.responseText); // Parsea la respuesta manualmente
+                    errorMessage = response.error || response.message || errorMessage;
+                } catch (e) {
+                    console.error("Error al parsear la respuesta:", e, xhr.responseText);
+                }
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: errorMessage,
+                });
+            }
+
+        });
+    }
+
+    // Función principal para agregar o actualizar la planeación
+    function addMachineOrUpdatePlaneacion(LineNum, status) {
+        let docEntry = parseInt($("#DocEntry").val().trim(), 10);
+        if (isNaN(docEntry)) {
+            console.error("El valor de DocEntry es inválido");
+            return;
+        }
+
+        let machineData = getMachineData(LineNum);
+        if (!machineData) return;
+
+               console.log("machineselec",machineData);
+        Swal.fire({
+            title: "¿Está seguro?",
+            text: "Esta acción agregará o actualizará la máquina en la planeación.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Sí, agregar",
+            cancelButtonText: "Cancelar",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                sendMachineUpdateRequest(docEntry, status, machineData);
+            }
+        });
+    }
+
+    // Función específica para actualizar solo el estado a 0
+    function updateStatusToZero(docEntry) {
+        sendMachineUpdateRequest(docEntry, 0, {});
+    }
+
+
+</script>
+
+<!-- Actualizar  Maquinas -->
+<script>
+    function mostrarModalCambioMaquina(itemCode, typeComp, lineNum) {
+        // Control de visibilidad de botones
+        document.getElementById("addMachineBtn").style.display = "none"; // Ocultar "Agregar"
+        document.getElementById("updateMachineBtn").style.display = "inline-block"; // Mostrar "Actualizar"
+
+        // Guardar información en atributos del modal
+        $('#machineModal').data('itemCode', itemCode);
+        $('#machineModal').data('typeComp', typeComp);
+        $('#machineModal').data('lineNum', lineNum);
+
+        // Mostrar el modal
+        var modal = new bootstrap.Modal(document.getElementById('machineModal'));
+        modal.show();
+    }
+
+    $(document).ready(function () {
+        $('#machineModal').on('shown.bs.modal', function () {
+            let itemCode = $(this).data('itemCode');
+            let typeComp = $(this).data('typeComp');
+            let lineNum = $(this).data('lineNum');
+
+            console.log("ItemCode:", itemCode, "TypeComp:", typeComp, "LineNum:", lineNum);
+
+             $('#machineModal').on('shown.bs.modal', function () {
+                    console.log("Cargando máquinas...");
+                    loadMachines();
+                });
+
+            // Elimina eventos previos para evitar duplicaciones
+            $("#updateMachineBtn").off("click").on("click", function () {
+                addMachineOrUpdatePlaneacion(lineNum, 1); // Llamar a la función con los valores correctos
+            });
+        });
+    });
+
+
+
+  
+</script>
+
+<!-- Actualizar  Estatus OF -->
+
+<script>
+    async function updateStatus(event, DocEntry, Status, ItemCode, statusDisp) {
+        // Verificar si el evento y el botón existen
+        if (!event || !event.currentTarget) {
+            console.error("Error: No se pudo obtener el botón.");
+            return;
+        }
+
+        if (statusDisp <= 0) {
+            await Swal.fire({
+                icon: "warning",
+                title: "Stock insuficiente",
+                text: "No se cuenta con stock suficiente para continuar.",
+                confirmButtonText: "Entendido"
+            });
+            return; // Salir de la función si no hay stock suficiente
+        }
+        
+        const button = event.currentTarget;
+        const spinner = button.querySelector(".spinner-border");
+        const buttonText = button.querySelector(".button-text");
+
+        if (!spinner || !buttonText) {
+            console.error("Error: No se encontraron los elementos internos del botón.");
+            return;
+        }
+
+
+
+        console.log("Estado actual:", Status);
+
+        // Determinar el nuevo estado
+        const newStatus = Status === 'P' ? 'R' : Status === 'R' ? 'L' : Status === 'L' ? 'R' : '';
+        console.log("Nuevo estado:", newStatus);
+        try {
+            const confirmResult = await Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¿Deseas cambiar el estado de la orden?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, actualizar'
+            });
+
+            if (!confirmResult.isConfirmed) return;
+
+            // Mostrar spinner y deshabilitar botón
+            button.disabled = true;
+            spinner.classList.remove("d-none");
+            buttonText.style.display = "none";
+
+            const url = `/Planning/Status_OrderProduction?DocEntry=${encodeURIComponent(DocEntry)}&Satus=${encodeURIComponent(newStatus)}&ItemCode=${encodeURIComponent(ItemCode)}`;
+
+            const response = await fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error en la actualización: ${response.statusText}`);
+            }
+
+            await response.json();
+
+            Swal.fire({
+                title: '¡Estatus actualizado!',
+                text: 'El estado se ha cambiado correctamente.',
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+            }).then(() => location.reload());
+
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Hubo un problema al actualizar el estatus.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+        } finally {
+            // Habilitar botón y ocultar spinner
+            button.disabled = false;
+            spinner.classList.add("d-none");
+            buttonText.style.display = "inline";
+        }
+    }
+
+
+</script>
+
+<script>
+
+
+        function solicitarSC(itemCode, DocEntry, LineNum, Quantity, WhsCode) {
+        // Asignar valores a campos ocultos antes de mostrar el modal
+        document.getElementById("itemCodeHidden").value = itemCode;
+        document.getElementById("docEntryHidden").value = DocEntry;
+        document.getElementById("lineNumHidden").value = LineNum;
+        document.getElementById("quantityHidden").value = Quantity;
+        document.getElementById("whsCodeHidden").value = WhsCode;
+
+        // Asignar valor visible para cantidad
+        document.getElementById("cantidadSolicitar").value = Quantity;
+
+        // Cambiar el título del modal e incluir el valor de ItemCode en el título
+        const solicitudCompraLabel = document.getElementById("solicitudCompraLabel");
+        solicitudCompraLabel.innerHTML = `Solicitud De Compra - <span id="ScItemCode">${itemCode}</span>`;
+
+        console.log(itemCode, DocEntry, LineNum, Quantity, WhsCode);
+        // Mostrar el modal
+        var modal = new bootstrap.Modal(document.getElementById('solicitudCompraModal'));
+
+        // Usar el evento 'shown.bs.modal' para garantizar que el modal esté completamente visible
+        modal.show();
+
+        // Asignar un evento para cuando el modal esté completamente cargado y visible
+        modal._element.addEventListener('shown.bs.modal', function() {
+            console.log("Modal mostrado y los valores fueron asignados correctamente.");
+            // Aquí ya puedes acceder a los campos ocultos si es necesario
+        });
+    }
+
+
+</script>
+
+<!-- Listar y formulario OC -->
+<script>
+    // Llamar la función cuando se cargue la página
+     document.addEventListener('DOMContentLoaded', cargarProveedores);
+
+    function handleProveedorChange(select) {
+        const selectedValue = select.value;
+        console.log("Proveedor seleccionado:", selectedValue);
+    }
+
+        async function cargarProveedores() {
+        try {
+            const response = await fetch('/MasterData/Get_BusinessPartners?Type=S');
+
+            // Verificar si la respuesta es válida
+            if (!response.ok) {
+                throw new Error("Error en la respuesta del servidor");
+            }
+
+            // Intentamos parsear la respuesta como JSON
+            const result = await response.json();
+
+            // Verificar si result es un arreglo de proveedores
+            if (!Array.isArray(result)) {
+                console.error("La respuesta no es un arreglo de proveedores:", result);
+                return;
+            }
+
+            const proveedores = result;
+            const datalist = document.getElementById('proveedores');
+
+            // Limpiar opciones previas
+            datalist.innerHTML = '';
+
+            // Rellenar el datalist con las opciones
+            proveedores.forEach(proveedor => {
+                const option = document.createElement('option');
+                option.value = `${proveedor.CardCode} - ${proveedor.CardName}`;
+                option.id = proveedor.CardCode;  // Asignar el id con el valor de CardCode
+                datalist.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error("Error al cargar proveedores:", error);
+            alert("Hubo un problema al cargar los proveedores. Intenta de nuevo más tarde.");
+        }
+    }
+
+    // Ejecutar cuando el DOM esté listo para proveedores 
+    document.addEventListener('DOMContentLoaded', cargarProveedores);
+
+   // document.getElementById("confirmarSolicitud").addEventListener("click", function () {
+   //      const proveedor = document.getElementById("proveedorInput");
+   //      const fechaNecesaria = document.getElementById("fechaNecesaria");
+   //      const cantidadSolicitar = document.getElementById("cantidadSolicitar");
+
+   //      let isValid = true; // Para verificar si hay errores
+
+   //      // Función para cambiar el borde en caso de error
+   //      function marcarError(input, error) {
+   //          if (error) {
+   //              input.classList.add("is-invalid");
+   //              input.classList.remove("is-valid");
+   //              isValid = false;
+   //          } else {
+   //              input.classList.add("is-valid");
+   //              input.classList.remove("is-invalid");
+   //          }
+   //      }
+
+   //      // Validar Proveedor
+   //      marcarError(proveedor, proveedor.value.trim() === "");
+
+   //      // Validar Fecha Necesaria
+   //      marcarError(fechaNecesaria, fechaNecesaria.value === "");
+
+   //      // Validar Cantidad a Solicitar
+   //      marcarError(cantidadSolicitar, cantidadSolicitar.value <= 0 || cantidadSolicitar.value === "");
+
+   //      // Si todo está bien, procesar la solicitud
+   //      if (isValid) {
+   //          alert("Solicitud enviada correctamente."); // Aquí puedes hacer la acción que necesites
+   //      }
+   //  });
+
+   // Quitar el error al escribir
+    document.querySelectorAll("#proveedorInput, #fechaNecesaria, #cantidadSolicitar").forEach(input => {
+        input.addEventListener("input", function () {
+            this.classList.remove("is-invalid");
+            this.classList.add("is-valid");
+        });
+    });
+
+
+        document.getElementById("confirmarSolicitud").addEventListener("click", async function () {
+        const proveedor = document.getElementById("proveedorInput");
+        const fechaNecesaria = document.getElementById("fechaNecesaria");
+        const cantidadSolicitar = document.getElementById("cantidadSolicitar");
+        const fileInput = document.getElementById("documentoAdjunto");
+        const docEntryHidden = document.getElementById("docEntryHidden");
+        const lineNumHidden = document.getElementById("lineNumHidden");
+         const proveedorValor = proveedor.value.trim();
+
+         console.log(docEntryHidden, lineNumHidden);
+          const proveedorParts = proveedorValor.split(" - ");
+          const cardCode = proveedorParts[0];  // "P-00001"
+        const cardName = proveedorParts[1];  // "Proveedro1"
+
+          let isValid = true;
+
+        function marcarError(input, error) {
+            if (error) {
+                input.classList.add("is-invalid");
+                input.classList.remove("is-valid");
+                isValid = false;
+            } else {
+                input.classList.add("is-valid");
+                input.classList.remove("is-invalid");
+            }
+        }
+
+        // Validaciones
+        marcarError(proveedor, proveedor.id === "");
+        marcarError(fechaNecesaria, fechaNecesaria.value === "");
+        marcarError(cantidadSolicitar, isNaN(cantidadSolicitar.value) || cantidadSolicitar.value <= 0);
+
+        if (!isValid) {
+            Swal.fire({
+                icon: "error",
+                title: "Error en la validación",
+                text: "Por favor, completa todos los campos correctamente.",
+            });
+            return;
+        }
+
+        // Confirmación con SweetAlert
+        Swal.fire({
+            title: "¿Confirmar solicitud?",
+            text: "Se enviará la solicitud de compra.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, confirmar"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                // Crear FormData al principio
+                let formData = new FormData();
+
+                // Agregar campos al FormData
+                 formData.append("CardCode", cardCode);
+                formData.append("DocDate", fechaNecesaria.value);
+                formData.append("Quantity", cantidadSolicitar.value);
+
+                // Obtener valores de los campos ocultos
+                const docEntryHidden = document.getElementById("docEntryHidden");
+                const lineNumHidden = document.getElementById("lineNumHidden");
+
+                // Validar y agregar los valores ocultos al FormData
+                if (docEntryHidden) {
+                    formData.append("DocEntry", docEntryHidden.value);
+                } else {
+                    console.error("Elemento 'docEntryHidden' no encontrado.");
+                }
+
+                if (lineNumHidden) {
+                    formData.append("LineNum", lineNumHidden.value);
+                } else {
+                    console.error("Elemento 'lineNumHidden' no encontrado.");
+                }
+
+                // Agregar archivo si existe
+                if (fileInput.files.length > 0) {
+                    formData.append("FileAttch", fileInput.files[0]);
+                }
+
+                console.log(formData);  // Verificar que todos los datos se estén agregando correctamente
+
+                try {
+                    let response = await fetch("/Planning/Add_DrafPurchaseRequest", {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP: ${response.status}`);
+                    }
+
+                    let result = await response.json();
+
+                    Swal.fire({
+                        icon: result.IsError ? "error" : "success",
+                        title: result.IsError ? "Error en la solicitud" : "Solicitud enviada",
+                        text: result.Message || (result.IsError ? "Ocurrió un problema." : "Se ha enviado correctamente."),
+                    });
+                } catch (error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error en la conexión",
+                        text: `No se pudo conectar con el servidor. ${error.message}`,
+                    });
+                }
+            }
+        });
+    });
+
+
+</script>
+
+<script>
+     function validarCampos(GroupCode) {
+        const tarimas = document.getElementById("inputTarimas").value.trim();
+        const rollos = document.getElementById("inputRollos").value.trim();
+        const metodoImpresion = document.getElementById("inputMetImprsn").value.trim();
+
+        if (tarimas === "" || rollos === "" || metodoImpresion === "") {
+            Swal.fire({
+                icon: "warning",
+                title: "Campos incompletos",
+                text: "Por favor, complete todos los campos antes de continuar.",
+                confirmButtonText: "Entendido"
+            }).then(() => {
+                console.log("Usuario cerró la alerta");
+            });
+        } else {
+            console.log("Campos completos, llamando a loadComponents...");
+            loadComponents(GroupCode);
+        }
+    }
+
+
+</script>
