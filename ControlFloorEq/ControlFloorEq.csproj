@@ -23,13 +23,13 @@
 
 	<ItemGroup>
 	  <Reference Include="Abixe_Logic">
-	    <HintPath>..\..\Abixe_ControlFloor\Abixe_Logic\bin\Debug\net9.0\Abixe_Logic.dll</HintPath>
+	    <HintPath>dlls\Abixe_Logic.dll</HintPath>
 	  </Reference>
 	  <Reference Include="Abixe_Models">
-	    <HintPath>..\..\Abixe_ControlFloor\Abixe_Logic\bin\Debug\net9.0\Abixe_Models.dll</HintPath>
+	    <HintPath>dlls\Abixe_Models.dll</HintPath>
 	  </Reference>
 	  <Reference Include="Abixe_SapServiceLayer">
-	    <HintPath>..\..\Abixe_ControlFloor\Abixe_SapServiceLayer\bin\Debug\net9.0\Abixe_SapServiceLayer.dll</HintPath>
+	    <HintPath>dlls\Abixe_SapServiceLayer.dll</HintPath>
 	  </Reference>
 	  <Reference Include="Context">
 	    <HintPath>..\..\Abixe_ControlFloor\Abixe_Logic\bin\Debug\net9.0\Context.dll</HintPath>
