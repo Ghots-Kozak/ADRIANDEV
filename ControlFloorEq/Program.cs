@@ -2,7 +2,7 @@
 using Context;
 using Control_Piso.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using PdfSharp.Charting;
+// Corrected namespace for PdfSharpCore
 using Microsoft.Extensions.Configuration;
 using ControlFloor.Models;
 using ControlFloor.Middleware;
@@ -17,11 +17,12 @@ var cultureInfo = new CultureInfo("es-MX");
 cultureInfo.DateTimeFormat.ShortDatePattern = "dd-MM-yyyy";
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 // Agregar servicios al contenedor.
 builder.Services.AddSignalR();  // Aquí se agrega SignalR
+
 // Acceder a la configuración
 Microsoft.Extensions.Configuration.ConfigurationManager configuration = builder.Configuration;
-
 
 var sapSettings = configuration.GetSection("SAP");
 
@@ -89,7 +90,6 @@ builder.Services.AddTransient<SapServiceCall>();
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
 
-
 var app = builder.Build();
 
 var supportedCultures = new[] { cultureInfo };
@@ -100,10 +100,12 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedCultures = supportedCultures,
     SupportedUICultures = supportedCultures
 });
+
 // Habilitar archivos estáticos
 app.UseStaticFiles();
 
 app.UseMiddleware<GlobalLoggingMiddleware>();
+
 // Middleware de manejo de errores
 if (!app.Environment.IsDevelopment())
 {
@@ -121,12 +123,12 @@ app.UseRouting();
 // Habilitar autenticación y autorización
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers(); // Habilita el uso de controladores
     endpoints.MapHub<MessageHub>("/basculahub");  // Aquí mapeas tu Hub SignalR
 });
-
 
 // Habilitar sesiones
 app.UseSession(); // Importante si usas sesiones
@@ -156,4 +158,3 @@ app.MapControllerRoute(
     pattern: "{controller=Accounts}/{action=Login}/{id?}");
 
 app.Run();
-

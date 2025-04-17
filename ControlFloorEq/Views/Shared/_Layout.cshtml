@@ -57,7 +57,7 @@
                             <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("PlnListProgramProd", "Planning")">Programación de Producción</a></li>
                            
                             <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("PlnSolCompra", "Planning")">Solicitud de Aprovisionamiento de Materiales  </a></li>
-                        </ul>
+                        </ul>0
                     </li>
                     <!-- Autorización -->
                     <li class="sidebar-item">
@@ -104,15 +104,7 @@
                         </ul>
                     </li>
                  
-                    <!-- Almacén -->
-                @*     <li class="sidebar-item">
-                        <a data-bs-target="#Almacen" data-bs-toggle="collapse" class="sidebar-link collapsed" aria-expanded="false">
-                            <i class="align-middle fas fa-warehouse"></i> <span class="align-middle">Almacén</span>
-                        </a>
-                        <ul id="Almacen" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar" style="">
-                            <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("Almacen", "Almacen")">Almacén</a></li>
-                        </ul>
-                    </li>*@
+                   
 
                     <!-- Logística -->
                     <li class="sidebar-item">
@@ -123,8 +115,26 @@
                             <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("Logistica", "Logistica")">Logística</a></li>
                             <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("LogisticaOne", "Logistica")">LogísticaOne</a></li>
                         </ul>
-                    </li> 
+                    </li>
+
+                    <!-- AKMACEN HRS -->
+                    <!-- Almacen (Moved Here) -->
+                    <li class="sidebar-item">
+                        <a data-bs-target="#Almacen" data-bs-toggle="collapse" class="sidebar-link collapsed" aria-expanded="false">
+                            <i class="align-middle fas fa-warehouse"></i> <span class="align-middle">Almacen</span>
+                        </a>
+                        <ul id="Almacen" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar" style="">
+                            <li class="sidebar-item"><a class="sidebar-link" href="@Url.Action("Almacen", "Almacen")">Almacen</a></li>
+                        </ul>
+                    </li>
+
+
                 </ul>
+
+
+                
+              
+
 
                @*  <ul class="sidebar-nav">
                     <li class="sidebar-header">

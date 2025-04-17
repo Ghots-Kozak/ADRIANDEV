@@ -5,15 +5,15 @@ using Abixe_SapServiceLayer;
 using Control_Piso.Models;
 using ControlFloor.Models;
 using ControlFloor.Services;
-using FastReport.Utils;
-using Microsoft.AspNetCore.Authorization;
+
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Newtonsoft.Json; 
 using System.Security.Claims;
 
 namespace ControlFloor.Controllers
 {
-    [Authorize]
+    
     public class PlanningController : Controller
     {
         private readonly ApplicationDbContext _context;
