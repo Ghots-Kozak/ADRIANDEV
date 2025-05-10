@@ -3,229 +3,778 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
+    /* General Container */
     .container {
         max-width: 1200px;
-        margin-top: 20px;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-    }
-
-    .table th, .table td {
-        vertical-align: middle;
-        text-align: center;
-        padding: 12px;
-    }
-
-    .table th {
-        background-color: #e9ecef;
-        font-weight: 500;
-        text-transform: uppercase;
-        font-size: 12px;
-        color: #555;
-        border-bottom: 2px solid #dee2e6;
-    }
-
-    .table td {
-        background-color: #fff;
-        border-bottom: 1px solid #ececec;
-    }
-
-    .table tbody tr:hover {
+        margin: 20px auto;
+        padding: 15px;
         background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header Section with Export, Mezclas, and Status */
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .header-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-export, .btn-mezclas {
+        background-color: #000000;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
         transition: background-color 0.3s ease;
     }
 
-    .btn-buscar {
-        background-color: #f1f3f5;
-        border: 1px solid #ced4da;
-        color: #495057;
-        margin-right: 5px;
-        border-radius: 5px;
-        transition: all 0.3s ease;
-    }
-
-        .btn-buscar:hover {
-            background-color: #e9ecef;
-            border-color: #adb5bd;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        .btn-export:hover, .btn-mezclas:hover {
+            background-color: #333333;
         }
 
-    .btn-abierto {
-        background-color: #28a745;
-        color: white;
-        border: none;
-        padding: 6px 16px;
-        font-size: 13px;
-        border-radius: 5px;
-        transition: transform 0.2s ease, box-shadow 0.3s ease;
-    }
-
-        .btn-abierto:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 8px rgba(40, 167, 69, 0.3);
+        .btn-export i, .btn-mezclas i {
+            margin-right: 5px;
         }
 
-    .btn-cerrado {
-        background-color: #fd7e14;
-        color: white;
-        border: none;
-        padding: 6px 16px;
-        font-size: 13px;
-        border-radius: 5px;
-        transition: transform 0.2s ease, box-shadow 0.3s ease;
+    .status-section {
+        display: flex;
+        gap: 20px;
     }
-
-        .btn-cerrado:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 8px rgba(253, 126, 20, 0.3);
-        }
 
     .status-abierto {
         color: #28a745;
-        font-weight: 600;
-        background-color: #e6f4ea;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 13px;
+        font-size: 14px;
+        font-weight: normal;
     }
 
     .status-cerrado {
-        color: #fd7e14;
-        font-weight: 600;
-        background-color: #ffecd9;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 13px;
+        color: #ff4500;
+        font-size: 14px;
+        font-weight: normal;
     }
 
-    .alm-destino {
-        color: #dc3545;
-        border: 2px solid #dc3545;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-weight: 500;
-    }
-
+    /* Search Inputs */
     .input-group {
         display: flex;
-        gap: 5px;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 15px 0;
+        justify-content: space-between;
     }
 
-    .btn-export {
+    .btn-buscar {
         background-color: #fff;
         border: 1px solid #ced4da;
         color: #495057;
-        padding: 6px 16px;
+        padding: 6px 12px;
+        font-size: 14px;
         border-radius: 5px;
-        transition: all 0.3s ease;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
-        .btn-export:hover {
-            background-color: #f8f9fa;
-            border-color: #adb5bd;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        .btn-buscar:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+            outline: none;
         }
+
+    /* Table Header */
+    .table-header {
+        display: flex;
+        background-color: #d3d3d3;
+        border: none;
+        font-size: 14px;
+        font-weight: normal;
+        color: #000;
+        border-radius: 5px 5px 0 0;
+    }
+
+        .table-header div {
+            text-align: center;
+            padding: 10px;
+            border-right: none;
+        }
+
+            .table-header div:last-child {
+                border-right: none;
+            }
+
+            /* Specific widths for header columns to match table */
+            .table-header div:nth-child(1), .table td:nth-child(1) {
+                width: 12%;
+            }
+
+            .table-header div:nth-child(2), .table td:nth-child(2) {
+                width: 14%;
+            }
+
+            .table-header div:nth-child(3), .table td:nth-child(3) {
+                width: 14%;
+            }
+
+            .table-header div:nth-child(4), .table td:nth-child(4) {
+                width: 14%;
+            }
+
+            .table-header div:nth-child(5), .table td:nth-child(5) {
+                width: 12%;
+            }
+
+            .table-header div:nth-child(6), .table td:nth-child(6) {
+                width: 12%;
+            }
+
+            .table-header div:nth-child(7), .table td:nth-child(7) {
+                width: 14%;
+            }
+
+            .table-header div:nth-child(8), .table td:nth-child(8) {
+                width: 8%;
+            }
+
+    /* Table Body */
+    .table {
+        border-collapse: collapse;
+        background-color: #fff;
+        border-radius: 0 0 5px 5px;
+        overflow: hidden;
+    }
+
+        .table td {
+            vertical-align: middle;
+            text-align: center;
+            padding: 10px;
+            border: none;
+            font-size: 14px;
+        }
+
+        .table tr {
+            transition: background-color 0.2s ease;
+        }
+
+            /* Alternating row colors */
+            .table tr:nth-child(odd) {
+                background-color: #e6f0fa;
+            }
+
+            .table tr:nth-child(even) {
+                background-color: #fff;
+            }
+
+            .table tr:hover {
+                background-color: #f1f1f1;
+            }
+
+    /* Status Buttons */
+    .btn-abierto, .btn-cerrado {
+        padding: 6px 14px;
+        font-size: 14px;
+        border-radius: 4px;
+        border: none;
+        color: white;
+        transition: transform 0.1s ease;
+    }
+
+        .btn-abierto:hover, .btn-cerrado:hover {
+            transform: scale(1.05);
+        }
+
+    .btn-abierto {
+        background-color: #008000;
+    }
+
+    .btn-cerrado {
+        background-color: #ffa500;
+    }
+
+    .alm-destino {
+        color: #000;
+        font-weight: normal;
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    }
+
+        .pagination .records-info {
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .pagination .controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pagination button {
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+            .pagination button:hover:not(:disabled) {
+                background-color: #e9ecef;
+                border-color: #adb5bd;
+            }
+
+            .pagination button:disabled {
+                background-color: #f8f9fa;
+                border-color: #dee2e6;
+                cursor: not-allowed;
+                color: #adb5bd;
+            }
+
+        .pagination .progress-bar {
+            flex-grow: 1;
+            height: 6px;
+            background-color: #e9ecef;
+            margin: 0 12px;
+            border-radius: 3px;
+            position: relative;
+        }
+
+            .pagination .progress-bar .progress {
+                height: 100%;
+                background-color: #6c757d;
+                border-radius: 3px;
+                transition: width 0.3s ease;
+            }
+
+        .pagination .page-numbers {
+            display: flex;
+            gap: 8px;
+        }
+
+            .pagination .page-numbers span {
+                padding: 6px 12px;
+                font-size: 14px;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
+
+                .pagination .page-numbers span:hover {
+                    background-color: #e9ecef;
+                }
+
+                .pagination .page-numbers span.active {
+                    background-color: #6c757d;
+                    color: white;
+                    border-color: #6c757d;
+                }
+
+    /* Hide rows by default */
+    .table-row {
+        display: none;
+    }
+
+        .table-row.active {
+            display: table-row;
+        }
+
+    /* Responsiveness */
+    (max-width: 768px) {
+        .input-group
+
+    {
+        flex-direction: column;
+    }
+
+    .input-group .btn-buscar {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table-header div, .table td {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .pagination {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+        .pagination .progress-bar {
+            width: 100%;
+        }
+
+    }
+
+    (max-width: 576px) {
+        .container
+
+    {
+        padding: 10px;
+    }
+
+    .btn-abierto, .btn-cerrado {
+        width: 100%;
+        text-align: center;
+    }
+
+    .table-header div, .table td {
+        font-size: 10px;
+        padding: 6px;
+    }
+
+    .pagination button, .pagination .page-numbers span {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    .pagination .records-info {
+        font-size: 12px;
+    }
+
+    .header-section {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .header-buttons {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .status-section {
+        gap: 10px;
+    }
+
+    }
 </style>
 
 <div class="container">
-    <div class="d-flex justify-content-between mb-4">
-        <button class="btn btn-export">Exportar a Excel</button>
-        <div>
-            <span class="status-abierto me-3"># Abiertas: 11.790</span>
-            <span class="status-cerrado"># Cerradas: 11.790</span>
+    <div class="header-section">
+        <div class="header-buttons">
+            <button class="btn-export" onclick="exportToExcel()">
+                <i class="fas fa-file-excel"></i> Exportar a Excel
+            </button>
+            <a class="btn-mezclas" href="@Url.Action("RProduccion", "Almacen")">
+                <i class="fas fa-flask"></i> Mezclas
+            </a>
+        </div>
+        <div class="status-section">
+            <span class="status-abierto" id="abiertoCount"># Abiertas: 0</span>
+            <span class="status-cerrado" id="cerradoCount"># Cerradas: 0</span>
         </div>
     </div>
 
-    <div class="input-group mb-4">
-        <input type="text" class="form-control btn-buscar" placeholder="Buscar">
-        <input type="text" class="form-control btn-buscar" placeholder="Buscar">
-        <input type="text" class="form-control btn-buscar" placeholder="Buscar">
-        <input type="text" class="form-control btn-buscar" placeholder="Buscar">
-        <input type="text" class="form-control btn-buscar" placeholder="Buscar">
-        <input type="text" class="form-control btn-buscar" placeholder="Buscar">
-        <input type="text" class="form-control btn-buscar" placeholder="Buscar">
+    <div class="input-group">
+        <input type="text" class="form-control btn-buscar" id="searchSolicitud" placeholder="Buscar Nº Solicitud">
+        <input type="text" class="form-control btn-buscar" id="searchFecha" placeholder="Buscar Fecha de solicitud">
+        <input type="text" class="form-control btn-buscar" id="searchDocumento" placeholder="Buscar Documento base">
+        <input type="text" class="form-control btn-buscar" id="searchSolicitante" placeholder="Buscar Solicitante">
+        <input type="text" class="form-control btn-buscar" id="searchAlmOrigen" placeholder="Buscar Alm. Origen">
+        <input type="text" class="form-control btn-buscar" id="searchAlmDestino" placeholder="Buscar Alm. destino">
+        <input type="text" class="form-control btn-buscar" id="searchDepartamento" placeholder="Buscar Departamento">
     </div>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Nº Solicitud</th>
-                <th>Fecha de solicitud</th>
-                <th>Documento base</th>
-                <th>Solicitante</th>
-                <th>Alm. Origen</th>
-                <th>Alm. destino</th>
-                <th>Departamento</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>2009</td>
-                <td>12/09/2024</td>
-                <td>OP-02049</td>
-                <td>Juan Hernandez</td>
-                <td>ALM-02</td>
-                <td class="alm-destino">ALM-02</td>
-                <td>Producción</td>
-                <td>
-                    <a class="btn btn-abierto" href="@Url.Action("Index", "Almacen", new { solicitudId = 2009, fecha = "12/09/2024", documento = "OP-02049", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Abierto" })">Abierto</a>
-                </td>
-            </tr>
-            <tr>
-                <td>2008</td>
-                <td>12/09/2024</td>
-                <td>OP-02049</td>
-                <td>Juan Hernandez</td>
-                <td>ALM-02</td>
-                <td>ALM-02</td>
-                <td>Producción</td>
-                <td>
-                    <a class="btn btn-abierto" href="@Url.Action("Index", "Almacen", new { solicitudId = 2008, fecha = "12/09/2024", documento = "OP-02049", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Abierto" })">Abierto</a>
-                </td>
-            </tr>
-            <tr>
-                <td>2007</td>
-                <td>12/09/2024</td>
-                <td>OP-02049</td>
-                <td>Juan Hernandez</td>
-                <td>ALM-02</td>
-                <td>ALM-02</td>
-                <td>Producción</td>
-                <td>
-                    <a class="btn btn-abierto" href="@Url.Action("Index", "Almacen", new { solicitudId = 2007, fecha = "12/09/2024", documento = "OP-02049", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Abierto" })">Abierto</a>
-                </td>
-            </tr>
-            <tr>
-                <td>2006</td>
-                <td>12/09/2024</td>
-                <td>OP-02049</td>
-                <td>Juan Hernandez</td>
-                <td>ALM-02</td>
-                <td>ALM-02</td>
-                <td>Producción</td>
-                <td>
-                    <a class="btn btn-cerrado" href="@Url.Action("Index", "Almacen", new { solicitudId = 2006, fecha = "12/09/2024", documento = "OP-02049", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Cerrado" })">Cerrado</a>
-                </td>
-            </tr>
-            <tr>
-                <td>2005</td>
-                <td>12/09/2024</td>
-                <td>OP-02049</td>
-                <td>Juan Hernandez</td>
-                <td>ALM-02</td>
-                <td>ALM-02</td>
-                <td>Producción</td>
-                <td>
-                    <a class="btn btn-cerrado" href="@Url.Action("Index", "Almacen", new { solicitudId = 2005, fecha = "12/09/2024", documento = "OP-02049", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Cerrado" })">Cerrado</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-header">
+        <div>Nº Solicitud</div>
+        <div>Fecha de solicitud</div>
+        <div>Documento base</div>
+        <div>Solicitante</div>
+        <div>Alm. Origen</div>
+        <div>Alm. destino</div>
+        <div>Departamento</div>
+        <div></div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table">
+            <tbody>
+                <tr class="table-row">
+                    <td>2009</td>
+                    <td>12/09/2024</td>
+                    <td>OP-02049</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td class="alm-destino">ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-abierto" href="@Url.Action("Index", "Almacen", new { solicitudId = 2009, fecha = "12/09/2024", documento = "OP-02049", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Abierto" })">Abierto</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>2008</td>
+                    <td>12/09/2024</td>
+                    <td>OP-02049</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td>ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-abierto" href="@Url.Action("Index", "Almacen", new { solicitudId = 2008, fecha = "12/09/2024", documento = "OP-02049", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Abierto" })">Abierto</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>2007</td>
+                    <td>12/09/2024</td>
+                    <td>OP-02049</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td>ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-abierto" href="@Url.Action("Index", "Almacen", new { solicitudId = 2007, fecha = "12/09/2024", documento = "OP-02049", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Abierto" })">Abierto</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>2006</td>
+                    <td>12/09/2024</td>
+                    <td>OP-02049</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td>ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-cerrado" href="@Url.Action("Index", "Almacen", new { solicitudId = 2006, fecha = "12/09/2024", documento = "OP-02049", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Cerrado" })">Cerrado</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>2005</td>
+                    <td>12/09/2024</td>
+                    <td>OP-02049</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td>ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-cerrado" href="@Url.Action("Index", "Almacen", new { solicitudId = 2005, fecha = "12/09/2024", documento = "OP-02049", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Cerrado" })">Cerrado</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>2004</td>
+                    <td>12/09/2024</td>
+                    <td>OP-02048</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td class="alm-destino">ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-abierto" href="@Url.Action("Index", "Almacen", new { solicitudId = 2004, fecha = "12/09/2024", documento = "OP-02048", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Abierto" })">Abierto</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>2003</td>
+                    <td>12/09/2024</td>
+                    <td>OP-02048</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td>ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-abierto" href="@Url.Action("Index", "Almacen", new { solicitudId = 2003, fecha = "12/09/2024", documento = "OP-02048", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Abierto" })">Abierto</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>2002</td>
+                    <td>12/09/2024</td>
+                    <td>OP-02048</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td>ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-abierto" href="@Url.Action("Index", "Almacen", new { solicitudId = 2002, fecha = "12/09/2024", documento = "OP-02048", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Abierto" })">Abierto</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>2001</td>
+                    <td>12/09/2024</td>
+                    <td>OP-02048</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td>ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-cerrado" href="@Url.Action("Index", "Almacen", new { solicitudId = 2001, fecha = "12/09/2024", documento = "OP-02048", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Cerrado" })">Cerrado</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>2000</td>
+                    <td>12/09/2024</td>
+                    <td>OP-02048</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td>ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-cerrado" href="@Url.Action("Index", "Almacen", new { solicitudId = 2000, fecha = "12/09/2024", documento = "OP-02048", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Cerrado" })">Cerrado</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>1999</td>
+                    <td>12/09/2024</td>
+                    <td>OP-02047</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td class="alm-destino">ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-abierto" href="@Url.Action("Index", "Almacen", new { solicitudId = 1999, fecha = "12/09/2024", documento = "OP-02047", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Abierto" })">Abierto</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>1998</td>
+                    <td>12/09/2024</td>
+                    <td>OP-02047</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td>ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-abierto" href="@Url.Action("Index", "Almacen", new { solicitudId = 1998, fecha = "12/09/2024", documento = "OP-02047", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Abierto" })">Abierto</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>1997</td>
+                    <td>12/09/2024</td>
+                    <td>OP-02047</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td>ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-abierto" href="@Url.Action("Index", "Almacen", new { solicitudId = 1997, fecha = "12/09/2024", documento = "OP-02047", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Abierto" })">Abierto</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>1996</td>
+                    <td>12/09/2014</td>
+                    <td>OP-02047</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td>ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-cerrado" href="@Url.Action("Index", "Almacen", new { solicitudId = 1996, fecha = "12/09/2014", documento = "OP-02047", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Cerrado" })">Cerrado</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>1995</td>
+                    <td>12/09/2014</td>
+                    <td>OP-02047</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td>ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-cerrado" href="@Url.Action("Index", "Almacen", new { solicitudId = 1995, fecha = "12/09/2014", documento = "OP-02047", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Cerrado" })">Cerrado</a>
+                    </td>
+                </tr>
+                <tr class="table-row">
+                    <td>1994</td>
+                    <td>12/09/2014</td>
+                    <td>OP-02046</td>
+                    <td>Juan Hernandez</td>
+                    <td>ALM-02</td>
+                    <td>ALM-02</td>
+                    <td>Producción</td>
+                    <td>
+                        <a class="btn btn-abierto" href="@Url.Action("Index", "Almacen", new { solicitudId = 1994, fecha = "12/09/2014", documento = "OP-02046", solicitante = "Juan Hernandez", almacenOrigen = "ALM-02", almacenDestino = "ALM-02", departamento = "Producción", estado = "Abierto" })">Abierto</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        <span class="records-info" id="recordsInfo">Mostrando 1 a 8 de 16 registros</span>
+        <div class="controls">
+            <button id="prevPage">Anterior</button>
+            <div class="progress-bar">
+                <div class="progress" id="progressBar"></div>
+            </div>
+            <div class="page-numbers">
+                <span class="page-num" data-page="1">1</span>
+                <span class="page-num" data-page="2">2</span>
+            </div>
+            <button id="nextPage">Siguiente</button>
+        </div>
+    </div>
 </div>
+
+<script>
+    const rows = document.querySelectorAll('.table-row');
+    const rowsPerPage = 8;
+    let filteredRows = Array.from(rows);
+    const totalRecords = rows.length;
+    const totalPages = Math.ceil(totalRecords / rowsPerPage);
+    let currentPage = 1;
+
+    let abiertoCount = 0;
+    let cerradoCount = 0;
+
+    rows.forEach(row => {
+        const status = row.querySelector('.btn-abierto') ? 'Abierto' : 'Cerrado';
+        if (status === 'Abierto') abiertoCount++;
+        else cerradoCount++;
+    });
+
+    const formatNumber = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+    document.getElementById('abiertoCount').textContent = `# Abiertas: ${formatNumber(abiertoCount)}`;
+    document.getElementById('cerradoCount').textContent = `# Cerradas: ${formatNumber(cerradoCount)}`;
+
+    function exportToExcel() {
+        // Collect data from filtered rows
+        const data = filteredRows.map(row => ({
+            'Nº Solicitud': row.cells[0].textContent,
+            'Fecha de solicitud': row.cells[1].textContent,
+            'Documento base': row.cells[2].textContent,
+            'Solicitante': row.cells[3].textContent,
+            'Alm. Origen': row.cells[4].textContent,
+            'Alm. destino': row.cells[5].textContent,
+            'Departamento': row.cells[6].textContent,
+            'Estado': row.querySelector('.btn-abierto') ? 'Abierto' : 'Cerrado'
+        }));
+
+        // Create a worksheet and workbook
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Solicitudes');
+
+        // Convert the workbook to a binary string
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+        // Create a Blob from the binary string
+        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+        // Create a downloadable link
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'Solicitudes.xlsx';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    }
+
+    function applyFilters() {
+        const searchSolicitud = document.getElementById('searchSolicitud').value.toLowerCase();
+        const searchFecha = document.getElementById('searchFecha').value.toLowerCase();
+        const searchDocumento = document.getElementById('searchDocumento').value.toLowerCase();
+        const searchSolicitante = document.getElementById('searchSolicitante').value.toLowerCase();
+        const searchAlmOrigen = document.getElementById('searchAlmOrigen').value.toLowerCase();
+        const searchAlmDestino = document.getElementById('searchAlmDestino').value.toLowerCase();
+        const searchDepartamento = document.getElementById('searchDepartamento').value.toLowerCase();
+
+        filteredRows = Array.from(rows).filter(row => {
+            const solicitud = row.cells[0].textContent.toLowerCase();
+            const fecha = row.cells[1].textContent.toLowerCase();
+            const documento = row.cells[2].textContent.toLowerCase();
+            const solicitante = row.cells[3].textContent.toLowerCase();
+            const almOrigen = row.cells[4].textContent.toLowerCase();
+            const almDestino = row.cells[5].textContent.toLowerCase();
+            const departamento = row.cells[6].textContent.toLowerCase();
+
+            return solicitud.includes(searchSolicitud) &&
+                fecha.includes(searchFecha) &&
+                documento.includes(searchDocumento) &&
+                solicitante.includes(searchSolicitante) &&
+                almOrigen.includes(searchAlmOrigen) &&
+                almDestino.includes(searchAlmDestino) &&
+                departamento.includes(searchDepartamento);
+        });
+
+        currentPage = 1;
+        updateTable();
+    }
+
+    function updateTable() {
+        rows.forEach(row => row.classList.remove('active'));
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        const rowsToShow = filteredRows.slice(startIndex, endIndex);
+
+        rowsToShow.forEach(row => row.classList.add('active'));
+
+        const totalFilteredRecords = filteredRows.length;
+        const startRecord = totalFilteredRecords > 0 ? startIndex + 1 : 0;
+        const endRecord = Math.min(startIndex + rowsPerPage, totalFilteredRecords);
+        document.getElementById('recordsInfo').textContent = `Mostrando ${startRecord} a ${endRecord} de ${totalFilteredRecords} registros`;
+
+        const totalFilteredPages = Math.max(1, Math.ceil(totalFilteredRecords / rowsPerPage));
+        const progressPercentage = totalFilteredRecords > 0 ? (currentPage / totalFilteredPages) * 100 : 0;
+        document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+
+        document.querySelectorAll('.page-num').forEach(span => {
+            span.classList.remove('active');
+            if (parseInt(span.getAttribute('data-page')) === currentPage) {
+                span.classList.add('active');
+            }
+            span.style.display = parseInt(span.getAttribute('data-page')) <= totalFilteredPages ? 'inline-block' : 'none';
+        });
+
+        document.getElementById('prevPage').disabled = currentPage === 1;
+        document.getElementById('nextPage').disabled = currentPage === totalFilteredPages || totalFilteredRecords === 0;
+    }
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            updateTable();
+        }
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+        const totalFilteredPages = Math.ceil(filteredRows.length / rowsPerPage);
+        if (currentPage < totalFilteredPages) {
+            currentPage++;
+            updateTable();
+        }
+    });
+
+    document.querySelectorAll('.page-num').forEach(span => {
+        span.addEventListener('click', () => {
+            currentPage = parseInt(span.getAttribute('data-page'));
+            updateTable();
+        });
+    });
+
+    document.querySelectorAll('.btn-buscar').forEach(input => {
+        input.addEventListener('input', applyFilters);
+    });
+
+    updateTable();
+</script>

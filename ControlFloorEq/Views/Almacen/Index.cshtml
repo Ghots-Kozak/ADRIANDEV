@@ -4,7 +4,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -13,24 +12,84 @@
         max-width: 1200px;
         margin: 20px auto;
         background-color: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
     }
+
+    .simple-header {
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+        .simple-header div {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .simple-header span {
+            font-size: 14px;
+            color: #000000; /* Titles remain black */
+        }
+
+    .btn-abierto {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        font-size: 14px;
+        border-radius: 4px;
+    }
+
+    .btn-cerrado {
+        background-color: #fd7e14;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        font-size: 14px;
+        border-radius: 4px;
+    }
+
+    .btn-regresar {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        font-size: 14px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-regresar:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-regresar i {
+            font-size: 16px;
+        }
 
     .table th, .table td {
         vertical-align: middle;
         text-align: center;
-        padding: 12px;
-        border-color: #e9ecef;
+        padding: 10px;
+        border-color: #dee2e6;
     }
 
     .table th {
-        background-color: #f8f9fa;
-        font-weight: 600;
+        background-color: #212529;
+        color: #ffffff;
+        font-weight: 500;
         text-transform: uppercase;
         font-size: 12px;
-        color: #495057;
     }
 
     .table td {
@@ -44,61 +103,43 @@
         border: none;
         padding: 8px 20px;
         font-size: 14px;
-        border-radius: 6px;
-        transition: transform 0.2s ease, box-shadow 0.3s ease;
+        border-radius: 4px;
+        transition: box-shadow 0.3s ease;
     }
 
         .btn-entregar:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
         }
-
-    .btn-abierto {
-        background-color: #28a745;
-        color: white;
-        border: none;
-        padding: 8px 20px;
-        font-size: 14px;
-        border-radius: 6px;
-    }
-
-    .btn-cerrado {
-        background-color: #fd7e14;
-        color: white;
-        border: none;
-        padding: 8px 20px;
-        font-size: 14px;
-        border-radius: 6px;
-    }
 
     .alm-destino {
         color: #dc3545;
         border: 2px solid #dc3545;
         padding: 4px 10px;
-        border-radius: 6px;
+        border-radius: 4px;
         font-weight: 500;
     }
 
     .delivery-section {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
-        margin-top: 25px;
-        padding: 20px;
-        background-color: #f8f9fa;
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #ffffff;
         border: 1px solid #dee2e6;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
     }
 
         .delivery-section .form-group {
-            flex: 1;
-            margin-right: 20px;
+            flex: 1 1 120px;
+            margin-right: 15px;
+            margin-bottom: 10px;
             min-width: 120px;
         }
 
             .delivery-section .form-group label {
-                font-weight: 600;
+                font-weight: 500;
                 color: #495057;
                 font-size: 14px;
                 margin-bottom: 5px;
@@ -108,188 +149,259 @@
             .delivery-section .form-group input {
                 background-color: #fff;
                 border: 1px solid #ced4da;
-                border-radius: 6px;
-                padding: 8px 12px;
+                border-radius: 4px;
+                padding: 6px 12px;
                 font-size: 14px;
                 color: #495057;
                 width: 100%;
                 box-sizing: border-box;
-                transition: border-color 0.3s ease;
             }
-
-                .delivery-section .form-group input:focus {
-                    border-color: #007bff;
-                    outline: none;
-                    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
-                }
 
         .delivery-section .print-btn {
             background-color: #007bff;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 15px;
             font-size: 14px;
-            border-radius: 8px;
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            border-radius: 4px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            height: 40px;
+            gap: 8px;
+            transition: box-shadow 0.3s ease;
+            margin-bottom: 10px;
         }
 
             .delivery-section .print-btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+                box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
             }
 
             .delivery-section .print-btn i {
-                font-size: 20px;
+                font-size: 16px;
             }
 
-    /* Modal Styles */
     .modal-content {
-        border-radius: 10px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
     .modal-header {
-        background-color: #007bff;
-        color: white;
-        border-bottom: none;
-        border-radius: 10px 10px 0 0;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 15px;
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #495057;
     }
 
     .modal-body {
         padding: 20px;
     }
 
-    .modal-table th {
-        background-color: #f8f9fa;
-        font-weight: 600;
-        color: #495057;
+        .modal-body .row {
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .modal-body label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .modal-body input, .modal-body .form-control {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: #495057;
+        }
+
+            .modal-body input[readonly] {
+                background-color: #e9ecef;
+                cursor: not-allowed;
+            }
+
+            .modal-body input:not([readonly]) {
+                background-color: #fff;
+            }
+
+    .modal-footer {
+        border-top: 1px solid #dee2e6;
+        padding: 15px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
     }
 
-    .modal-table td {
-        padding: 10px;
-        vertical-align: middle;
+        .modal-footer .btn-cancel {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+            .modal-footer .btn-cancel:hover {
+                background-color: #c82333;
+            }
+
+        .modal-footer .btn-create {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+            .modal-footer .btn-create:hover {
+                background-color: #218838;
+            }
+
+    /* Responsividad */
+    (max-width: 768px) {
+        .simple-header
+
+    {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-    .modal-table input {
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-        padding: 6px;
-        width: 80px;
+    .simple-header div {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .delivery-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+        .delivery-section .form-group {
+            width: 100%;
+            margin-right: 0;
+        }
+
+        .delivery-section .print-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .modal-body .row {
+        flex-direction: column;
+    }
+
+    .modal-body .col-md-3 {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    }
+
+    (max-width: 576px) {
+        .container
+
+    {
+        padding: 15px;
+    }
+
+    .btn-entregar, .btn-abierto, .btn-cerrado {
+        width: 100%;
         text-align: center;
     }
 
-    .modal-table .remove-btn {
-        color: #dc3545;
-        cursor: pointer;
-        font-size: 18px;
+    .modal-body label, .modal-body input {
+        font-size: 12px;
     }
-
-        .modal-table .remove-btn:hover {
-            color: #c82333;
-        }
 
     .modal-footer .btn {
-        padding: 8px 20px;
-        font-size: 14px;
-        border-radius: 6px;
+        font-size: 12px;
+        padding: 6px 15px;
     }
 
-    .modal-footer .btn-cancel {
-        background-color: #dc3545;
-        color: white;
+    .simple-header span {
+        font-size: 12px;
     }
 
-        .modal-footer .btn-cancel:hover {
-            background-color: #c82333;
-            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-        }
-
-    .modal-footer .btn-create {
-        background-color: #28a745;
-        color: white;
     }
-
-        .modal-footer .btn-create:hover {
-            background-color: #218838;
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-        }
 </style>
 
 <div class="container">
-    <div class="d-flex justify-content-end mb-4">
-        <button class="btn @(Model.Estado == "Abierto" ? "btn-abierto" : "btn-cerrado")">@Model.Estado</button>
+    <div class="simple-header">
+        <button class="btn-regresar" onclick="window.history.back()">
+            <i class="bi bi-arrow-left"></i> Regresar
+        </button>
+        <button class="btn @(Model.Estado == "Abierto" ? "btn-abierto" : "btn-cerrado")" style="margin-left: auto;">@Model.Estado</button>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-md-2">
-            <label class="fw-bold">Solicitud de traslado</label>
-            <input type="text" class="form-control" value="@Model.SolicitudId" readonly>
-        </div>
-        <div class="col-md-2">
-            <label class="fw-bold">Fecha de solicitud</label>
-            <input type="text" class="form-control" value="@Model.Fecha" readonly>
-        </div>
-        <div class="col-md-2">
-            <label class="fw-bold">Documento base</label>
-            <input type="text" class="form-control" value="@Model.Documento" readonly>
-        </div>
-        <div class="col-md-2">
-            <label class="fw-bold">Solicitante</label>
-            <input type="text" class="form-control" value="@Model.Solicitante" readonly>
-        </div>
-        <div class="col-md-2">
-            <label class="fw-bold">Almacen origen</label>
-            <input type="text" class="form-control" value="@Model.AlmacenOrigen" readonly>
-        </div>
-        <div class="col-md-2">
-            <label class="fw-bold">Almacen destino</label>
-            <input type="text" class="form-control alm-destino" value="@Model.AlmacenDestino" readonly>
-        </div>
-        <div class="col-md-2">
-            <label class="fw-bold">Departamento</label>
-            <input type="text" class="form-control" value="@Model.Departamento" readonly>
+    <div class="simple-header">
+        <div>
+            <h5>Orden de Servicio #@Model.SolicitudId</h5>
+            <span>Doc Num: @Model.SolicitudId</span>
+            <span>Fecha: @Model.Fecha</span>
+            <span>Documento: @Model.Documento</span>
+            <span>Solicitante: @Model.Solicitante</span>
+            <span>Almacén origen: @Model.AlmacenOrigen</span>
+            <span>Almacén destino: @Model.AlmacenDestino</span>
+            <span>Departamento: @Model.Departamento</span>
         </div>
     </div>
 
-    <div class="d-flex justify-content-start mb-4">
+    <div class="d-flex justify-content-start mb-3">
         <button class="btn btn-entregar" data-bs-toggle="modal" data-bs-target="#deliveryModal">Entregar componentes</button>
     </div>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Nº de producto</th>
-                <th>Descripción</th>
-                <th>Ctd. requerida</th>
-                <th>Ctd. entregada</th>
-                <th>Ctd. restante</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>M-00162</td>
-                <td>Core de cartón 53.35x77.47x500 PTS 1.5 kg</td>
-                <td>100</td>
-                <td>100</td>
-                <td>0</td>
-            </tr>
-            <tr>
-                <td>M-00386</td>
-                <td>Lámina single (Linner)</td>
-                <td>100</td>
-                <td>90</td>
-                <td>10</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Nº de producto</th>
+                    <th>Descripción</th>
+                    <th>Ctd. requerida</th>
+                    <th>Ctd. entregada</th>
+                    <th>Ctd. restante</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>M-00162</td>
+                    <td>Core de cartón 53.35x77.47x500 PTS 1.5 kg</td>
+                    <td>100</td>
+                    <td>100</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>M-00386</td>
+                    <td>Lámina single (Linner)</td>
+                    <td>100</td>
+                    <td>90</td>
+                    <td>10</td>
+                </tr>
+                <tr>
+                    <td>M-00388</td>
+                    <td>Tarima 40 x 48</td>
+                    <td>200</td>
+                    <td>100</td>
+                    <td>100</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <div class="mt-4">
+    <div class="mt-3">
         <h5>Lista de partidas de la solicitud</h5>
-
     </div>
 
     <div class="delivery-section" id="deliverySection">
@@ -329,44 +441,55 @@
 
 <!-- Modal -->
 <div class="modal fade" id="deliveryModal" tabindex="-1" aria-labelledby="deliveryModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="deliveryModalLabel">Confirma cantidad a entregar</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <table class="table table-bordered modal-table">
-                    <thead>
-                        <tr>
-                            <th>Nº de producto</th>
-                            <th>Descripción</th>
-                            <th>Ctd. restante</th>
-                            <th>Cta. a entregar</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="modalTableBody">
-                        <tr>
-                            <td>M-00386</td>
-                            <td>Lámina single (Linner)</td>
-                            <td>10</td>
-                            <td><input type="number" class="form-control" id="qtyM00386" min="0" max="10" value="10"></td>
-                            <td><span class="remove-btn"><i class="bi bi-x"></i></span></td>
-                        </tr>
-                        <tr>
-                            <td>M-00388</td>
-                            <td>Tarima 40 x 48</td>
-                            <td>200</td>
-                            <td><input type="number" class="form-control" id="qtyM00388" min="0" max="200" value="100"></td>
-                            <td><span class="remove-btn"><i class="bi bi-x"></i></span></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="modal-body" id="modalBody">
+                <!-- Product 1 -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Nº de producto</label>
+                        <input type="text" class="form-control" id="modalProducto1" readonly>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Descripción</label>
+                        <input type="text" class="form-control" id="modalDescripcion1" readonly>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Ctd. restante</label>
+                        <input type="text" class="form-control" id="modalCtdRestante1" readonly>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Cta. A entregar</label>
+                        <input type="number" class="form-control" id="modalCtaEntregar1" min="0">
+                    </div>
+                </div>
+                <!-- Product 2 -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Nº de producto</label>
+                        <input type="text" class="form-control" id="modalProducto2" readonly>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Descripción</label>
+                        <input type="text" class="form-control" id="modalDescripcion2" readonly>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Ctd. restante</label>
+                        <input type="text" class="form-control" id="modalCtdRestante2" readonly>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Cta. A entregar</label>
+                        <input type="number" class="form-control" id="modalCtaEntregar2" min="0">
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-create" id="confirmDelivery">Creat</button>
+                <button type="button" class="btn btn-create" id="confirmDelivery">Crear</button>
             </div>
         </div>
     </div>
@@ -374,21 +497,36 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Populate modal with data when opened
+    document.querySelector('.btn-entregar').addEventListener('click', function () {
+        document.getElementById('modalProducto1').value = 'M-00386';
+        document.getElementById('modalDescripcion1').value = 'Lámina single (Linner)';
+        document.getElementById('modalCtdRestante1').value = '10';
+        document.getElementById('modalCtaEntregar1').value = '';
+        document.getElementById('modalCtaEntregar1').setAttribute('max', '10');
+
+        document.getElementById('modalProducto2').value = 'M-00388';
+        document.getElementById('modalDescripcion2').value = 'Tarima 40 x 48';
+        document.getElementById('modalCtdRestante2').value = '100';
+        document.getElementById('modalCtaEntregar2').value = '';
+        document.getElementById('modalCtaEntregar2').setAttribute('max', '100');
+    });
+
     document.getElementById('confirmDelivery').addEventListener('click', function () {
         try {
             // Obtener valores del modal
-            const qtyM00386 = document.getElementById('qtyM00386')?.value || 0;
-            const qtyM00388 = document.getElementById('qtyM00388')?.value || 0;
+            const ctaEntregar1 = parseInt(document.getElementById('modalCtaEntregar1')?.value || 0);
+            const ctaEntregar2 = parseInt(document.getElementById('modalCtaEntregar2')?.value || 0);
+            const totalEntregar = ctaEntregar1 + ctaEntregar2;
 
-            const deliveryNumber = '999'; 
+            const deliveryNumber = '999';
             const deliveryDate = new Date().toLocaleDateString('es-MX');
-            const deliveredBy = 'Alberto'; 
-            const receivedBy = 'Luis'; 
-            const quantityRequested = parseInt(qtyM00386) + parseInt(qtyM00388);
+            const deliveredBy = 'Alberto';
+            const receivedBy = 'Luis';
+            const quantityRequested = totalEntregar;
             const origin = '@Model.AlmacenOrigen';
             const destination = '@Model.AlmacenDestino';
 
-       
             document.getElementById('deliveryNumber').value = deliveryNumber;
             document.getElementById('deliveryDate').value = deliveryDate;
             document.getElementById('deliveredBy').value = deliveredBy;
@@ -408,10 +546,9 @@
                 backdrop.remove();
             }
             document.body.classList.remove('modal-open');
-            document.body.style.overflow = ''; // Restaurar el desplazamiento
+            document.body.style.overflow = '';
         } catch (error) {
             console.error('Error al cerrar el modal:', error);
-            // Forzar cierre en caso de error
             const modalElement = document.getElementById('deliveryModal');
             modalElement.classList.remove('show');
             modalElement.style.display = 'none';

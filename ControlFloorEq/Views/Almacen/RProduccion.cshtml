@@ -1,0 +1,1901 @@
+﻿@model dynamic
+
+@{
+    var docEntry = Model?.DocEntry?.ToString() ?? "0";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    .nav-tabs .nav-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        font-size: 14px;
+        width: auto;
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+    }
+
+        .nav-tabs .nav-link.active {
+            background-color: #f8f9fa;
+            border-bottom-color: transparent;
+        }
+
+        .nav-tabs .nav-link i {
+            font-size: 30px;
+        }
+
+    .tab-content {
+        background: white;
+        padding: 20px;
+        border: 1px solid #dee2e6;
+        border-top: none;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 8px 20px;
+        font-size: 14px;
+        border-radius: 4px;
+        transition: box-shadow 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        }
+
+    .input-error {
+        border: 2px solid red !important;
+    }
+
+    .totales-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+    .total-label {
+        color: #333;
+    }
+
+    .total-value {
+        color: #007bff;
+    }
+
+    .table-container {
+        max-height: 350px;
+        overflow-y: auto;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+    .header-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .search-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+        .search-bar .form-group {
+            min-width: 120px;
+        }
+
+            .search-bar .form-group.wide {
+                flex: 2;
+                min-width: 200px;
+            }
+
+            .search-bar .form-group label {
+                font-size: 14px;
+                color: #495057;
+                margin-bottom: 5px;
+                display: block;
+            }
+
+            .search-bar .form-group input {
+                background-color: #fff;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                padding: 6px 12px;
+                font-size: 14px;
+                color: #495057;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+                .search-bar .form-group input::placeholder {
+                    color: #6c757d;
+                }
+
+    .button-section {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .btn-buscar {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        font-size: 14px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: box-shadow 0.3s ease;
+    }
+
+        .btn-buscar:hover {
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        }
+
+    .btn-iniciar {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: box-shadow 0.3s ease;
+    }
+
+        .btn-iniciar:hover {
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        }
+
+    .btn-merma {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: box-shadow 0.3s ease;
+    }
+
+        .btn-merma:hover {
+            box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-buscar i, .btn-iniciar i, .btn-merma i {
+            font-size: 20px;
+        }
+
+    .modal-body table {
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .modal-body th, .modal-body td {
+        padding: 10px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .modal-body th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .modal-body tbody tr {
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+        .modal-body tbody tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .modal-body tbody tr.selected {
+            background-color: #d1e7ff;
+            font-weight: bold;
+        }
+
+    /* Responsividad */
+    (max-width: 768px) {
+        .header-section
+
+    {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .search-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+        .search-bar .form-group, .search-bar .form-group.wide {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+    .button-section {
+        flex-direction: column;
+        align-items: center;
+    }
+
+        .button-section .btn-iniciar, .button-section .btn-merma {
+            width: 100%;
+            justify-content: center;
+        }
+
+    .modal-body table {
+        font-size: 12px;
+    }
+
+    .modal-body th, .modal-body td {
+        padding: 8px;
+    }
+
+    }
+
+    (max-width: 576px) {
+        .container
+
+    {
+        padding: 15px;
+    }
+
+    .search-bar .form-group label {
+        font-size: 12px;
+    }
+
+    .search-bar .form-group input {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+
+    .btn-buscar, .btn-iniciar, .btn-merma {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+        .btn-buscar i, .btn-iniciar i, .btn-merma i {
+            font-size: 18px;
+        }
+
+    .modal-body table {
+        font-size: 10px;
+    }
+
+    .modal-body th, .modal-body td {
+        padding: 6px;
+    }
+
+    }</style>
+
+<div class="container">
+    <div class="header-section" id="headerSection">
+        <button class="btn btn-buscar" id="btnBuscar" data-bs-toggle="modal" data-bs-target="#ordersModal">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+    </div>
+
+    <div class="search-bar">
+        <div class="form-group">
+            <label>Número OP</label>
+            <input type="text" class="form-control" id="numeroOP" placeholder="Número OP">
+        </div>
+        <div class="form-group">
+            <label>Fecha de Orden</label>
+            <input type="text" class="form-control" id="fechaOrden" placeholder="Fecha de Orden">
+        </div>
+        <div class="form-group">
+            <label>Código artículo</label>
+            <input type="text" class="form-control" id="codigoArticulo" placeholder="Código artículo">
+        </div>
+        <div class="form-group wide">
+            <label>Producto</label>
+            <input type="text" class="form-control" id="producto" placeholder="Producto">
+        </div>
+        <div class="form-group">
+            <label>Nº rollos</label>
+            <input type="text" class="form-control" id="numRollos" placeholder="Nº rollos">
+        </div>
+        <div class="form-group">
+            <label>Cantidad Planificada</label>
+            <input type="text" class="form-control" id="cantidadPlanificada" placeholder="Cantidad Planificada">
+        </div>
+        <div class="form-group">
+            <label>Peso Neto</label>
+            <input type="text" class="form-control" id="pesoNeto" placeholder="Peso Neto">
+        </div>
+        <div class="form-group">
+            <label>Peso Bruto</label>
+            <input type="text" class="form-control" id="pesoBruto" placeholder="Peso Bruto">
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="ordersModal" tabindex="-1" aria-labelledby="ordersModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ordersModalLabel">Lista de Órdenes de Producción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Número OP</th>
+                                <th>Máquina</th>
+                                <th>Código artículo</th>
+                                <th>Producto</th>
+                                <th>Nº rollos</th>
+                                <th>Cantidad Planificada</th>
+                                <th>Peso Neto</th>
+                                <th>Peso Bruto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2006</td>
+                                <td>COEX04</td>
+                                <td>PS-00032</td>
+                                <td>20" 80 5000 15.6KG CORE 1.F1</td>
+                                <td>4200</td>
+                                <td>3000</td>
+                                <td>2730</td>
+                                <td>2730</td>
+                            </tr>
+                            <tr>
+                                <td>2000</td>
+                                <td>COEX05</td>
+                                <td>PS-00032</td>
+                                <td>20" 80 5000 15.6KG CORE 1.F1</td>
+                                <td>4200</td>
+                                <td>3000</td>
+                                <td>2730</td>
+                                <td>2730</td>
+                            </tr>
+                            <tr>
+                                <td>1999</td>
+                                <td>COEX06</td>
+                                <td>PS-00032</td>
+                                <td>20" 80 5000 15.6KG CORE 1.F1</td>
+                                <td>4200</td>
+                                <td>3000</td>
+                                <td>2730</td>
+                                <td>2730</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<div class="container mt-4">
+    <ul class="nav nav-tabs" id="botonesTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="iniciar-tab" data-bs-toggle="tab" data-bs-target="#content-iniciar" type="button" role="tab">
+                <i class="fas fa-check-circle tab-icon text-success"></i>
+                Iniciar
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="merma-tab" data-bs-toggle="tab" data-bs-target="#content-merma" type="button" role="tab">
+                <i class="fas fa-trash-restore tab-icon text-secondary"></i>
+                Merma
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="botonesTabsContent">
+        <!-- Iniciar Tab -->
+        <div class="tab-pane fade show active" id="content-iniciar" role="tabpanel">
+            <input type="hidden" id="IdPallet" value="" />
+            <input type="text" id="DocEntry" value="@docEntry" hidden="hidden">
+
+            <div class="col-md-12">
+                <div class="row align-items-center">
+                    <!-- Botón para abrir pallet -->
+                    <div class="col d-flex justify-content-center">
+                        <button id="btnAbrirPallet" class="btn btn-primary btn-lg">Abrir Pallet</button>
+                    </div>
+
+                    <!-- Botón para generar reporte -->
+                    <div class="col d-flex justify-content-center">
+                        <button id="btnGenerarReporte" type="button" class="btn btn-success btn-lg d-flex align-items-center gap-2" onclick="cargarReportePallet('@docEntry')">
+                            <i class="bi bi-printer"></i> Empaque por Tarima
+                        </button>
+                    </div>
+
+                    <div class="col text-end">
+                        <label id="labelPallet" class="text-dark fw-bold" for="StringPallet">Sin Pallet Asignado</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Primera columna: Formularios -->
+                    <div class="col-md-4">
+                        <div class="container">
+                            <div class="row row-cols-2 row-gap-md-4">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <!-- Icono y método de impresión -->
+                                        <div class="col-md-7 d-flex align-items-center">
+                                            <i class="fa fa-print" style="font-size: 30px;"></i>
+                                            <label style="color: #000; margin-left: 10px;" for="floatingInput">Método Impresión De Etiqueta</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Selector de Supervisor -->
+                                <div class="col-md-12">
+                                    <div class="form-floating">
+                                        <div style="width: 100%; position: relative; z-index: 10">
+                                            <label for="dropdown-supervisores" style="margin-bottom: 8px; display: block;">
+                                                Selecciona un Supervisor:
+                                            </label>
+                                            <input list="supervisor" id="supervisorInput" class="form-control" placeholder="Selecciona o escribe un Supervisor">
+                                            <datalist id="supervisor"></datalist>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Campo de Piezas -->
+                                <div class="col">
+                                    <div class="form-floating">
+                                        <input type="number"
+                                               class="form-control"
+                                               id="piezas"
+                                               placeholder="Bascula"
+                                               style="color: #000; height: 120px; font-size: 4rem; text-align: center;"
+                                               value="0"
+                                               onchange="this.form.submit()" />
+                                        <label style="color: #000" for="piezas">Piezas</label>
+                                    </div>
+                                </div>
+
+                                <!-- Campo de Lectura de Báscula -->
+                                <div class="col">
+                                    <div class="form-floating">
+                                        <input type="number"
+                                               class="form-control"
+                                               id="lecturaBascula"
+                                               placeholder="Bascula"
+                                               style="color: #000; height: 120px; font-size: 4rem; text-align: center;"
+                                               value="0"
+                                               onchange="this.form.submit()" />
+                                        <label style="color: #000" for="lecturaBascula">Lectura De Bascula (KG.)</label>
+                                    </div>
+                                </div>
+
+                                <!-- Selector de Báscula -->
+                                <div class="col-md-12">
+                                    <div style="position: relative; z-index: 9">
+                                        <label for="dropdown-basculas" style="margin-bottom: 8px; display: block;">
+                                            Bascula Habilitada:
+                                        </label>
+                                        <select class="form-control" id="dropdown-basculas" style="width: 100%;">
+                                            <option value="" disabled selected>Buscar o seleccionar...</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Selector de Impresora -->
+                                <div class="col-md-12">
+                                    <div style="position: relative; z-index: 9">
+                                        <label for="dropdown-impresoras" style="margin-bottom: 8px; display: block;">
+                                            Impresion De Etiqueta:
+                                        </label>
+                                        <select class="form-control" id="dropdown-impresoras" style="width: 100%;">
+                                            <option value="" disabled selected>Buscar o seleccionar...</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <!-- Contenedor flexible para los botones -->
+                                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                                            <button type="button" id="cerrarPalletBtn" class="btn btn-warning px-4 py-2 flex-fill" onclick="cerrarPallet()">
+                                                Cerrar Pallet
+                                            </button>
+                                            <button type="button" id="finEditPalletBtn" class="btn btn-warning px-4 py-2 flex-fill" style="display:none;" onclick="terminarEdicionPallet()">
+                                                Terminar edición Pallet
+                                            </button>
+                                            <button type="button" id="guardarBtn" class="btn btn-primary px-4 py-2 flex-fill">
+                                                Guardar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Segunda columna: Tablas -->
+                    <div class="col-md-8">
+                        <div class="totales-container">
+                            <span class="total-label">Total Peso Neto:</span>
+                            <span class="total-value" id="totalPesoNeto">0.00</span>
+                            <span class="total-label">Total Peso Bruto:</span>
+                            <span class="total-value" id="totalPesoBruto">0.00</span>
+                        </div>
+
+                        <ul class="nav nav-tabs" id="palletsTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="allPallets-tab" data-bs-toggle="tab" data-bs-target="#allPallets" type="button" role="tab">Todos los pallets</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="groupPallets-tab" data-bs-toggle="tab" data-bs-target="#groupPallets" type="button" role="tab">Pallets agrupados</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="palletsTabContent">
+                            <div class="tab-pane fade show active" id="allPallets" role="tabpanel">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table class="ordenes-wps-table table table-striped table-bordered table-hover text-center mt-3">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th># De Pallet</th>
+                                                    <th># De Paquete</th>
+                                                    <th>Fecha y Hora de Ingreso</th>
+                                                    <th>Lote</th>
+                                                    <th>Peso Neto</th>
+                                                    <th>Peso Bruto</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="groupPallets" role="tabpanel">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table class="agrupaciones-wps-table table table-striped table-bordered table-hover text-center mt-3">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th># De Pallet</th>
+                                                    <th># De Paquete</th>
+                                                    <th>Lote</th>
+                                                    <th>Peso Neto</th>
+                                                    <th>Peso Bruto</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modals -->
+            <!-- Modal VerPallets -->
+            <div class="modal fade" id="verPalletsModal" tabindex="-1" aria-labelledby="verPalletsModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="verPalletsModalLabel">Ver Pallets</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3 row">
+                                <div class="col-12">
+                                    <div class="table-container">
+                                        <div class="table-responsive">
+                                            <table id="vwPalletsTable" class="table table-striped table-bordered table-hover">
+                                                <thead class="table-dark">
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th># De Pallet</th>
+                                                        <th># De Paquete</th>
+                                                        <th>Fecha y Hora de Ingreso</th>
+                                                        <th>Lote</th>
+                                                        <th>Peso Neto</th>
+                                                        <th>Peso Bruto</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal EditarPallets -->
+            <div class="modal modal-fullscreen fade" id="editPalletsModal" tabindex="-1" aria-labelledby="editPalletsModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editPalletsModalLabel">Editar Pallets</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="dropdown-tecnicos" style="margin-bottom: 8px; display: block;">
+                                    Selecciona un Técnico:
+                                </label>
+                                <input list="tecnico" id="tecnicoInput" class="form-control" placeholder="Selecciona o escribe un Técnico" required>
+                                <datalist id="tecnico"></datalist>
+                                <div class="invalid-feedback">Seleccione un técnico.</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="fechaInicial" class="form-label">Fecha inicial</label>
+                                    <input type="date" class="form-control" id="fechaInicial" required>
+                                    <div class="invalid-feedback">Ingrese la fecha inicial.</div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="horaInicial" class="form-label">Hora inicial</label>
+                                    <input type="time" class="form-control" id="horaInicial" required>
+                                    <div class="invalid-feedback">Ingrese la hora inicial.</div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="horaFinal" class="form-label">Hora final</label>
+                                    <input type="time" class="form-control" id="horaFinal" required>
+                                    <div class="invalid-feedback">Ingrese la hora final.</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="tiempoPlaneado" class="form-label">Tiempo planeado</label>
+                                    <input type="number" class="form-control" id="tiempoPlaneado" placeholder="Tiempo en minutos" required readonly>
+                                    <div class="invalid-feedback">Ingrese el tiempo planeado.</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="tiempoReal" class="form-label">Tiempo real</label>
+                                    <input type="number" class="form-control" id="tiempoReal" placeholder="Tiempo en minutos" required>
+                                    <div class="invalid-feedback">Ingrese el tiempo real.</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="comentarios" class="form-label">Comentarios</label>
+                                <textarea class="form-control" id="comentarios" rows="3" placeholder="Comentarios" required></textarea>
+                                <div class="invalid-feedback">Ingrese los comentarios.</div>
+                            </div>
+                            <div class="col-12">
+                                <div class="table-container">
+                                    <div class="table-responsive">
+                                        <table id="vwPalletsTable" class="table table-striped table-bordered table-hover">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th># De Pallet</th>
+                                                    <th># De Paquete</th>
+                                                    <th>Fecha y Hora de Ingreso</th>
+                                                    <th>Lote</th>
+                                                    <th>Peso Neto</th>
+                                                    <th>Peso Bruto</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="button" class="btn btn-primary" id="editarPalletsBtn">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Merma Tab -->
+        <div class="tab-pane fade" id="content-merma" role="tabpanel">
+            <div class="container">
+                <div class="row mb-3">
+                    <h3 class="text-center fw-bold">📊 Acumulado De Merma</h3>
+                </div>
+
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label for="supervisoresMermaInput" class="form-label">👨‍💼 Supervisor:</label>
+                        <input list="supervisoresMerma" id="supervisoresMermaInput" class="form-control" placeholder="Selecciona o escribe un Supervisor">
+                        <datalist id="supervisoresMerma"></datalist>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="dropdown-TypMerma" class="form-label">🗑️ Tipo de Merma:</label>
+                        <select class="form-control" id="dropdown-TypMerma">
+                            <option value="" disabled selected>Seleccionar...</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="pesoMerma" class="form-label">⚖️ Peso Merma (kg):</label>
+                        <input type="number" class="form-control" id="pesoMerma" placeholder="Ingrese peso">
+                    </div>
+
+                    <div class="col-md-3 d-grid">
+                        <button class="btn btn-primary fw-bold" onclick="sendMermaData('@docEntry')">
+                            💾 Guardar Merma
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-light rounded shadow-sm">
+                    <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                        <table class="table table-striped table-hover text-center align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Id</th>
+                                    <th>📌 Tipo De Merma</th>
+                                    <th>📊 Acumulado</th>
+                                    <th>🗑️ Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mermasTableBody">
+                                <!-- Se llenará con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6 text-end fw-bold">♻️ Acumulado De Desperdicio:</div>
+                    <div class="col-md-6 text-start">
+                        <p class="p-2 rounded text-white fw-bold text-center" style="background-color: #4CAF50;">
+                            <!-- Aquí se llenará el acumulado dinámicamente -->
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para mostrar el reporte -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reportModalLabel">Reporte</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se mostrará el PDF -->
+                <iframe id="pdfIframe" style="width: 100%; height: 500px;" frameborder="0"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btnImprimir">Imprimir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Sección: Funcionalidad del Botón Buscar
+    document.getElementById('btnBuscar').addEventListener('click', function() {
+        const searchData = {
+            numeroOP: document.getElementById('numeroOP').value,
+            fechaOrden: document.getElementById('fechaOrden').value,
+            codigoArticulo: document.getElementById('codigoArticulo').value,
+            producto: document.getElementById('producto').value,
+            numRollos: document.getElementById('numRollos').value,
+            cantidadPlanificada: document.getElementById('cantidadPlanificada').value,
+            pesoNeto: document.getElementById('pesoNeto').value,
+            pesoBruto: document.getElementById('pesoBruto').value
+        };
+
+
+        if (Object.values(searchData).some(value => value.trim() !== '')) {
+            console.log('Datos de búsqueda:', searchData);
+
+        } else {
+            alert('Por favor, ingresa al menos un criterio de búsqueda.');
+
+            const modal = new bootstrap.Modal(document.getElementById('ordersModal'));
+            modal.hide();
+        }
+    });
+
+    const rows = document.querySelectorAll('.modal-body tbody tr');
+    rows.forEach(row => {
+        row.addEventListener('click', function() {
+
+            rows.forEach(r => r.classList.remove('selected'));
+
+            this.classList.add('selected');
+
+            // Obtener los datos de la fila seleccionada
+            const cells = this.getElementsByTagName('td');
+            const orderDetails = {
+                numeroOP: cells[0].textContent,
+                maquina: cells[1].textContent,
+                codigoArticulo: cells[2].textContent,
+                producto: cells[3].textContent,
+                numRollos: cells[4].textContent,
+                cantidadPlanificada: cells[5].textContent,
+                pesoNeto: cells[6].textContent,
+                pesoBruto: cells[7].textContent
+            };
+
+
+            document.getElementById('numeroOP').value = orderDetails.numeroOP;
+            document.getElementById('fechaOrden').value = '';
+            document.getElementById('codigoArticulo').value = orderDetails.codigoArticulo;
+            document.getElementById('producto').value = orderDetails.producto;
+            document.getElementById('numRollos').value = orderDetails.numRollos;
+            document.getElementById('cantidadPlanificada').value = orderDetails.cantidadPlanificada;
+            document.getElementById('pesoNeto').value = orderDetails.pesoNeto;
+            document.getElementById('pesoBruto').value = orderDetails.pesoBruto;
+
+            // Cerrar el modal
+            const modalElement = document.getElementById('ordersModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+
+
+            document.body.classList.remove('modal-open');
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+        });
+    });
+
+
+    document.getElementById('ordersModal').addEventListener('hidden.bs.modal', function () {
+        document.body.classList.remove('modal-open');
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+    });
+
+
+    document.getElementById('btnIniciar').addEventListener('click', function() {
+        const requiredFields = [
+            document.getElementById('numeroOP'),
+            document.getElementById('codigoArticulo'),
+            document.getElementById('producto')
+        ];
+
+        const allFilled = requiredFields.every(field => field.value.trim() !== '');
+
+        if (allFilled) {
+            console.log('Iniciando proceso con:', {
+                numeroOP: requiredFields[0].value,
+                codigoArticulo: requiredFields[1].value,
+                producto: requiredFields[2].value
+            });
+            alert('Proceso iniciado correctamente.');
+        } else {
+            alert('Por favor, completa los campos obligatorios: Número OP, Código artículo y Producto.');
+        }
+    });
+
+    // Sección: Funcionalidad del Botón Merma
+    document.getElementById('btnMerma').addEventListener('click', function() {
+        const numeroOP = document.getElementById('numeroOP').value;
+
+        if (numeroOP.trim() !== '') {
+            if (confirm(`¿Estás seguro de marcar como merma el Número OP: ${numeroOP}?`)) {
+                console.log('Marcado como merma:', { numeroOP });
+                alert('Merma registrada correctamente.');
+            }
+        } else {
+            alert('Por favor, ingresa un Número OP para registrar la merma.');
+        }
+    });
+</script>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById("btnAbrirPallet").addEventListener("click", handleOpenModalConfirm);
+        document.getElementById('guardarBtn').addEventListener('click', guardarRegistroLectura);
+        cargarSupervisores();
+        cargarBasculas();
+        cargarImpresoras();
+        cargarPesoMerma();
+        fetchProdOrderWps('@docEntry');
+
+        const tabElements = document.querySelectorAll('button[data-bs-toggle="tab"]');
+        tabElements.forEach(tab => {
+            tab.addEventListener("shown.bs.tab", function (event) {
+                const targetTab = event.target.getAttribute("data-bs-target").replace("#", "");
+                if (targetTab === "content-iniciar") {
+                    fetchProdOrderWps('@docEntry');
+                } else if (targetTab === "content-merma") {
+                    fetchListadoMerma('@docEntry');
+                }
+            });
+        });
+    });
+
+
+    async function fetchIdPallet() {
+        try {
+            let docEntry = document.getElementById("DocEntry").value;
+            if (!docEntry || docEntry === "0") {
+                throw new Error("DocEntry no válido");
+            }
+            const response = await fetch(`/Pallets/IdPallet`);
+            const data = await response.json();
+
+            Swal.fire({
+                title: "Pallet asignado",
+                text: `Pallet: ${data.entryObject}`,
+                icon: "success"
+            });
+
+            console.log("Pallet asignado:", data.entryObject);
+            document.getElementById("IdPallet").value = data.entryObject;
+            localStorage.setItem('IdPallet', data.entryObject);
+            document.getElementById("labelPallet").innerText = "Pallet Asignado: " + data.entryObject;
+        } catch (error) {
+            Swal.fire({
+                title: "Error",
+                text: "No se pudo obtener el pallet",
+                icon: "error"
+            });
+            console.error("Error al obtener pallet:", error);
+        }
+    }
+
+    function handleOpenModalConfirm(event) {
+        event.preventDefault();
+        let idPallet = document.getElementById("IdPallet").value;
+
+        if (idPallet === "") {
+            Swal.fire({
+                title: "¿Iniciar nuevo pallet?",
+                text: "No hay un pallet en proceso. ¿Desea iniciar uno nuevo?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Sí, iniciar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetchIdPallet();
+                }
+            });
+        } else {
+            Swal.fire({
+                title: "¿Cambio de pallet?",
+                text: "Actualmente hay un pallet en proceso. ¿Desea cambiar a uno nuevo?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, cambiar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetchIdPallet();
+                }
+            });
+        }
+    }
+
+    // Carga Inicial Formulario Inicio
+    async function cargarSupervisores() {
+        const apiUrl = '/MasterData/Get_Employes_Supervisor?Type=S';
+        console.log("Intentando cargar supervisores desde:", apiUrl);
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error(`Error en la respuesta del servidor: ${response.status} ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            console.log("Respuesta de la API para supervisores:", result);
+
+            if (!Array.isArray(result) || result.length === 0) {
+                console.error("La respuesta no es un arreglo válido o está vacía:", result);
+                Swal.fire({
+                    title: "Advertencia",
+                    text: "No se encontraron supervisores. Por favor, ingrese el código manualmente.",
+                    icon: "warning"
+                });
+                return;
+            }
+
+            const datalist = document.getElementById('supervisor');
+            const datalistMerma = document.getElementById('supervisoresMerma');
+            datalist.innerHTML = '';
+            datalistMerma.innerHTML = '';
+
+            result.forEach(supervisor => {
+                const option = document.createElement('option');
+                option.value = `${supervisor.Code} - ${supervisor.Name}`;
+                datalist.appendChild(option);
+
+                const optionMerma = document.createElement('option');
+                optionMerma.value = `${supervisor.Code} - ${supervisor.Name}`;
+                datalistMerma.appendChild(optionMerma);
+            });
+
+            console.log("Opciones de datalist para 'supervisor':", datalist.innerHTML);
+            console.log("Opciones de datalist para 'supervisoresMerma':", datalistMerma.innerHTML);
+        } catch (error) {
+            console.error(`Error al cargar supervisores desde ${apiUrl}:`, error.message);
+            Swal.fire({
+                title: "Error",
+                text: `No se pudieron cargar los supervisores: ${error.message}. Por favor, ingrese el código manualmente.`,
+                icon: "error"
+            });
+        }
+    }
+
+    async function cargarBasculas() {
+        const apiUrl = '/Basculas/PesosPorBascula?idBascula=';
+        console.log("Intentando cargar básculas desde:", apiUrl);
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error(`Error en la respuesta del servidor: ${response.status} ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            if (!Array.isArray(result)) {
+                console.error("La respuesta no es un arreglo de básculas:", result);
+                return;
+            }
+
+            const dropdown = document.getElementById('dropdown-basculas');
+            dropdown.innerHTML = '<option value="" disabled selected>Buscar o seleccionar...</option>';
+
+            result.forEach(bascula => {
+                const option = document.createElement('option');
+                option.value = bascula.IdBascula;
+                option.textContent = `${bascula.IdBascula} - ${bascula.Name}`;
+                dropdown.appendChild(option);
+            });
+        } catch (error) {
+            console.error(`Error al cargar básculas desde ${apiUrl}:`, error.message);
+            Swal.fire({
+                title: "Error",
+                text: `No se pudieron cargar las básculas: ${error.message}.`,
+                icon: "error"
+            });
+        }
+    }
+
+    async function cargarImpresoras() {
+        const apiUrl = '/Basculas/Impresoras?idImpresora=';
+        console.log("Intentando cargar impresoras desde:", apiUrl);
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error(`Error en la respuesta del servidor: ${response.status} ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            if (!Array.isArray(result)) {
+                console.error("La respuesta no es un arreglo de impresoras:", result);
+                return;
+            }
+
+            const dropdown = document.getElementById('dropdown-impresoras');
+            dropdown.innerHTML = '<option value="" disabled selected>Buscar o seleccionar...</option>';
+
+            result.forEach(impresora => {
+                const option = document.createElement('option');
+                option.value = impresora.PrintCode;
+                option.textContent = `${impresora.PrintCode} - ${impresora.PrintName}`;
+                dropdown.appendChild(option);
+            });
+        } catch (error) {
+            console.error(`Error al cargar impresoras desde ${apiUrl}:`, error.message);
+            Swal.fire({
+                title: "Error",
+                text: `No se pudieron cargar las impresoras: ${error.message}.`,
+                icon: "error"
+            });
+        }
+    }
+
+    async function cargarPesoMerma() {
+        const apiUrl = '/Decrease/Type_Decrease';
+        console.log("Intentando cargar tipos de merma desde:", apiUrl);
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error(`Error en la respuesta del servidor: ${response.status} ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            console.log("Respuesta de la API para Tipo de Merma:", result);
+
+            if (!Array.isArray(result) || result.length === 0) {
+                console.error("La respuesta no es un arreglo válido o está vacía:", result);
+                Swal.fire({
+                    title: "Advertencia",
+                    text: "No se encontraron tipos de merma. Por favor, ingrese el código manualmente.",
+                    icon: "warning"
+                });
+                return;
+            }
+
+            const dropdown = document.getElementById('dropdown-TypMerma');
+            dropdown.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+
+            result.forEach(pesoMerma => {
+                const option = document.createElement('option');
+                option.value = pesoMerma.Code;
+                option.textContent = `${pesoMerma.Code} - ${pesoMerma.Name}`;
+                dropdown.appendChild(option);
+            });
+
+            console.log("Opciones de dropdown para 'dropdown-TypMerma':", dropdown.innerHTML);
+        } catch (error) {
+            console.error(`Error al cargar tipos de merma desde ${apiUrl}:`, error.message);
+            Swal.fire({
+                title: "Error",
+                text: `No se pudieron cargar los tipos de merma: ${error.message}. Por favor, ingrese el código manualmente.`,
+                icon: "error"
+            });
+        }
+    }
+
+    // Validacion Formulario Inicio
+    const validarCamposRequeridos = (campos) => {
+        let valid = true;
+
+        campos.forEach(campo => {
+            const inputElement = document.getElementById(campo.id);
+            if (!inputElement.value) {
+                inputElement.classList.add('input-error');
+                valid = false;
+            } else {
+                inputElement.classList.remove('input-error');
+            }
+        });
+
+        return valid;
+    };
+
+    const obtenerDatosFormulario = () => {
+        console.log("Inicio");
+        const supervisorInput = document.getElementById('supervisorInput').value;
+        console.log("Supervisor ingresado:", supervisorInput);
+        const piezasInput = document.getElementById('piezas').value;
+        console.log(piezasInput);
+        const lecturaBasculaInput = document.getElementById('lecturaBascula').value;
+        console.log(lecturaBasculaInput);
+        const basculaSeleccionadaInput = document.getElementById('dropdown-basculas').value;
+        const impresoraSeleccionadaInput = document.getElementById('dropdown-impresoras').value;
+
+        let supervisorId;
+        if (supervisorInput.includes(" - ")) {
+            supervisorId = supervisorInput.split(" - ")[0];
+        } else {
+            supervisorId = supervisorInput; // Fallback: usar el valor ingresado directamente
+        }
+        console.log("Supervisor ID extraído:", supervisorId);
+
+        const fechaActual = new Date();
+        const fecha = fechaActual.toLocaleDateString('en-CA');
+        const hora = fechaActual.toLocaleTimeString('es-ES');
+        const docEntry = document.getElementById('DocEntry').value;
+        const idPallet = document.getElementById('IdPallet').value;
+
+        return {
+            employe: supervisorId,
+            piezas: parseFloat(piezasInput),
+            netWeight: parseFloat(lecturaBasculaInput),
+            grossWeight: parseFloat(lecturaBasculaInput),
+            idScales: basculaSeleccionadaInput,
+            print: impresoraSeleccionadaInput,
+            fechaIncome: fecha,
+            timeIncome: hora,
+            entryOf: docEntry,
+            IdPallet: idPallet
+        };
+    };
+
+    const mostrarMensaje = (mensaje, tipo) => {
+        Swal.fire({
+            title: tipo === 'error' ? '¡Error!' : tipo === 'warning' ? '¡Advertencia!' : 'Éxito',
+            text: mensaje,
+            icon: tipo,
+            confirmButtonText: 'Aceptar'
+        });
+    };
+
+    const enviarDatosAPI = async (data) => {
+        const apiUrl = '/Pallets/PalletsLines';
+        console.log("Enviando datos a:", apiUrl, data);
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                const responseData = await response.json();
+                fetchProdOrderWps(document.getElementById('DocEntry').value);
+                mostrarMensaje('Registro guardado con éxito', 'success');
+            } else {
+                throw new Error(`Error en la respuesta del servidor: ${response.status} ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error(`Error al enviar datos a ${apiUrl}:`, error.message);
+            mostrarMensaje(`Error al conectar con la API: ${error.message}`, 'error');
+        }
+    };
+
+    const guardarRegistroLectura = async () => {
+        const camposRequeridos = [
+            { id: 'supervisorInput' },
+            { id: 'piezas' },
+            { id: 'lecturaBascula' },
+            { id: 'dropdown-basculas' },
+            { id: 'dropdown-impresoras' },
+            { id: 'IdPallet' }
+        ];
+
+        if (!validarCamposRequeridos(camposRequeridos)) {
+            mostrarMensaje('Por favor, complete todos los campos requeridos', 'warning');
+            return;
+        }
+
+        const data = obtenerDatosFormulario();
+        console.log("Datos enviados a la API:", data);
+        await enviarDatosAPI(data);
+    };
+
+    function cerrarPallet() {
+        const idPallet = document.getElementById("IdPallet").value;
+
+        if (!idPallet) {
+            Swal.fire("Error", "El ID del pallet no está disponible.", "error");
+            return;
+        }
+
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "¿Quieres cerrar este pallet? Esta acción no se puede deshacer.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Sí, cerrar",
+            cancelButtonText: "Cancelar"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Cerrando pallet...",
+                    text: "Por favor espera mientras procesamos la solicitud.",
+                    icon: "info",
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    allowOutsideClick: false
+                });
+                Swal.showLoading();
+
+                const apiUrl = `/Pallets/Close_Pallets?IdPallet=${idPallet}`;
+                console.log("Cerrando pallet en:", apiUrl);
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    });
+
+                    if (response.ok) {
+                        Swal.fire("Cerrado", "El pallet ha sido cerrado con éxito.", "success")
+                            .then(() => {
+                                location.reload();
+                            });
+                    } else {
+                        throw new Error(`Error en la respuesta del servidor: ${response.status} ${response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error(`Error al cerrar pallet en ${apiUrl}:`, error.message);
+                    Swal.fire("Error", `No se pudo cerrar el pallet: ${error.message}`, "error");
+                }
+            } else {
+                Swal.fire("Cancelado", "La acción ha sido cancelada.", "info");
+            }
+        });
+    }
+
+    function terminarEdicionPallet() {
+        const idPallet = document.getElementById("IdPallet").value;
+
+        if (!idPallet) {
+            document.getElementById("IdPallet").value = "";
+            document.getElementById("cerrarPalletBtn").style.display = "block";
+            document.getElementById("finEditPalletBtn").style.display = "none";
+            Swal.fire("Error", "El ID del pallet no está disponible.", "error");
+            document.getElementById("labelPallet").innerText = "Sin Pallet Asignado";
+            return;
+        }
+
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "¿Quieres terminar de editar este pallet?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Sí, cerrar",
+            cancelButtonText: "Cancelar"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Cerrando pallet...",
+                    text: "Por favor espera mientras procesamos la solicitud.",
+                    icon: "info",
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    allowOutsideClick: false
+                });
+                Swal.showLoading();
+
+                try {
+                    document.getElementById("IdPallet").value = "";
+                    document.getElementById("cerrarPalletBtn").style.display = "block";
+                    document.getElementById("finEditPalletBtn").style.display = "none";
+                    document.getElementById("labelPallet").innerText = "Sin Pallet Asignado";
+                    localStorage.setItem('IdPallet', '');
+
+                    Swal.fire("Cerrado", "El pallet ha sido cerrado con éxito.", "success")
+                        .then(() => {
+                            location.reload();
+                        });
+                } catch (error) {
+                    console.error("Error al cerrar edición de pallet:", error.message);
+                    Swal.fire("Error", `Ocurrió un problema: ${error.message}`, "error");
+                }
+            } else {
+                Swal.fire("Cancelado", "La acción ha sido cancelada.", "info");
+            }
+        });
+    }
+
+    // Tabla Formulario Inicio
+    const fetchProdOrderWps = async (docEntry) => {
+        const apiUrl = `/Production/WPS_Pallets?DocEntry=${docEntry}`;
+        console.log("Obteniendo pallets desde:", apiUrl);
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Pallets obtenidos:', data);
+            setProdOrdersWps(data.DataSource);
+            setAgroupProdOrdersWps(data.DataSourceGroup);
+        } catch (error) {
+            console.error(`Error al obtener pallets desde ${apiUrl}:`, error.message);
+            setProdOrdersWps([]);
+            setAgroupProdOrdersWps([]);
+            const errorMessage = error.message || "Error al obtener WPS";
+            mostrarMensaje(errorMessage, "error");
+        }
+    };
+
+    const setProdOrdersWps = (data) => {
+        const tbody = document.querySelector(".ordenes-wps-table tbody");
+        const totalPesoNeto = document.getElementById("totalPesoNeto");
+        const totalPesoBruto = document.getElementById("totalPesoBruto");
+
+        tbody.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='8' class='text-center'>No hay registros disponibles</td></tr>";
+            totalPesoNeto.textContent = "0.00";
+            totalPesoBruto.textContent = "0.00";
+            return;
+        }
+
+        let totalNeto = 0;
+        let totalBruto = 0;
+
+        data.forEach((item, index) => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${item.Code}</td>
+                <td>${item.IdPaquete}</td>
+                <td>${formatDate(item.PallDate)} Hrs ${formatTime(item.PalletTime)}</td>
+                <td>${item.SerialAndBatch}</td>
+                <td>${item.WeightNet.toFixed(2)}</td>
+                <td>${item.WeightBrut.toFixed(2)}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="eliminarRegistro(${item.DocEntry}, ${item.U_EntryOf}, ${item.LineId})">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            row.setAttribute("data-docentry", item.DocEntry);
+            row.setAttribute("data-uentry", item.U_EntryOf);
+            row.setAttribute("data-lid", item.LineId);
+            row.addEventListener("click", function (e) {
+                console.log(this.attributes);
+                var modalEditPallets = document.getElementById('editPalletsModal');
+                if (modalEditPallets) {
+                    let editModalPallets = new bootstrap.Modal(modalEditPallets, { keyboard: true });
+                    editModalPallets.show();
+                }
+            });
+
+            tbody.appendChild(row);
+
+            totalNeto += item.WeightNet;
+            totalBruto += item.WeightBrut;
+        });
+
+        totalPesoNeto.textContent = totalNeto.toFixed(2);
+        totalPesoBruto.textContent = totalBruto.toFixed(2);
+    };
+
+    const setAgroupProdOrdersWps = (data) => {
+        const tbody = document.querySelector(".agrupaciones-wps-table tbody");
+
+        tbody.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='7' class='text-center'>No hay registros disponibles</td></tr>";
+            return;
+        }
+
+        data.forEach((item, index) => {
+            const row = document.createElement("tr");
+            row.style.cursor = 'pointer';
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${item.Code}</td>
+                <td>${item.IdPaquete}</td>
+                <td>${item.SerialAndBatch}</td>
+                <td>${item.WeightNet.toFixed(2)}</td>
+                <td>${item.WeightBrut.toFixed(2)}</td>
+                <td>
+                    <button class="btn btn-success btn-sm" onclick="editarRegistro('${item.Code}')">
+                        <i class="fa fa-pencil"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    };
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    };
+
+    const formatTime = (timeString) => {
+        if (!timeString) return "-";
+        return timeString.substring(0, 2) + ":" + timeString.substring(2, 4);
+    };
+
+    const eliminarRegistro = (docEntry, Code, lineId) => {
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción no se puede deshacer.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Sí, eliminar"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const apiUrl = `/Production/WPS_DeleteLine_Pallet?EntryOf=${Code}&DocEntry=${docEntry}&IdLine=${lineId}`;
+                console.log("Eliminando registro en:", apiUrl);
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" }
+                    });
+
+                    if (response.ok) {
+                        fetchProdOrderWps(document.getElementById('DocEntry').value);
+                        Swal.fire("Eliminado", "El registro ha sido eliminado.", "success");
+                    } else {
+                        throw new Error(`Error en la respuesta del servidor: ${response.status} ${response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error(`Error al eliminar registro en ${apiUrl}:`, error.message);
+                    Swal.fire("Error", `No se pudo eliminar el registro: ${error.message}`, "error");
+                }
+            }
+        });
+    };
+
+    const editarRegistro = (Code) => {
+        Swal.fire({
+            title: "¿Estás seguro de editar el pallet " + Code + "?",
+            text: "Esta acción editará el pallet.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Sí, editar"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    document.getElementById("IdPallet").value = Code;
+                    document.getElementById("cerrarPalletBtn").style.display = "none";
+                    document.getElementById("finEditPalletBtn").style.display = "block";
+                    localStorage.setItem('IdPallet', Code);
+                    document.getElementById("labelPallet").innerText = "Pallet Asignado: " + Code;
+                    Swal.fire("Abriendo Pallet", "El pallet se puede editar", "success");
+                } catch (error) {
+                    console.error("Error al editar registro:", error.message);
+                    Swal.fire("Error", `Ocurrió un problema al editar el pallet: ${error.message}`, "error");
+                }
+            }
+        });
+    };
+
+    // Reporte Functionality
+    async function cargarReportePallet(docEntry) {
+        if (!docEntry || docEntry === "0") {
+            Swal.fire({
+                title: "Error",
+                text: "No se proporcionó un DocEntry válido.",
+                icon: "error",
+                confirmButtonText: "Aceptar"
+            });
+            return;
+        }
+
+        const btnGenerarReporte = document.getElementById("btnGenerarReporte");
+        const originalHTML = btnGenerarReporte.innerHTML;
+
+        const apiUrl = `/Production/WPS_PrintPallet?DocEntry=${docEntry}`;
+        console.log("Generando reporte en:", apiUrl);
+        try {
+            btnGenerarReporte.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando...`;
+            btnGenerarReporte.disabled = true;
+
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error en la solicitud al servidor: ${response.status} ${response.statusText}`);
+            }
+
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/pdf")) {
+                const blob = await response.blob();
+                const pdfUrl = URL.createObjectURL(blob);
+                const pdfIframe = document.getElementById("pdfIframe");
+                pdfIframe.src = pdfUrl;
+
+                const reportModal = new bootstrap.Modal(document.getElementById('reportModal'), { keyboard: true });
+                reportModal.show();
+
+                document.getElementById('btnImprimir').onclick = function () {
+                    pdfIframe.contentWindow.print();
+                };
+            } else {
+                const data = await response.json();
+                Swal.fire({
+                    title: "Error",
+                    text: "Error al generar el reporte: " + (data?.Message || "Respuesta inválida del servidor."),
+                    icon: "error",
+                    confirmButtonText: "Aceptar"
+                });
+            }
+        } catch (error) {
+            console.error(`Error al generar reporte en ${apiUrl}:`, error.message);
+            Swal.fire({
+                title: "Error",
+                text: `Error de conexión con el servidor: ${error.message}`,
+                icon: "error",
+                confirmButtonText: "Aceptar"
+            });
+        } finally {
+            btnGenerarReporte.innerHTML = originalHTML;
+            btnGenerarReporte.disabled = false;
+        }
+    }
+
+    // Merma Functionality
+    async function fetchListadoMerma(docEntry) {
+        const tbody = document.getElementById("mermasTableBody");
+        const acumuladoElement = document.querySelector(".p-2.rounded.text-white");
+
+        const apiUrl = `/Decrease/Decrease?DocEntry=${docEntry}`;
+        console.log("Obteniendo listado de merma desde:", apiUrl);
+        try {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-primary">🔄 Cargando...</td></tr>`;
+            acumuladoElement.textContent = "Cargando...";
+
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error(`Error al cargar listado de merma: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            if (!Array.isArray(data) || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-warning">⚠️ No hay registros de merma.</td></tr>`;
+                acumuladoElement.textContent = "0 kg";
+                return;
+            }
+
+            tbody.innerHTML = "";
+            let acumuladoTotal = 0;
+
+            data.forEach(merma => {
+                acumuladoTotal += merma.Weight;
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${merma.LineId}</td>
+                    <td>${merma.Name}</td>
+                    <td>${merma.Weight} kg</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="eliminarMerma(${merma.DocEntry}, ${merma.LineId})">
+                            🗑️ Eliminar
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            acumuladoElement.textContent = `${acumuladoTotal.toFixed(2)} kg`;
+        } catch (error) {
+            console.error(`Error al cargar listado de merma desde ${apiUrl}:`, error.message);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: `No se pudo cargar el listado de merma: ${error.message}. Intenta nuevamente.`,
+                confirmButtonColor: "#d33"
+            });
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">❌ Error al obtener datos</td></tr>`;
+            acumuladoElement.textContent = "0 kg";
+        }
+    }
+
+    async function eliminarMerma(docEntry, idLine) {
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "¡Esta acción no se puede revertir!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Eliminando...",
+                    text: "Por favor, espera...",
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                const apiUrl = `/Decrease/DelDecrease?DocEntry=${docEntry}&IdLine=${idLine}`;
+                console.log("Eliminando merma en:", apiUrl);
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" }
+                    });
+
+                    if (response.ok) {
+                        await fetchListadoMerma(docEntry);
+                        Swal.fire({
+                            icon: "success",
+                            title: "Eliminado",
+                            text: "La merma ha sido eliminada exitosamente.",
+                            confirmButtonColor: "#3085d6"
+                        });
+                    } else {
+                        throw new Error(`Error en la respuesta del servidor: ${response.status} ${response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error(`Error al eliminar merma en ${apiUrl}:`, error.message);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: `No se pudo eliminar la merma: ${error.message}. Inténtalo de nuevo.`,
+                        confirmButtonColor: "#d33"
+                    });
+                }
+            }
+        });
+    }
+
+    async function sendMermaData(docEntry) {
+        if (!docEntry || docEntry === "0") {
+            Swal.fire({
+                title: "Error",
+                text: "No se proporcionó un DocEntry válido.",
+                icon: "error",
+                confirmButtonText: "Aceptar"
+            });
+            return;
+        }
+
+        const supervisorInput = document.getElementById("supervisoresMermaInput");
+        const tipoMerma = document.getElementById("dropdown-TypMerma");
+        const pesoMerma = document.getElementById("pesoMerma");
+        const supervisorDatalist = document.getElementById("supervisoresMerma");
+
+        supervisorInput.style.border = "";
+        tipoMerma.style.border = "";
+        pesoMerma.style.border = "";
+
+        let errores = [];
+
+        const supervisorValue = supervisorInput.value.trim();
+        let supervisorSeleccionado = Array.from(supervisorDatalist.options).some(
+            (option) => option.value === supervisorValue
+        );
+
+        if (!supervisorSeleccionado && supervisorValue) {
+            console.log("Supervisor ingresado manualmente:", supervisorValue);
+            supervisorSeleccionado = true;
+        } else if (!supervisorValue) {
+            errores.push("Por favor, ingrese o seleccione un supervisor.");
+            supervisorInput.style.border = "2px solid red";
+        }
+
+        const tipoMermaValue = tipoMerma.value.trim();
+        const tipoMermaOptions = Array.from(tipoMerma.options).map(opt => opt.value);
+        const tipoMermaValido = tipoMermaOptions.includes(tipoMermaValue) && tipoMermaValue !== "";
+
+        if (!tipoMermaValido && tipoMermaValue) {
+            console.log("Tipo de merma ingresado manualmente:", tipoMermaValue);
+            // Permitir ingreso manual
+        } else if (!tipoMermaValue) {
+            errores.push("Por favor, selecciona un tipo de merma.");
+            tipoMerma.style.border = "2px solid red";
+        }
+
+        const peso = parseFloat(pesoMerma.value.trim());
+        if (isNaN(peso) || peso <= 0) {
+            errores.push("Por favor, ingresa un peso de merma válido.");
+            pesoMerma.style.border = "2px solid red";
+        }
+
+        if (errores.length > 0) {
+            Swal.fire({
+                icon: "error",
+                title: "Error de validación",
+                html: errores.join("<br>"),
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Se enviará la información de la merma.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, guardar",
+            cancelButtonText: "Cancelar",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Guardando...",
+                    text: "Por favor, espera mientras se guarda la información.",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                let supervisorId;
+                if (supervisorValue.includes(" - ")) {
+                    supervisorId = supervisorValue.split(" - ")[0];
+                } else {
+                    supervisorId = supervisorValue;
+                }
+
+                const data = {
+                    Employe: parseInt(supervisorId, 10),
+                    DreaseType: tipoMermaValue,
+                    EntryOf: docEntry,
+                    Weight: peso
+                };
+
+                console.log("Datos enviados para merma:", data);
+                postMermaData(data, docEntry);
+            }
+        });
+    }
+
+    async function postMermaData(data, docEntry) {
+        const apiUrl = "/Decrease/Decrease";
+        console.log("Enviando datos de merma a:", apiUrl, data);
+        try {
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error al guardar la merma: ${response.status} ${response.statusText}`);
+            }
+
+            Swal.fire({
+                icon: "success",
+                title: "Guardado exitoso",
+                text: "La merma ha sido registrada correctamente.",
+            });
+
+            document.getElementById("supervisoresMermaInput").value = "";
+            document.getElementById("dropdown-TypMerma").value = "";
+            document.getElementById("pesoMerma").value = "";
+
+            fetchListadoMerma(docEntry);
+        } catch (error) {
+            console.error(`Error al guardar merma en ${apiUrl}:`, error.message);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: `Hubo un problema al guardar la merma: ${error.message}`,
+            });
+        }
+    }
+</script>

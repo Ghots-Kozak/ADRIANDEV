@@ -2,14 +2,19 @@
 
 namespace ControlFloor.Controllers
 {
-	public class AlmacenController : Controller
-	{
-		// Acción para la vista principal de Almacén
-		public IActionResult Almacen()
-		{
-			return View(); // Esto renderizará la vista "Almacen.cshtml"
-		}
-        
+    public class AlmacenController : Controller
+    {
+        // Acción para la vista principal de Almacén
+        public IActionResult Almacen()
+        {
+            return View(); // Esto renderizará la vista "Almacen.cshtml"
+        }
+
+        public IActionResult RProduccion()
+        {
+            return View(); // Esto renderizará la vista "RProduccion.cshtml"
+        }
+
 
         public IActionResult Index(int solicitudId, string fecha, string documento, string solicitante, string almacenOrigen, string almacenDestino, string departamento, string estado)
         {
